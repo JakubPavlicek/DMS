@@ -8,5 +8,5 @@ public interface DocumentFileService {
 
     DocumentFile getDocumentFile(String id);
 
-    String updateDocumentFilePath(String id, String path);
+    String updateDocumentFile(String id, DocumentFile file);
 }

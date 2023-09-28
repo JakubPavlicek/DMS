@@ -48,13 +48,13 @@ public class DocumentFileServiceImpl implements DocumentFileService {
     }
 
     @Override
-    public String updateDocumentFilePath(String id, String path) {
-        Optional<DocumentFile> documentFile = documentFileRepository.findById(id);
+    public String updateDocumentFile(String id, DocumentFile file) {
+        Optional<DocumentFile> documentFileById = documentFileRepository.findById(id);
 
-        DocumentFile file = documentFile.get();
+        DocumentFile documentFile = documentFileById.get();
 
-        file.setFilePath(path);
-        documentFileRepository.save(file);
+        documentFile.setFilePath(file.getFilePath());
+        documentFileRepository.save(documentFile);
 
 //        documentFileRepository.updateDocumentFileLocationById(id, location);
         return "Document file updated successfully";

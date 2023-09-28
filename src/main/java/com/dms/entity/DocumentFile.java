@@ -31,6 +31,7 @@ public class DocumentFile {
 
     @Audited
     private String fileName;
+
     @Audited
     private String fileType;
 

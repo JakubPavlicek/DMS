@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface DocumentFileRepository extends JpaRepository<DocumentFile, String>, RevisionRepository<DocumentFile, String, Long> {
     @Modifying
     @Transactional
-    @Query("UPDATE DocumentFile file SET file.filePath = :location WHERE file.id = :id")
+    @Query("UPDATE DocumentFile file SET file.filePath = :location WHERE file.fileId = :id")
     void updateDocumentFileLocationById(String id, String location);
 }

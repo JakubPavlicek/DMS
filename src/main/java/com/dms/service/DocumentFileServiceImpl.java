@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class DocumentFileServiceImpl implements DocumentFileService {
@@ -44,5 +45,18 @@ public class DocumentFileServiceImpl implements DocumentFileService {
     @Override
     public DocumentFile getDocumentFile(String id) {
         return documentFileRepository.findById(id).orElseThrow(() -> new RuntimeException("Soubor s id: " + id + " nebyl nalezen."));
+    }
+
+    @Override
+    public String updateDocumentFilePath(String id, String path) {
+        Optional<DocumentFile> documentFile = documentFileRepository.findById(id);
+
+        DocumentFile file = documentFile.get();
+
+        file.setFilePath(path);
+        documentFileRepository.save(file);
+
+//        documentFileRepository.updateDocumentFileLocationById(id, location);
+        return "Document file updated successfully";
     }
 }

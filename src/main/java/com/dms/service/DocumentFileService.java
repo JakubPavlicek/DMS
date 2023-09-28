@@ -7,4 +7,6 @@ public interface DocumentFileService {
     DocumentFile saveFile(MultipartFile file);
 
     DocumentFile getDocumentFile(String id);
+
+    String updateDocumentFilePath(String id, String path);
 }

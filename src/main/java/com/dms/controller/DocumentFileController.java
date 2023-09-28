@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,8 +30,12 @@ public class DocumentFileController {
     }
 
     @GetMapping("/download/{id}")
-    public DocumentFile downloadDocumentFile(@PathVariable("id") String id)
-    {
+    public DocumentFile downloadDocumentFile(@PathVariable("id") String id) {
         return documentFileService.getDocumentFile(id);
+    }
+
+    @PutMapping("/update/{id}")
+    public String updateDocumentFilePath(@PathVariable("id") String id, @RequestParam("path") String path) {
+        return documentFileService.updateDocumentFilePath(id, path);
     }
 }

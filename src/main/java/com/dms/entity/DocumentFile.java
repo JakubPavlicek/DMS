@@ -27,27 +27,24 @@ import java.time.LocalDateTime;
 public class DocumentFile {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private String fileId;
 
+    @Audited
     private String fileName;
+    @Audited
     private String fileType;
 
     @Audited
-    private String location;
+    private String filePath;
 
-    @Audited
-    private Integer revision;
-
-    @Audited
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Audited
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @Audited
     @Lob
     @Column(length = Integer.MAX_VALUE)
+    @Audited
     private byte[] data;
 }

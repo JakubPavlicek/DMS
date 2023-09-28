@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,10 +14,12 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Audited
 @Setter
 @Getter
 @NoArgsConstructor
@@ -29,23 +30,21 @@ public class DocumentFile {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String fileId;
 
-    @Audited
     private String fileName;
-
-    @Audited
     private String fileType;
-
-    @Audited
     private String filePath;
 
+    @NotAudited
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @NotAudited
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    private String author;
+
     @Lob
     @Column(length = Integer.MAX_VALUE)
-    @Audited
     private byte[] data;
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/document-files")
+@RequestMapping("/files")
 public class DocumentFileController {
 
     private final DocumentFileService documentFileService;
@@ -35,7 +35,7 @@ public class DocumentFileController {
     }
 
     @PutMapping("/update/{id}")
-    public String updateDocumentFilePath(@PathVariable("id") String id, @RequestParam("path") String path) {
-        return documentFileService.updateDocumentFilePath(id, path);
+    public String updateDocumentFile(@PathVariable("id") String id, @RequestBody DocumentFile file) {
+        return documentFileService.updateDocumentFile(id, file);
     }
 }

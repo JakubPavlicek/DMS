@@ -9,13 +9,13 @@ import java.util.List;
 public interface DocumentFileService {
     DocumentFile saveDocumentFile(DocumentFileRequest fileRequest);
 
-    DocumentFile getDocumentFile(String id);
+    DocumentFile getDocumentFile(String fileId);
 
-    String updateDocumentFile(String id, DocumentFile file);
+    String updateDocumentFile(String fileId, DocumentFile file);
 
-    DocumentFileRevision switchToRevision(String fileId, Long revision);
+    DocumentFileRevision switchToRevision(String fileId, Long revisionId);
 
-    List<DocumentFileRevision> getRevisions(String id);
+    List<DocumentFileRevision> getRevisions(String fileId);
 
-    String deleteRevision(String id, Long revision);
+    String deleteRevision(String fileId, Long revisionId);
 }

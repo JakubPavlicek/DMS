@@ -34,31 +34,31 @@ public class DocumentFileController {
     }
 
     @GetMapping("/download/{id}")
-    public DocumentFile getDocumentFile(@PathVariable("id") String id) {
-        return documentFileService.getDocumentFile(id);
+    public DocumentFile getDocumentFile(@PathVariable("id") String fileId) {
+        return documentFileService.getDocumentFile(fileId);
     }
 
     @PutMapping("/update/{id}")
-    public String updateDocumentFile(@PathVariable("id") String id, @RequestBody DocumentFile file) {
-        return documentFileService.updateDocumentFile(id, file);
+    public String updateDocumentFile(@PathVariable("id") String fileId, @RequestBody DocumentFile file) {
+        return documentFileService.updateDocumentFile(fileId, file);
     }
 
     @PutMapping("/{id}/revisions/{revision}")
-    public DocumentFileRevision switchToRevision(@PathVariable("id") String id, @PathVariable("revision") Long revision)
+    public DocumentFileRevision switchToRevision(@PathVariable("id") String fileId, @PathVariable("revision") Long revisionId)
     {
-        return documentFileService.switchToRevision(id, revision);
+        return documentFileService.switchToRevision(fileId, revisionId);
     }
 
     @GetMapping("/{id}/revisions")
-    public List<DocumentFileRevision> getRevisions(@PathVariable("id") String id)
+    public List<DocumentFileRevision> getRevisions(@PathVariable("id") String fileId)
     {
-        return documentFileService.getRevisions(id);
+        return documentFileService.getRevisions(fileId);
     }
 
     @DeleteMapping("/{id}/revisions/{revision}")
-    public String deleteRevision(@PathVariable("id") String id, @PathVariable("revision") Long revision)
+    public String deleteRevision(@PathVariable("id") String fileId, @PathVariable("revision") Long revisionId)
     {
-        return documentFileService.deleteRevision(id, revision);
+        return documentFileService.deleteRevision(fileId, revisionId);
     }
 
 }

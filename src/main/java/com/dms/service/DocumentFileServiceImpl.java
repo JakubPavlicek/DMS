@@ -140,7 +140,7 @@ public class DocumentFileServiceImpl implements DocumentFileService {
     public String deleteRevision(String fileId, Long revisionId) {
         Optional<DocumentFileRevision> documentFileRevision = documentFileRevisionRepository.findByFileIdAndRevisionId(fileId, revisionId);
 
-        if(documentFileRevision.isEmpty())
+        if (documentFileRevision.isEmpty())
             throw new RuntimeException("Revize nenalezena");
 
         documentFileRevisionRepository.deleteByFileIdAndRevisionId(fileId, revisionId);

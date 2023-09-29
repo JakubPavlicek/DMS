@@ -44,20 +44,17 @@ public class DocumentFileController {
     }
 
     @PutMapping("/{id}/revisions/{revision}")
-    public DocumentFileRevision switchToRevision(@PathVariable("id") String fileId, @PathVariable("revision") Long revisionId)
-    {
+    public DocumentFileRevision switchToRevision(@PathVariable("id") String fileId, @PathVariable("revision") Long revisionId) {
         return documentFileService.switchToRevision(fileId, revisionId);
     }
 
     @GetMapping("/{id}/revisions")
-    public List<DocumentFileRevision> getRevisions(@PathVariable("id") String fileId)
-    {
+    public List<DocumentFileRevision> getRevisions(@PathVariable("id") String fileId) {
         return documentFileService.getRevisions(fileId);
     }
 
     @DeleteMapping("/{id}/revisions/{revision}")
-    public String deleteRevision(@PathVariable("id") String fileId, @PathVariable("revision") Long revisionId)
-    {
+    public String deleteRevision(@PathVariable("id") String fileId, @PathVariable("revision") Long revisionId) {
         return documentFileService.deleteRevision(fileId, revisionId);
     }
 

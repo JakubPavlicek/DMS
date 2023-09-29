@@ -4,13 +4,12 @@ import com.dms.entity.DocumentFile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 
 @Repository
-public interface DocumentFileRepository extends JpaRepository<DocumentFile, String>, RevisionRepository<DocumentFile, String, Long> {
+public interface DocumentFileRepository extends JpaRepository<DocumentFile, String> {
     @Modifying
     @Query("UPDATE DocumentFile file SET file.fileName = :name WHERE file = :file")
     void updateFileName(DocumentFile file, String name);
@@ -34,12 +33,4 @@ public interface DocumentFileRepository extends JpaRepository<DocumentFile, Stri
     @Modifying
     @Query("UPDATE DocumentFile file SET file.updatedAt = :updatedAt WHERE file = :file")
     void updateFileUpdatedAt(DocumentFile file, LocalDateTime updatedAt);
-
-    @Modifying
-    @Query(value = "DELETE FROM document_file_history WHERE revision_id = :revisionId", nativeQuery = true)
-    void deleteFileHistoryById(Long revisionId);
-
-    @Modifying
-    @Query("DELETE FROM DocumentFileRevisionInfo fileRevisionInfo WHERE fileRevisionInfo.revisionId = :revisionId")
-    void deleteRevisionById(Long revisionId);
 }

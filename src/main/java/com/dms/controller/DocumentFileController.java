@@ -4,6 +4,8 @@ import com.dms.entity.DocumentFile;
 import com.dms.model.DocumentFileRequest;
 import com.dms.service.DocumentFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.history.Revision;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/files")
@@ -39,9 +43,23 @@ public class DocumentFileController {
         return documentFileService.updateDocumentFile(id, file);
     }
 
-    @PutMapping("/{id}/revision/{revision}")
-    public DocumentFile setDocumentFileAsCurrent(@PathVariable("id") String id, @PathVariable("revision") Long revision)
+    @PutMapping("/{id}/revisions/{revision}")
+    public DocumentFile switchToRevision(@PathVariable("id") String id, @PathVariable("revision") Long revision)
     {
-        return documentFileService.setDocumentFileAsCurrent(id, revision);
+        return documentFileService.switchToRevision(id, revision);
     }
+
+    @GetMapping("/{id}/revisions")
+    public List<Revision<Long, DocumentFile>> getRevisions(@PathVariable("id") String id)
+    {
+        return documentFileService.getRevisions(id);
+    }
+
+    // TODO: smazani revize
+    @DeleteMapping("/{id}/revisions/{revision}")
+    public String deleteRevision(@PathVariable("id") String id, @PathVariable("revision") Long revision)
+    {
+        return documentFileService.deleteRevision(id, revision);
+    }
+
 }

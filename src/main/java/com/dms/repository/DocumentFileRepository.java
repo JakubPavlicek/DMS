@@ -34,4 +34,12 @@ public interface DocumentFileRepository extends JpaRepository<DocumentFile, Stri
     @Modifying
     @Query("UPDATE DocumentFile file SET file.updatedAt = :updatedAt WHERE file = :file")
     void updateFileUpdatedAt(DocumentFile file, LocalDateTime updatedAt);
+
+    @Modifying
+    @Query(value = "DELETE FROM document_file_history WHERE revision_id = :revisionId", nativeQuery = true)
+    void deleteFileHistoryById(Long revisionId);
+
+    @Modifying
+    @Query("DELETE FROM DocumentFileRevisionInfo fileRevisionInfo WHERE fileRevisionInfo.revisionId = :revisionId")
+    void deleteRevisionById(Long revisionId);
 }

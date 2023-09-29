@@ -73,7 +73,7 @@ public class DocumentFileServiceImpl implements DocumentFileService {
         String author = file.getAuthor();
         byte[] data = file.getData();
 
-        DocumentFileRevision documentFileRevision = saveDocumentFileRevision(id, documentFile);
+        saveDocumentFileRevision(id, documentFile);
 
         if (Objects.nonNull(name))
             documentFile.setFileName(name);
@@ -95,7 +95,7 @@ public class DocumentFileServiceImpl implements DocumentFileService {
         return "Document file updated successfully";
     }
 
-    private DocumentFileRevision saveDocumentFileRevision(String id, DocumentFile file) {
+    private void saveDocumentFileRevision(String id, DocumentFile file) {
         FileOperation operation = documentFileRevisionRepository.existsByFileId(id) ? FileOperation.UPDATE : FileOperation.INSERT;
 
         DocumentFileRevision documentFileRevision = DocumentFileRevision.builder()
@@ -107,7 +107,7 @@ public class DocumentFileServiceImpl implements DocumentFileService {
                                                                         .fileOperation(operation)
                                                                         .data(file.getData())
                                                                         .build();
-        return documentFileRevisionRepository.save(documentFileRevision);
+        documentFileRevisionRepository.save(documentFileRevision);
     }
 
     @Override

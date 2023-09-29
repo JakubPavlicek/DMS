@@ -1,10 +1,10 @@
 package com.dms.controller;
 
 import com.dms.entity.DocumentFile;
+import com.dms.entity.DocumentFileRevision;
 import com.dms.model.DocumentFileRequest;
 import com.dms.service.DocumentFileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.history.Revision;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -44,13 +44,13 @@ public class DocumentFileController {
     }
 
     @PutMapping("/{id}/revisions/{revision}")
-    public DocumentFile switchToRevision(@PathVariable("id") String id, @PathVariable("revision") Long revision)
+    public DocumentFileRevision switchToRevision(@PathVariable("id") String id, @PathVariable("revision") Long revision)
     {
         return documentFileService.switchToRevision(id, revision);
     }
 
     @GetMapping("/{id}/revisions")
-    public List<Revision<Long, DocumentFile>> getRevisions(@PathVariable("id") String id)
+    public List<DocumentFileRevision> getRevisions(@PathVariable("id") String id)
     {
         return documentFileService.getRevisions(id);
     }

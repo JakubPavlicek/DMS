@@ -55,7 +55,6 @@ public class DocumentFileController {
         return documentFileService.getRevisions(id);
     }
 
-    // TODO: smazani revize
     @DeleteMapping("/{id}/revisions/{revision}")
     public String deleteRevision(@PathVariable("id") String id, @PathVariable("revision") Long revision)
     {

@@ -6,7 +6,6 @@ import com.dms.repository.DocumentFileRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.history.Revision;
-import org.springframework.data.history.Revisions;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -124,20 +123,7 @@ public class DocumentFileServiceImpl implements DocumentFileService {
     @Override
     @Transactional
     public String deleteRevision(String id, Long revisionId) {
-        Revisions<Long, DocumentFile> revisions = documentFileRepository.findRevisions(id);
-        Revision<Long, DocumentFile> revision = revisions.stream()
-                                                         .filter(rev -> rev.getRevisionNumber()
-                                                                           .orElseThrow(() -> new RuntimeException("revize nenalezena"))
-                                                                           .equals(revisionId))
-                                                         .findFirst()
-                                                         .orElseThrow(() -> new RuntimeException("revize nenalezena"));
-
-        DocumentFile file = documentFileRepository.findById(id).orElseThrow(() -> new RuntimeException("soubor nenalezen"));
-
         // TODO: zabranit smazani hlavni revize ADD (0) - (vytvoreni dokumentu)
-
-        if(revision.getEntity().equals(file))
-            throw new RuntimeException("nelze odstranit revizi souboru, ktery je nastaven jako aktualni");
 
         documentFileRepository.deleteFileHistoryById(revisionId);
         documentFileRepository.deleteRevisionById(revisionId);

@@ -1,8 +1,8 @@
 package com.dms.service;
 
 import com.dms.entity.DocumentFile;
+import com.dms.entity.DocumentFileRevision;
 import com.dms.model.DocumentFileRequest;
-import org.springframework.data.history.Revision;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ public interface DocumentFileService {
 
     String updateDocumentFile(String id, DocumentFile file);
 
-    DocumentFile switchToRevision(String fileId, Long revision);
+    DocumentFileRevision switchToRevision(String fileId, Long revision);
 
-    List<Revision<Long, DocumentFile>> getRevisions(String id);
+    List<DocumentFileRevision> getRevisions(String id);
 
     String deleteRevision(String id, Long revision);
 }

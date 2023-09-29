@@ -1,30 +1,33 @@
 package com.dms.service;
 
 import com.dms.entity.DocumentFile;
+import com.dms.entity.DocumentFileRevision;
 import com.dms.model.DocumentFileRequest;
+import com.dms.model.FileOperation;
 import com.dms.repository.DocumentFileRepository;
+import com.dms.repository.DocumentFileRevisionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class DocumentFileServiceImpl implements DocumentFileService {
 
     private final DocumentFileRepository documentFileRepository;
+    private final DocumentFileRevisionRepository documentFileRevisionRepository;
 
     @Autowired
-    public DocumentFileServiceImpl(DocumentFileRepository documentFileRepository) {
+    public DocumentFileServiceImpl(DocumentFileRepository documentFileRepository, DocumentFileRevisionRepository documentFileRevisionRepository) {
         this.documentFileRepository = documentFileRepository;
+        this.documentFileRevisionRepository = documentFileRevisionRepository;
     }
 
     @Override
@@ -70,6 +73,8 @@ public class DocumentFileServiceImpl implements DocumentFileService {
         String author = file.getAuthor();
         byte[] data = file.getData();
 
+        DocumentFileRevision documentFileRevision = saveDocumentFileRevision(id, documentFile);
+
         if (Objects.nonNull(name))
             documentFile.setFileName(name);
 
@@ -90,44 +95,55 @@ public class DocumentFileServiceImpl implements DocumentFileService {
         return "Document file updated successfully";
     }
 
+    private DocumentFileRevision saveDocumentFileRevision(String id, DocumentFile file) {
+        FileOperation operation = documentFileRevisionRepository.existsByFileId(id) ? FileOperation.UPDATE : FileOperation.INSERT;
+
+        DocumentFileRevision documentFileRevision = DocumentFileRevision.builder()
+                                                                        .fileId(id)
+                                                                        .fileName(file.getFileName())
+                                                                        .fileType(file.getFileType())
+                                                                        .filePath(file.getFilePath())
+                                                                        .author(file.getAuthor())
+                                                                        .fileOperation(operation)
+                                                                        .data(file.getData())
+                                                                        .build();
+        return documentFileRevisionRepository.save(documentFileRevision);
+    }
+
     @Override
     @Transactional
-    public DocumentFile switchToRevision(String fileId, Long revisionId) {
-        Revision<Long, DocumentFile> documentFileRevision = documentFileRepository.findRevision(fileId, revisionId)
-                                                                                  .orElseThrow(() -> new RuntimeException("revize nenalezena"));
-
-        DocumentFile revisionFile = documentFileRevision.getEntity();
+    public DocumentFileRevision switchToRevision(String fileId, Long revision) {
         DocumentFile databaseFile = documentFileRepository.findById(fileId)
                                                           .orElseThrow(() -> new RuntimeException("soubor nenalezen"));
 
-        Instant revisionInstant = documentFileRevision.getRevisionInstant()
-                                                      .orElseThrow(() -> new RuntimeException("datum vytvoreni revize nebyl nalezen"));
-        LocalDateTime revisionCreatedAt = LocalDateTime.ofInstant(revisionInstant, ZoneId.systemDefault());
+        DocumentFileRevision documentFileRevision = documentFileRevisionRepository.findByFileIdAndRevisionId(fileId, revision)
+                                                                                  .orElseThrow(() -> new RuntimeException("revize nenalezena"));
 
-        documentFileRepository.updateFileName(databaseFile, revisionFile.getFileName());
-        documentFileRepository.updateFileType(databaseFile, revisionFile.getFileType());
-        documentFileRepository.updateFilePath(databaseFile, revisionFile.getFilePath());
-        documentFileRepository.updateFileAuthor(databaseFile, revisionFile.getAuthor());
-        documentFileRepository.updateFileUpdatedAt(databaseFile, revisionCreatedAt);
-        documentFileRepository.updateFileData(databaseFile, revisionFile.getData());
+        documentFileRepository.updateFileName(databaseFile, documentFileRevision.getFileName());
+        documentFileRepository.updateFileType(databaseFile, documentFileRevision.getFileType());
+        documentFileRepository.updateFilePath(databaseFile, documentFileRevision.getFilePath());
+        documentFileRepository.updateFileAuthor(databaseFile, documentFileRevision.getAuthor());
+        documentFileRepository.updateFileUpdatedAt(databaseFile, LocalDateTime.now());
+        documentFileRepository.updateFileData(databaseFile, documentFileRevision.getData());
 
-        return revisionFile;
-    }
-
-    @Override
-    public List<Revision<Long, DocumentFile>> getRevisions(String id) {
-        return documentFileRepository.findRevisions(id)
-                                     .getContent();
+        return documentFileRevision;
     }
 
     @Override
     @Transactional
-    public String deleteRevision(String id, Long revisionId) {
-        // TODO: zabranit smazani hlavni revize ADD (0) - (vytvoreni dokumentu)
+    public List<DocumentFileRevision> getRevisions(String id) {
+        return documentFileRevisionRepository.findAllByFileId(id);
+    }
 
-        documentFileRepository.deleteFileHistoryById(revisionId);
-        documentFileRepository.deleteRevisionById(revisionId);
+    @Override
+    @Transactional
+    public String deleteRevision(String id, Long revision) {
+        Optional<DocumentFileRevision> documentFileRevision = documentFileRevisionRepository.findByFileIdAndRevisionId(id, revision);
 
+        if(documentFileRevision.isEmpty())
+            throw new RuntimeException("Revize nenalezena");
+
+        documentFileRevisionRepository.deleteByFileIdAndRevisionId(id, revision);
         return "Revision deleted successfully";
     }
 }

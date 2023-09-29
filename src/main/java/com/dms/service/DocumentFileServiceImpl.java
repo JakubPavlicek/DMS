@@ -110,6 +110,6 @@ public class DocumentFileServiceImpl implements DocumentFileService {
         documentFileRepository.updateFileUpdatedAt(databaseFile, revisionCreatedAt);
         documentFileRepository.updateFileData(databaseFile, revisionFile.getData());
 
-        return databaseFile;
+        return revisionFile;
     }
 }

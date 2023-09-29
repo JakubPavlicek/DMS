@@ -2,6 +2,9 @@ package com.dms.service;
 
 import com.dms.entity.DocumentFile;
 import com.dms.model.DocumentFileRequest;
+import org.springframework.data.history.Revision;
+
+import java.util.List;
 
 public interface DocumentFileService {
     DocumentFile saveDocumentFile(DocumentFileRequest fileRequest);
@@ -10,5 +13,9 @@ public interface DocumentFileService {
 
     String updateDocumentFile(String id, DocumentFile file);
 
-    DocumentFile setDocumentFileAsCurrent(String fileId, Long revision);
+    DocumentFile switchToRevision(String fileId, Long revision);
+
+    List<Revision<Long, DocumentFile>> getRevisions(String id);
+
+    String deleteRevision(String id, Long revision);
 }

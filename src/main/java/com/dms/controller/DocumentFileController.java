@@ -20,7 +20,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/files")
 public class DocumentFileController {
-
     private final DocumentFileService documentFileService;
 
     @Autowired
@@ -57,5 +56,4 @@ public class DocumentFileController {
     public String deleteRevision(@PathVariable("id") String fileId, @PathVariable("revision") Long revisionId) {
         return documentFileService.deleteRevision(fileId, revisionId);
     }
-
 }

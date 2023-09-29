@@ -119,12 +119,12 @@ public class DocumentFileServiceImpl implements DocumentFileService {
         DocumentFileRevision documentFileRevision = documentFileRevisionRepository.findByFileIdAndRevisionId(fileId, revisionId)
                                                                                   .orElseThrow(() -> new RuntimeException("revize nenalezena"));
 
-        updateDocumentFileWithRevision(databaseFile, documentFileRevision);
+        updateDocumentFileToRevision(databaseFile, documentFileRevision);
 
         return documentFileRevision;
     }
 
-    private void updateDocumentFileWithRevision(DocumentFile databaseFile, DocumentFileRevision documentFileRevision) {
+    private void updateDocumentFileToRevision(DocumentFile databaseFile, DocumentFileRevision documentFileRevision) {
         documentFileRepository.updateFileName(databaseFile, documentFileRevision.getFileName());
         documentFileRepository.updateFileType(databaseFile, documentFileRevision.getFileType());
         documentFileRepository.updateFilePath(databaseFile, documentFileRevision.getFilePath());

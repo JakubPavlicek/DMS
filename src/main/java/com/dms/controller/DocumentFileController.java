@@ -2,8 +2,9 @@ package com.dms.controller;
 
 import com.dms.entity.DocumentFile;
 import com.dms.entity.DocumentFileRevision;
-import com.dms.model.DocumentFileRequest;
+import com.dms.request.DocumentFileRequest;
 import com.dms.service.DocumentFileService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class DocumentFileController {
     }
 
     @PostMapping("/upload")
-    public DocumentFile saveDocumentFile(@ModelAttribute DocumentFileRequest fileRequest) {
+    public DocumentFile saveDocumentFile(@Valid @ModelAttribute DocumentFileRequest fileRequest) {
         return documentFileService.saveDocumentFile(fileRequest);
     }
 
@@ -40,8 +41,8 @@ public class DocumentFileController {
     }
 
     @PutMapping("/{id}")
-    public String updateDocumentFile(@PathVariable("id") String fileId, @RequestBody DocumentFile file) {
-        return documentFileService.updateDocumentFile(fileId, file);
+    public String updateDocumentFile(@PathVariable("id") String fileId, @Valid @ModelAttribute DocumentFileRequest fileRequest) {
+        return documentFileService.updateDocumentFile(fileId, fileRequest);
     }
 
     @DeleteMapping("/{id}")
@@ -65,8 +66,8 @@ public class DocumentFileController {
     }
 
     @PutMapping("/{id}/move")
-    public String moveDocumentFile(@PathVariable("id") String fileId, @RequestBody String filePath) {
-        return documentFileService.moveDocumentFile(fileId, filePath);
+    public String moveDocumentFile(@PathVariable("id") String fileId, @RequestBody String path) {
+        return documentFileService.moveDocumentFile(fileId, path);
     }
 
     @GetMapping("/{id}/download")

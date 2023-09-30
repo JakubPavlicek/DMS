@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DocumentFileRevision {
+public class DocumentRevision {
     @Id
     @SequenceGenerator(
         name = "revision_generator",
@@ -37,19 +37,19 @@ public class DocumentFileRevision {
     )
     private Long revisionId;
 
-    private String fileId;
+    private String documentId;
 
-    private String fileName;
-    private String fileExtension;
-    private String fileType;
-    private String filePath;
+    private String name;
+    private String extension;
+    private String type;
+    private String path;
     private String author;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
-    private FileOperation fileOperation;
+    private DocumentOperation operation;
 
     @Lob
     @Column(length = Integer.MAX_VALUE)

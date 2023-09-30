@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DocumentFileRequest {
+public class DocumentRequest {
     @NotNull(message = "File is mandatory")
     MultipartFile file;
 

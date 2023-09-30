@@ -1,6 +1,6 @@
 package com.dms.entity;
 
-public enum FileOperation {
+public enum DocumentOperation {
     INSERT,
     UPDATE,
     DELETE

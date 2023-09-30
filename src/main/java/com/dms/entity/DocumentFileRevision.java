@@ -41,6 +41,7 @@ public class DocumentFileRevision {
     private String fileId;
 
     private String fileName;
+    private String fileExtension;
     private String fileType;
     private String filePath;
     private String author;

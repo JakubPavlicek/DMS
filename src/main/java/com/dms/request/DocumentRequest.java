@@ -10,8 +10,8 @@ import lombok.Setter;
 @Setter
 public class DocumentRequest {
     @NotNull(message = "File is mandatory")
-    MultipartFile file;
+    private MultipartFile file;
 
     @NotBlank(message = "Author is mandatory")
-    String author;
+    private String author;
 }

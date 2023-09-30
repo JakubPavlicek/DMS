@@ -1,7 +1,10 @@
 package com.dms.entity;
 
+import com.dms.model.FileOperation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,6 +41,9 @@ public class DocumentFile {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    private FileOperation fileOperation;
 
     @Lob
     @Column(length = Integer.MAX_VALUE)

@@ -43,7 +43,7 @@ public class DocumentService {
     }
 
     private DocumentRevision getDocumentRevisionWithId(String documentId, Long revisionId) {
-        return documentRevisionRepository.findByFileIdAndRevisionId(documentId, revisionId)
+        return documentRevisionRepository.findByDocumentIdAndRevisionId(documentId, revisionId)
                                          .orElseThrow(() -> new RuntimeException("revize nenalezena"));
     }
 
@@ -133,13 +133,13 @@ public class DocumentService {
 
     @Transactional
     public List<DocumentRevision> getRevisions(String documentId) {
-        return documentRevisionRepository.findAllByFileId(documentId);
+        return documentRevisionRepository.findAllByDocumentId(documentId);
     }
 
     @Transactional
     public String deleteRevision(String documentId, Long revisionId) {
         DocumentRevision documentRevision = getDocumentRevisionWithId(documentId, revisionId);
-        documentRevisionRepository.deleteByFileIdAndRevisionId(documentId, revisionId);
+        documentRevisionRepository.deleteByDocumentIdAndRevisionId(documentId, revisionId);
 
         return "Revision deleted successfully";
     }

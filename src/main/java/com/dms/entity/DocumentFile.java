@@ -1,6 +1,5 @@
 package com.dms.entity;
 
-import com.dms.model.FileOperation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

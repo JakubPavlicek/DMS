@@ -1,6 +1,7 @@
 package com.dms.repository;
 
 import com.dms.entity.DocumentFile;
+import com.dms.model.FileOperation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -29,6 +30,10 @@ public interface DocumentFileRepository extends JpaRepository<DocumentFile, Stri
     @Modifying
     @Query("UPDATE DocumentFile file SET file.author = :author WHERE file = :file")
     void updateFileAuthor(DocumentFile file, String author);
+
+    @Modifying
+    @Query("UPDATE DocumentFile file SET file.fileOperation = :operation WHERE file = :file")
+    void updateFileOperation(DocumentFile file, FileOperation operation);
 
     @Modifying
     @Query("UPDATE DocumentFile file SET file.data = :data WHERE file = :file")

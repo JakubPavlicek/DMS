@@ -8,12 +8,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-      org:
-        hibernate:
-          envers:
-            audit_table_suffix: _history
-            revision_field_name: revision_id
-            revision_type_field_name: revision_type
     hibernate:
       ddl-auto: create-drop
 #    show-sql: true
@@ -35,12 +29,6 @@ spring:
 #    properties:
 #      hibernate:
 #        dialect: org.hibernate.dialect.OracleDialect
-#      org:
-#        hibernate:
-#          envers:
-#            audit_table_suffix: _history
-#            revision_field_name: revision_id
-#            revision_type_field_name: revision_type
 #    hibernate:
 #      ddl-auto: update
 #    show-sql: true
@@ -62,12 +50,6 @@ spring:
 #    properties:
 #      hibernate:
 #        dialect: org.hibernate.dialect.SQLServerDialect
-#      org:
-#        hibernate:
-#          envers:
-#            audit_table_suffix: _history
-#            revision_field_name: revision_id
-#            revision_type_field_name: revision_type
 #    hibernate:
 #      ddl-auto: update
 #    show-sql: true

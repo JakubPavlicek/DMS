@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class DocumentFileService {
@@ -32,6 +31,21 @@ public class DocumentFileService {
     public DocumentFileService(DocumentFileRepository documentFileRepository, DocumentFileRevisionRepository documentFileRevisionRepository) {
         this.documentFileRepository = documentFileRepository;
         this.documentFileRevisionRepository = documentFileRevisionRepository;
+    }
+
+    public DocumentFile getDocumentFile(String fileId) {
+        return documentFileRepository.findById(fileId)
+                                     .orElseThrow(() -> new RuntimeException("Soubor s id: " + fileId + " nebyl nalezen."));
+    }
+
+    public DocumentFileRevision getDocumentFileRevision(String fileId) {
+        return documentFileRevisionRepository.findById(fileId)
+                                             .orElseThrow(() -> new RuntimeException("Revize s id: " + fileId + " nebyla nalezena."));
+    }
+
+    private DocumentFileRevision getDocumentFileRevisionWithId(String fileId, Long revisionId) {
+        return documentFileRevisionRepository.findByFileIdAndRevisionId(fileId, revisionId)
+                                             .orElseThrow(() -> new RuntimeException("revize nenalezena"));
     }
 
     public DocumentFile saveDocumentFile(DocumentFileRequest fileRequest) {
@@ -47,7 +61,7 @@ public class DocumentFileService {
         try {
             fileData = file.getBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Data souboru se nepodarilo ziskat.");
         }
 
         DocumentFile documentFile = DocumentFile.builder()
@@ -55,20 +69,15 @@ public class DocumentFileService {
                                                 .fileExtension(extension)
                                                 .fileType(type)
                                                 .author(author)
+                                                .fileOperation(FileOperation.INSERT)
                                                 .data(fileData)
                                                 .build();
 
         return documentFileRepository.save(documentFile);
     }
 
-    public DocumentFile getDocumentFile(String fileId) {
-        return documentFileRepository.findById(fileId)
-                                     .orElseThrow(() -> new RuntimeException("Soubor s id: " + fileId + " nebyl nalezen."));
-    }
-
     public String updateDocumentFile(String fileId, DocumentFile file) {
-        DocumentFile documentFile = documentFileRepository.findById(fileId)
-                                                          .orElseThrow(() -> new RuntimeException("soubor nenalezen"));
+        DocumentFile documentFile = getDocumentFile(fileId);
 
         String name = file.getFileName();
         String extension = file.getFileExtension();
@@ -77,8 +86,7 @@ public class DocumentFileService {
         String author = file.getAuthor();
         byte[] data = file.getData();
 
-        FileOperation operation = documentFileRevisionRepository.existsByFileId(fileId) ? FileOperation.UPDATE : FileOperation.INSERT;
-        saveDocumentFileRevision(documentFile, operation);
+        saveDocumentFileRevision(documentFile, documentFile.getFileOperation());
 
         // TODO: add Validation and remove if statements
 
@@ -99,6 +107,8 @@ public class DocumentFileService {
 
         if (Objects.nonNull(data))
             documentFile.setData(data);
+
+        documentFile.setFileOperation(FileOperation.UPDATE);
 
         documentFileRepository.save(documentFile);
 
@@ -121,13 +131,13 @@ public class DocumentFileService {
 
     @Transactional
     public DocumentFileRevision switchToRevision(String fileId, Long revisionId) {
-        DocumentFile databaseFile = documentFileRepository.findById(fileId)
-                                                          .orElseThrow(() -> new RuntimeException("soubor nenalezen"));
+        DocumentFile databaseFile = getDocumentFile(fileId);
+        DocumentFileRevision documentFileRevision = getDocumentFileRevisionWithId(fileId, revisionId);
 
-        DocumentFileRevision documentFileRevision = documentFileRevisionRepository.findByFileIdAndRevisionId(fileId, revisionId)
-                                                                                  .orElseThrow(() -> new RuntimeException("revize nenalezena"));
-
+        saveDocumentFileRevision(databaseFile, databaseFile.getFileOperation());
         updateDocumentFileToRevision(databaseFile, documentFileRevision);
+
+        documentFileRevisionRepository.delete(documentFileRevision);
 
         return documentFileRevision;
     }
@@ -138,6 +148,7 @@ public class DocumentFileService {
         documentFileRepository.updateFileType(databaseFile, documentFileRevision.getFileType());
         documentFileRepository.updateFilePath(databaseFile, documentFileRevision.getFilePath());
         documentFileRepository.updateFileAuthor(databaseFile, documentFileRevision.getAuthor());
+        documentFileRepository.updateFileOperation(databaseFile, documentFileRevision.getFileOperation());
         documentFileRepository.updateFileUpdatedAt(databaseFile, LocalDateTime.now());
         documentFileRepository.updateFileData(databaseFile, documentFileRevision.getData());
     }
@@ -149,37 +160,30 @@ public class DocumentFileService {
 
     @Transactional
     public String deleteRevision(String fileId, Long revisionId) {
-        Optional<DocumentFileRevision> documentFileRevision = documentFileRevisionRepository.findByFileIdAndRevisionId(fileId, revisionId);
-
-        if (documentFileRevision.isEmpty())
-            throw new RuntimeException("Revize nenalezena");
-
+        DocumentFileRevision documentFileRevision = getDocumentFileRevisionWithId(fileId, revisionId);
         documentFileRevisionRepository.deleteByFileIdAndRevisionId(fileId, revisionId);
+
         return "Revision deleted successfully";
     }
 
     public String deleteDocumentFile(String fileId) {
-        DocumentFile file = documentFileRepository.findById(fileId)
-                                                  .orElseThrow(() -> new RuntimeException("soubor nenalezen"));
-
+        DocumentFile file = getDocumentFile(fileId);
         saveDocumentFileRevision(file, FileOperation.DELETE);
-
         documentFileRepository.delete(file);
+
         return "File deleted successfully";
     }
 
     @Transactional
     public String moveDocumentFile(String fileId, String filePath) {
-        DocumentFile file = documentFileRepository.findById(fileId)
-                                                  .orElseThrow(() -> new RuntimeException("soubor nenalezen"));
-
+        DocumentFile file = getDocumentFile(fileId);
         documentFileRepository.updateFilePath(file, filePath);
+
         return "File moved successfully";
     }
 
     public ResponseEntity<Resource> downloadDocumentFile(String fileId) {
-        DocumentFile file = documentFileRepository.findById(fileId)
-                                                  .orElseThrow(() -> new RuntimeException("soubor nenalezen"));
+        DocumentFile file = getDocumentFile(fileId);
 
         // TODO: add file UUID to header
 

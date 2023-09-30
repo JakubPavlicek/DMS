@@ -1,7 +1,7 @@
 package com.dms.repository;
 
 import com.dms.entity.DocumentFile;
-import com.dms.model.FileOperation;
+import com.dms.entity.FileOperation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

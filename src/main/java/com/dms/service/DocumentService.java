@@ -1,11 +1,12 @@
 package com.dms.service;
 
 import com.dms.entity.Document;
-import com.dms.entity.DocumentRevision;
-import com.dms.request.DocumentRequest;
 import com.dms.entity.DocumentOperation;
+import com.dms.entity.DocumentRevision;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
+import com.dms.request.DocumentPathRequest;
+import com.dms.request.DocumentRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -152,9 +153,9 @@ public class DocumentService {
     }
 
     @Transactional
-    public String moveDocument(String documentId, String filePath) {
+    public String moveDocument(String documentId, DocumentPathRequest documentPath) {
         Document file = getDocument(documentId);
-        documentRepository.updateDocumentPath(file, filePath);
+        documentRepository.updateDocumentPath(file, documentPath.getPath());
 
         return "File moved successfully";
     }

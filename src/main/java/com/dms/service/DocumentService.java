@@ -91,7 +91,7 @@ public class DocumentService {
 
         documentRepository.save(document);
 
-        return "File updated successfully";
+        return "Document updated successfully";
     }
 
     private void saveDocumentRevision(Document file, DocumentOperation operation) {
@@ -149,7 +149,7 @@ public class DocumentService {
         saveDocumentRevision(file, DocumentOperation.DELETE);
         documentRepository.delete(file);
 
-        return "File deleted successfully";
+        return "Document deleted successfully";
     }
 
     @Transactional
@@ -157,7 +157,7 @@ public class DocumentService {
         Document file = getDocument(documentId);
         documentRepository.updateDocumentPath(file, documentPath.getPath());
 
-        return "File moved successfully";
+        return "Document moved successfully";
     }
 
     public ResponseEntity<Resource> downloadDocument(String documentId) {

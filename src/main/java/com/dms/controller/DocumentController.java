@@ -2,6 +2,7 @@ package com.dms.controller;
 
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.request.DocumentPathRequest;
 import com.dms.request.DocumentRequest;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
@@ -66,7 +67,7 @@ public class DocumentController {
     }
 
     @PutMapping("/{id}/move")
-    public String moveDocument(@PathVariable("id") String documentId, @RequestBody String path) {
+    public String moveDocument(@PathVariable("id") String documentId, @Valid @RequestBody DocumentPathRequest path) {
         return documentService.moveDocument(documentId, path);
     }
 

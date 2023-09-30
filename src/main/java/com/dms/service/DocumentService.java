@@ -138,7 +138,6 @@ public class DocumentService {
 
     @Transactional
     public String deleteRevision(String documentId, Long revisionId) {
-        DocumentRevision documentRevision = getDocumentRevisionWithId(documentId, revisionId);
         documentRevisionRepository.deleteByDocumentIdAndRevisionId(documentId, revisionId);
 
         return "Revision deleted successfully";

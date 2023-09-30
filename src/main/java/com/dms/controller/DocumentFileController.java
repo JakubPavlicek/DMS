@@ -5,6 +5,8 @@ import com.dms.entity.DocumentFileRevision;
 import com.dms.model.DocumentFileRequest;
 import com.dms.service.DocumentFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -32,14 +34,19 @@ public class DocumentFileController {
         return documentFileService.saveDocumentFile(fileRequest);
     }
 
-    @GetMapping("/download/{id}")
+    @GetMapping("/{id}")
     public DocumentFile getDocumentFile(@PathVariable("id") String fileId) {
         return documentFileService.getDocumentFile(fileId);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public String updateDocumentFile(@PathVariable("id") String fileId, @RequestBody DocumentFile file) {
         return documentFileService.updateDocumentFile(fileId, file);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteDocumentFile(@PathVariable("id") String fileId) {
+        return documentFileService.deleteDocumentFile(fileId);
     }
 
     @PutMapping("/{id}/revisions/{revision}")
@@ -55,5 +62,15 @@ public class DocumentFileController {
     @DeleteMapping("/{id}/revisions/{revision}")
     public String deleteRevision(@PathVariable("id") String fileId, @PathVariable("revision") Long revisionId) {
         return documentFileService.deleteRevision(fileId, revisionId);
+    }
+
+    @PutMapping("/{id}/move")
+    public String moveDocumentFile(@PathVariable("id") String fileId, @RequestBody String filePath) {
+        return documentFileService.moveDocumentFile(fileId, filePath);
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> downloadDocumentFile(@PathVariable("id") String fileId) {
+        return documentFileService.downloadDocumentFile(fileId);
     }
 }

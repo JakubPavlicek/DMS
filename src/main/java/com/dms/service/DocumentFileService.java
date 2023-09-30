@@ -2,8 +2,8 @@ package com.dms.service;
 
 import com.dms.entity.DocumentFile;
 import com.dms.entity.DocumentFileRevision;
-import com.dms.model.DocumentFileRequest;
-import com.dms.model.FileOperation;
+import com.dms.request.DocumentFileRequest;
+import com.dms.entity.FileOperation;
 import com.dms.repository.DocumentFileRepository;
 import com.dms.repository.DocumentFileRevisionRepository;
 import jakarta.transaction.Transactional;
@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class DocumentFileService {
@@ -49,6 +48,12 @@ public class DocumentFileService {
     }
 
     public DocumentFile saveDocumentFile(DocumentFileRequest fileRequest) {
+        DocumentFile documentFile = getDocumentFileFromRequest(fileRequest);
+
+        return documentFileRepository.save(documentFile);
+    }
+
+    public DocumentFile getDocumentFileFromRequest(DocumentFileRequest fileRequest) {
         MultipartFile file = fileRequest.getFile();
 
         String path = StringUtils.cleanPath(file.getOriginalFilename());
@@ -56,63 +61,36 @@ public class DocumentFileService {
         String extension = StringUtils.getFilenameExtension(path);
         String type = file.getContentType();
         String author = fileRequest.getAuthor();
-        byte[] fileData;
+        byte[] data;
 
         try {
-            fileData = file.getBytes();
+            data = file.getBytes();
         } catch (IOException e) {
             throw new RuntimeException("Data souboru se nepodarilo ziskat.");
         }
 
-        DocumentFile documentFile = DocumentFile.builder()
-                                                .fileName(name)
-                                                .fileExtension(extension)
-                                                .fileType(type)
-                                                .author(author)
-                                                .fileOperation(FileOperation.INSERT)
-                                                .data(fileData)
-                                                .build();
-
-        return documentFileRepository.save(documentFile);
+        return DocumentFile.builder()
+                           .fileName(name)
+                           .fileExtension(extension)
+                           .fileType(type)
+                           .filePath(path)
+                           .author(author)
+                           .fileOperation(FileOperation.INSERT)
+                           .data(data)
+                           .build();
     }
 
-    public String updateDocumentFile(String fileId, DocumentFile file) {
-        DocumentFile documentFile = getDocumentFile(fileId);
+    public String updateDocumentFile(String fileId, DocumentFileRequest fileRequest) {
+        DocumentFile databaseFile = getDocumentFile(fileId);
+        saveDocumentFileRevision(databaseFile, databaseFile.getFileOperation());
 
-        String name = file.getFileName();
-        String extension = file.getFileExtension();
-        String type = file.getFileType();
-        String path = file.getFilePath();
-        String author = file.getAuthor();
-        byte[] data = file.getData();
-
-        saveDocumentFileRevision(documentFile, documentFile.getFileOperation());
-
-        // TODO: add Validation and remove if statements
-
-        if (Objects.nonNull(name))
-            documentFile.setFileName(name);
-
-        if (Objects.nonNull(extension))
-            documentFile.setFileExtension(extension);
-
-        if (Objects.nonNull(type))
-            documentFile.setFileType(type);
-
-        if (Objects.nonNull(path))
-            documentFile.setFilePath(path);
-
-        if (Objects.nonNull(author))
-            documentFile.setAuthor(author);
-
-        if (Objects.nonNull(data))
-            documentFile.setData(data);
-
+        DocumentFile documentFile = getDocumentFileFromRequest(fileRequest);
+        documentFile.setFileId(fileId);
         documentFile.setFileOperation(FileOperation.UPDATE);
 
         documentFileRepository.save(documentFile);
 
-        return "Document file updated successfully";
+        return "File updated successfully";
     }
 
     private void saveDocumentFileRevision(DocumentFile file, FileOperation operation) {

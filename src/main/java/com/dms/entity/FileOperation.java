@@ -1,4 +1,4 @@
-package com.dms.model;
+package com.dms.entity;
 
 public enum FileOperation {
     INSERT,

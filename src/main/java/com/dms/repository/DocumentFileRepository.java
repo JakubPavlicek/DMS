@@ -19,6 +19,10 @@ public interface DocumentFileRepository extends JpaRepository<DocumentFile, Stri
     void updateFilePath(DocumentFile file, String path);
 
     @Modifying
+    @Query("UPDATE DocumentFile file SET file.fileExtension = :extension WHERE file = :file")
+    void updateFileExtension(DocumentFile file, String extension);
+
+    @Modifying
     @Query("UPDATE DocumentFile file SET file.fileType = :type WHERE file = :file")
     void updateFileType(DocumentFile file, String type);
 

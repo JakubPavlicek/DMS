@@ -9,11 +9,11 @@ import java.util.Optional;
 
 @Repository
 public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, String> {
-    Optional<DocumentRevision> findByFileIdAndRevisionId(String fileId, Long revisionId);
+    Optional<DocumentRevision> findByDocumentIdAndRevisionId(String documentId, Long revisionId);
 
-    List<DocumentRevision> findAllByFileId(String fileId);
+    List<DocumentRevision> findAllByDocumentId(String documentId);
 
-    void deleteByFileIdAndRevisionId(String fileId, Long revisionId);
+    void deleteByDocumentIdAndRevisionId(String documentId, Long revisionId);
 
-    boolean existsByFileId(String fileId);
+    boolean existsByDocumentId(String documentId);
 }

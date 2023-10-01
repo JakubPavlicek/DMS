@@ -2,7 +2,7 @@ package com.dms.controller;
 
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
-import com.dms.request.DocumentPathRequest;
+import com.dms.request.DocumentDestinationRequest;
 import com.dms.request.DocumentRequest;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
@@ -67,12 +67,18 @@ public class DocumentController {
     }
 
     @PutMapping("/{id}/move")
-    public String moveDocument(@PathVariable("id") String documentId, @Valid @RequestBody DocumentPathRequest path) {
-        return documentService.moveDocument(documentId, path);
+    public String moveDocument(@PathVariable("id") String documentId, @Valid @RequestBody DocumentDestinationRequest destination) {
+        return documentService.moveDocument(documentId, destination);
     }
 
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> downloadDocument(@PathVariable("id") String documentId) {
         return documentService.downloadDocument(documentId);
+    }
+
+    @PostMapping("/{id}/copy")
+    public String copyDocument(@PathVariable("id") String documentId, @RequestBody DocumentDestinationRequest destination)
+    {
+        return documentService.copyDocument(documentId, destination);
     }
 }

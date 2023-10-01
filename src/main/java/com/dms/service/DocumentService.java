@@ -5,9 +5,10 @@ import com.dms.entity.DocumentOperation;
 import com.dms.entity.DocumentRevision;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
-import com.dms.request.DocumentPathRequest;
+import com.dms.request.DocumentDestinationRequest;
 import com.dms.request.DocumentRequest;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -82,28 +83,29 @@ public class DocumentService {
     }
 
     public String updateDocument(String documentId, DocumentRequest documentRequest) {
-        Document databaseFile = getDocument(documentId);
-        saveDocumentRevision(databaseFile, databaseFile.getOperation());
+        Document databaseDocument = getDocument(documentId);
+        saveDocumentRevision(databaseDocument, databaseDocument.getOperation());
 
         Document document = getDocumentFromRequest(documentRequest);
         document.setDocumentId(documentId);
         document.setOperation(DocumentOperation.UPDATE);
+        document.setCreatedAt(databaseDocument.getCreatedAt());
 
         documentRepository.save(document);
 
         return "Document updated successfully";
     }
 
-    private void saveDocumentRevision(Document file, DocumentOperation operation) {
+    private void saveDocumentRevision(Document document, DocumentOperation operation) {
         DocumentRevision documentRevision = DocumentRevision.builder()
-                                                            .documentId(file.getDocumentId())
-                                                            .name(file.getName())
-                                                            .extension(file.getExtension())
-                                                            .type(file.getType())
-                                                            .path(file.getPath())
-                                                            .author(file.getAuthor())
+                                                            .documentId(document.getDocumentId())
+                                                            .name(document.getName())
+                                                            .extension(document.getExtension())
+                                                            .type(document.getType())
+                                                            .path(document.getPath())
+                                                            .author(document.getAuthor())
                                                             .operation(operation)
-                                                            .data(file.getData())
+                                                            .data(document.getData())
                                                             .build();
         documentRevisionRepository.save(documentRevision);
     }
@@ -153,9 +155,9 @@ public class DocumentService {
     }
 
     @Transactional
-    public String moveDocument(String documentId, DocumentPathRequest documentPath) {
+    public String moveDocument(String documentId, DocumentDestinationRequest documentDestination) {
         Document file = getDocument(documentId);
-        documentRepository.updateDocumentPath(file, documentPath.getPath());
+        documentRepository.updateDocumentPath(file, documentDestination.getDestination());
 
         return "Document moved successfully";
     }
@@ -169,5 +171,17 @@ public class DocumentService {
                              .contentType(MediaType.parseMediaType(file.getType()))
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
                              .body(new ByteArrayResource(file.getData()));
+    }
+
+    public String copyDocument(String documentId, DocumentDestinationRequest destination) {
+        Document databaseDocument = getDocument(documentId);
+
+        Document document = new Document();
+        BeanUtils.copyProperties(databaseDocument, document, "documentId", "path");
+        document.setPath(destination.getDestination());
+
+        documentRepository.save(document);
+
+        return "Document copied successfully";
     }
 }

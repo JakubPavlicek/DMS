@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DocumentPathRequest {
-    @NotBlank(message = "Path is mandatory")
-    private String path;
+public class DocumentDestinationRequest {
+    @NotBlank(message = "Destination path is mandatory")
+    private String destination;
 }

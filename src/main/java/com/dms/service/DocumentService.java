@@ -56,7 +56,7 @@ public class DocumentService {
         return documentRevision;
     }
 
-    private DocumentRevision getDocumentRevisionWithId(String documentId, Long revisionId) {
+    public DocumentRevision getDocumentRevisionWithId(String documentId, Long revisionId) {
         DocumentRevision documentRevision = documentRevisionRepository.findByDocumentIdAndRevisionId(documentId, revisionId)
                                                                       .orElseThrow(() -> new RuntimeException("revize nenalezena"));
 
@@ -66,7 +66,7 @@ public class DocumentService {
         return documentRevision;
     }
 
-    public Document getDocumentFromRequest(DocumentRequest documentRequest) {
+    private Document getDocumentFromRequest(DocumentRequest documentRequest) {
         MultipartFile file = documentRequest.getFile();
 
         String path = StringUtils.cleanPath(file.getOriginalFilename());
@@ -85,11 +85,11 @@ public class DocumentService {
                        .build();
     }
 
-    public Document saveDocument(DocumentRequest fileRequest) {
-        MultipartFile file = fileRequest.getFile();
+    public Document saveDocument(DocumentRequest documentRequest) {
+        MultipartFile file = documentRequest.getFile();
         String hash = blobStorageService.storeBlob(file);
 
-        Document document = getDocumentFromRequest(fileRequest);
+        Document document = getDocumentFromRequest(documentRequest);
         document.setHashPointer(hash);
 
         return documentRepository.save(document);
@@ -99,10 +99,14 @@ public class DocumentService {
         Document databaseDocument = getDocument(documentId);
         saveDocumentRevision(databaseDocument, databaseDocument.getOperation());
 
+        MultipartFile file = documentRequest.getFile();
+        String hash = blobStorageService.storeBlob(file);
+
         Document document = getDocumentFromRequest(documentRequest);
         document.setDocumentId(documentId);
-        document.setOperation(DocumentOperation.UPDATE);
         document.setCreatedAt(databaseDocument.getCreatedAt());
+        document.setOperation(DocumentOperation.UPDATE);
+        document.setHashPointer(hash);
 
         documentRepository.save(document);
 
@@ -118,7 +122,7 @@ public class DocumentService {
                                                             .path(document.getPath())
                                                             .author(document.getAuthor())
                                                             .operation(operation)
-                                                            .data(document.getData())
+                                                            .hashPointer(document.getHashPointer())
                                                             .build();
         documentRevisionRepository.save(documentRevision);
     }
@@ -169,21 +173,30 @@ public class DocumentService {
 
     @Transactional
     public String moveDocument(String documentId, DocumentDestinationRequest documentDestination) {
-        Document file = getDocument(documentId);
-        documentRepository.updateDocumentPath(file, documentDestination.getDestination());
+        Document document = getDocument(documentId);
+        documentRepository.updateDocumentPath(document, documentDestination.getDestination());
 
         return "Document moved successfully";
     }
 
     public ResponseEntity<Resource> downloadDocument(String documentId) {
-        Document file = getDocument(documentId);
+        Document document = getDocument(documentId);
 
         // TODO: add file UUID to header
 
         return ResponseEntity.ok()
-                             .contentType(MediaType.parseMediaType(file.getType()))
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
-                             .body(new ByteArrayResource(file.getData()));
+                             .contentType(MediaType.parseMediaType(document.getType()))
+                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
+                             .body(new ByteArrayResource(document.getData()));
+    }
+
+    public ResponseEntity<Resource> downloadDocumentRevision(String documentId, Long revisionId) {
+        DocumentRevision documentRevision = getDocumentRevisionWithId(documentId, revisionId);
+
+        return ResponseEntity.ok()
+                             .contentType(MediaType.parseMediaType(documentRevision.getType()))
+                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentRevision.getName() + "\"")
+                             .body(new ByteArrayResource(documentRevision.getData()));
     }
 
     public String copyDocument(String documentId, DocumentDestinationRequest destination) {

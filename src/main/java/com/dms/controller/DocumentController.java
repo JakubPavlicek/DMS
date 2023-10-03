@@ -47,8 +47,8 @@ public class DocumentController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteDocument(@PathVariable("id") String documentId) {
-        return documentService.deleteDocument(documentId);
+    public String deleteDocumentWithRevisions(@PathVariable("id") String documentId) {
+        return documentService.deleteDocumentWithRevisions(documentId);
     }
 
     @PutMapping("/{id}/revisions/{revision}")
@@ -86,11 +86,5 @@ public class DocumentController {
     public DocumentRevision getRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId)
     {
         return documentService.getDocumentRevisionWithId(documentId, revisionId);
-    }
-
-    @PostMapping("/{id}/copy")
-    public String copyDocument(@PathVariable("id") String documentId, @RequestBody DocumentDestinationRequest destination)
-    {
-        return documentService.copyDocument(documentId, destination);
     }
 }

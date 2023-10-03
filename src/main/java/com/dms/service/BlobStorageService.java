@@ -15,14 +15,16 @@ import java.nio.file.Paths;
 public class BlobStorageService {
 
     private final BlobStorage blobStorage;
+    private final Sha256Hasher hasher;
 
     @Autowired
-    public BlobStorageService(BlobStorage blobStorage) {
+    public BlobStorageService(BlobStorage blobStorage, Sha256Hasher hasher) {
         this.blobStorage = blobStorage;
+        this.hasher = hasher;
     }
 
     public String storeBlob(MultipartFile file) {
-        String hash = Sha256Hasher.hashFile(file);
+        String hash = hasher.hashFile(file);
         Path filePath = Paths.get(blobStorage.getStoragePath(), hash);
 
         try {

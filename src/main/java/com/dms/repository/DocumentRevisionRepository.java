@@ -12,6 +12,4 @@ public interface DocumentRevisionRepository extends JpaRepository<DocumentRevisi
     Optional<DocumentRevision> findByDocumentIdAndRevisionId(String documentId, Long revisionId);
 
     List<DocumentRevision> findAllByDocumentId(String documentId);
-
-    void deleteByDocumentIdAndRevisionId(String documentId, Long revisionId);
 }

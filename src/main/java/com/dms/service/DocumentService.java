@@ -8,7 +8,6 @@ import com.dms.repository.DocumentRevisionRepository;
 import com.dms.request.DocumentDestinationRequest;
 import com.dms.request.DocumentRequest;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -129,11 +128,11 @@ public class DocumentService {
 
     @Transactional
     public DocumentRevision switchToRevision(String documentId, Long revisionId) {
-        Document databaseFile = getDocument(documentId);
+        Document databaseDocument = getDocument(documentId);
         DocumentRevision documentRevision = getDocumentRevisionWithId(documentId, revisionId);
 
-        saveDocumentRevision(databaseFile, databaseFile.getOperation());
-        updateDocumentToRevision(databaseFile, documentRevision);
+        saveDocumentRevision(databaseDocument, databaseDocument.getOperation());
+        updateDocumentToRevision(databaseDocument, documentRevision);
 
         documentRevisionRepository.delete(documentRevision);
 
@@ -148,7 +147,7 @@ public class DocumentService {
         documentRepository.updateDocumentAuthor(databaseFile, documentRevision.getAuthor());
         documentRepository.updateDocumentOperation(databaseFile, documentRevision.getOperation());
         documentRepository.updateDocumentUpdatedAt(databaseFile, LocalDateTime.now());
-//        documentRepository.updateDocumentData(databaseFile, documentRevision.getData());
+        documentRepository.updateDocumentHashPointer(databaseFile, documentRevision.getHashPointer());
     }
 
     @Transactional
@@ -158,15 +157,27 @@ public class DocumentService {
 
     @Transactional
     public String deleteRevision(String documentId, Long revisionId) {
-        documentRevisionRepository.deleteByDocumentIdAndRevisionId(documentId, revisionId);
+        DocumentRevision documentRevision = getDocumentRevisionWithId(documentId, revisionId);
+        String hash = documentRevision.getHashPointer();
+
+        blobStorageService.deleteBlob(hash);
+        documentRevisionRepository.delete(documentRevision);
 
         return "Revision deleted successfully";
     }
 
-    public String deleteDocument(String documentId) {
-        Document file = getDocument(documentId);
-        saveDocumentRevision(file, DocumentOperation.DELETE);
-        documentRepository.delete(file);
+    @Transactional
+    public String deleteDocumentWithRevisions(String documentId) {
+        List<DocumentRevision> documentRevisions = getRevisions(documentId);
+
+        documentRevisions.forEach(revision -> {
+            blobStorageService.deleteBlob(revision.getHashPointer());
+            documentRevisionRepository.delete(revision);
+        });
+
+        Document document = getDocument(documentId);
+        blobStorageService.deleteBlob(document.getHashPointer());
+        documentRepository.delete(document);
 
         return "Document deleted successfully";
     }
@@ -197,17 +208,5 @@ public class DocumentService {
                              .contentType(MediaType.parseMediaType(documentRevision.getType()))
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentRevision.getName() + "\"")
                              .body(new ByteArrayResource(documentRevision.getData()));
-    }
-
-    public String copyDocument(String documentId, DocumentDestinationRequest destination) {
-        Document databaseDocument = getDocument(documentId);
-
-        Document document = new Document();
-        BeanUtils.copyProperties(databaseDocument, document, "documentId", "path");
-        document.setPath(destination.getDestination());
-
-        documentRepository.save(document);
-
-        return "Document copied successfully";
     }
 }

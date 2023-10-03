@@ -38,4 +38,8 @@ public interface DocumentRepository extends JpaRepository<Document, String> {
     @Modifying
     @Query("UPDATE Document document SET document.updatedAt = :updatedAt WHERE document = :document")
     void updateDocumentUpdatedAt(Document document, LocalDateTime updatedAt);
+
+    @Modifying
+    @Query("UPDATE Document document SET document.hashPointer = :hashPointer WHERE document = :document")
+    void updateDocumentHashPointer(Document document, String hashPointer);
 }

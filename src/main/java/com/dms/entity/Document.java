@@ -1,13 +1,12 @@
 package com.dms.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,7 +43,8 @@ public class Document {
     @Enumerated(EnumType.STRING)
     private DocumentOperation operation;
 
-    @Lob
-    @Column(length = Integer.MAX_VALUE)
+    private String hashPointer;
+
+    @Transient
     private byte[] data;
 }

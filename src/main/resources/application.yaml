@@ -17,6 +17,9 @@ spring:
       max-file-size: 200MB
       max-request-size: 200MB
 
+storage:
+  path: /Users/kuba/Downloads/blob_storage
+
 #---
 #
 #spring:

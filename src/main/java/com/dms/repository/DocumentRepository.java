@@ -36,10 +36,6 @@ public interface DocumentRepository extends JpaRepository<Document, String> {
     void updateDocumentOperation(Document document, DocumentOperation operation);
 
     @Modifying
-    @Query("UPDATE Document document SET document.data = :data WHERE document = :document")
-    void updateDocumentData(Document document, byte[] data);
-
-    @Modifying
     @Query("UPDATE Document document SET document.updatedAt = :updatedAt WHERE document = :document")
     void updateDocumentUpdatedAt(Document document, LocalDateTime updatedAt);
 }

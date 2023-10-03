@@ -27,6 +27,9 @@ public class BlobStorageService {
         String hash = hasher.hashFile(file);
         Path filePath = Paths.get(blobStorage.getStoragePath(), hash);
 
+        if(Files.exists(filePath))
+            throw new RuntimeException("Soubor " + file.getOriginalFilename() + " s hashem " + hash + " jiz existuje");
+
         try {
             Files.write(filePath, file.getBytes());
         } catch (IOException exception) {

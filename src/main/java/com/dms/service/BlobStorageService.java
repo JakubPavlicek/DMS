@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 
 @Service
 public class BlobStorageService {
-
     private final BlobStorage blobStorage;
     private final Sha256Hasher hasher;
 
@@ -27,7 +26,7 @@ public class BlobStorageService {
         String hash = hasher.hashFile(file);
         Path filePath = Paths.get(blobStorage.getStoragePath(), hash);
 
-        if(Files.exists(filePath))
+        if (Files.exists(filePath))
             throw new RuntimeException("Soubor " + file.getOriginalFilename() + " s hashem " + hash + " jiz existuje");
 
         try {

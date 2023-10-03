@@ -77,14 +77,12 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}/revisions/{revision}/download")
-    public ResponseEntity<Resource> downloadDocumentRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId)
-    {
+    public ResponseEntity<Resource> downloadDocumentRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId) {
         return documentService.downloadDocumentRevision(documentId, revisionId);
     }
 
     @GetMapping("/{id}/revisions/{revision}")
-    public DocumentRevision getRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId)
-    {
+    public DocumentRevision getRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId) {
         return documentService.getDocumentRevisionWithId(documentId, revisionId);
     }
 }

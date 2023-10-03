@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,31 +27,43 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentRevisionRepository documentRevisionRepository;
 
+    private final BlobStorageService blobStorageService;
+
     @Autowired
-    public DocumentService(DocumentRepository documentRepository, DocumentRevisionRepository documentRevisionRepository) {
+    public DocumentService(DocumentRepository documentRepository, DocumentRevisionRepository documentRevisionRepository, BlobStorageService blobStorageService) {
         this.documentRepository = documentRepository;
         this.documentRevisionRepository = documentRevisionRepository;
+        this.blobStorageService = blobStorageService;
     }
 
     public Document getDocument(String documentId) {
-        return documentRepository.findById(documentId)
-                                 .orElseThrow(() -> new RuntimeException("Soubor s id: " + documentId + " nebyl nalezen."));
+        Document document = documentRepository.findById(documentId)
+                                              .orElseThrow(() -> new RuntimeException("Soubor s id: " + documentId + " nebyl nalezen."));
+
+        byte[] data = blobStorageService.getBlob(document.getHashPointer());
+        document.setData(data);
+
+        return document;
     }
 
     public DocumentRevision getDocumentRevision(String documentId) {
-        return documentRevisionRepository.findById(documentId)
-                                         .orElseThrow(() -> new RuntimeException("Revize s id: " + documentId + " nebyla nalezena."));
+        DocumentRevision documentRevision = documentRevisionRepository.findById(documentId)
+                                                                      .orElseThrow(() -> new RuntimeException("Revize s id: " + documentId + " nebyla nalezena."));
+
+        byte[] data = blobStorageService.getBlob(documentRevision.getHashPointer());
+        documentRevision.setData(data);
+
+        return documentRevision;
     }
 
     private DocumentRevision getDocumentRevisionWithId(String documentId, Long revisionId) {
-        return documentRevisionRepository.findByDocumentIdAndRevisionId(documentId, revisionId)
-                                         .orElseThrow(() -> new RuntimeException("revize nenalezena"));
-    }
+        DocumentRevision documentRevision = documentRevisionRepository.findByDocumentIdAndRevisionId(documentId, revisionId)
+                                                                      .orElseThrow(() -> new RuntimeException("revize nenalezena"));
 
-    public Document saveDocument(DocumentRequest fileRequest) {
-        Document document = getDocumentFromRequest(fileRequest);
+        byte[] data = blobStorageService.getBlob(documentRevision.getHashPointer());
+        documentRevision.setData(data);
 
-        return documentRepository.save(document);
+        return documentRevision;
     }
 
     public Document getDocumentFromRequest(DocumentRequest documentRequest) {
@@ -63,13 +74,6 @@ public class DocumentService {
         String extension = StringUtils.getFilenameExtension(path);
         String type = file.getContentType();
         String author = documentRequest.getAuthor();
-        byte[] data;
-
-        try {
-            data = file.getBytes();
-        } catch (IOException e) {
-            throw new RuntimeException("Data souboru se nepodarilo ziskat.");
-        }
 
         return Document.builder()
                        .name(name)
@@ -78,8 +82,17 @@ public class DocumentService {
                        .path(path)
                        .author(author)
                        .operation(DocumentOperation.INSERT)
-                       .data(data)
                        .build();
+    }
+
+    public Document saveDocument(DocumentRequest fileRequest) {
+        MultipartFile file = fileRequest.getFile();
+        String hash = blobStorageService.storeBlob(file);
+
+        Document document = getDocumentFromRequest(fileRequest);
+        document.setHashPointer(hash);
+
+        return documentRepository.save(document);
     }
 
     public String updateDocument(String documentId, DocumentRequest documentRequest) {
@@ -131,7 +144,7 @@ public class DocumentService {
         documentRepository.updateDocumentAuthor(databaseFile, documentRevision.getAuthor());
         documentRepository.updateDocumentOperation(databaseFile, documentRevision.getOperation());
         documentRepository.updateDocumentUpdatedAt(databaseFile, LocalDateTime.now());
-        documentRepository.updateDocumentData(databaseFile, documentRevision.getData());
+//        documentRepository.updateDocumentData(databaseFile, documentRevision.getData());
     }
 
     @Transactional

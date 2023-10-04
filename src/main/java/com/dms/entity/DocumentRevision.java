@@ -48,8 +48,7 @@ public class DocumentRevision {
     )
     @JoinColumn(
         name = "user_id",
-        referencedColumnName = "userId",
-        unique = false
+        referencedColumnName = "userId"
     )
     private User author;
 

@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class DocumentService {
@@ -58,7 +59,8 @@ public class DocumentService {
     private Document getDocumentFromRequest(DocumentRequest documentRequest) {
         MultipartFile file = documentRequest.getFile();
 
-        String path = StringUtils.cleanPath(file.getOriginalFilename());
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
+        String path = StringUtils.cleanPath(originalFileName);
         String name = StringUtils.getFilename(path);
         String extension = StringUtils.getFilenameExtension(path);
         String type = file.getContentType();

@@ -83,6 +83,6 @@ public class DocumentController {
 
     @GetMapping("/{id}/revisions/{revision}")
     public DocumentRevision getRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId) {
-        return documentService.getDocumentRevisionWithId(documentId, revisionId);
+        return documentService.getDocumentRevision(documentId, revisionId);
     }
 }

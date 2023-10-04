@@ -1,12 +1,18 @@
 package com.dms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,10 +22,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,13 +35,35 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String documentId;
 
+    @OneToOne(
+        fetch = FetchType.EAGER,
+        cascade = CascadeType.PERSIST
+    )
+    @JoinColumn(
+        name = "user_id",
+        referencedColumnName = "userId"
+    )
+    private User author;
+
+    @OneToMany(
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.REMOVE,
+        mappedBy = "document"
+    )
+    @JsonIgnore
+    private List<DocumentRevision> revisions;
+
     private String name;
     private String extension;
     private String type;
     private String path;
-    private String author;
+    private String hashPointer;
 
     @CreationTimestamp
+    @Column(
+        nullable = false,
+        updatable = false
+    )
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -42,9 +71,4 @@ public class Document {
 
     @Enumerated(EnumType.STRING)
     private DocumentOperation operation;
-
-    private String hashPointer;
-
-    @Transient
-    private byte[] data;
 }

@@ -156,8 +156,7 @@ public class DocumentService {
         List<DocumentRevision> documentRevisions = documentRevisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
 
         Long version = 1L;
-        for(DocumentRevision revision : documentRevisions)
-        {
+        for (DocumentRevision revision : documentRevisions) {
             documentRevisionRepository.updateVersion(revision, version);
             version++;
         }

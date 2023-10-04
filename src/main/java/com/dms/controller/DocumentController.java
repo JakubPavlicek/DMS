@@ -2,7 +2,6 @@ package com.dms.controller;
 
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
-import com.dms.request.DocumentDestinationRequest;
 import com.dms.request.DocumentRequest;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -64,11 +62,6 @@ public class DocumentController {
     @DeleteMapping("/{id}/revisions/{revision}")
     public String deleteRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId) {
         return documentService.deleteRevision(documentId, revisionId);
-    }
-
-    @PutMapping("/{id}/move")
-    public String moveDocument(@PathVariable("id") String documentId, @Valid @RequestBody DocumentDestinationRequest destination) {
-        return documentService.moveDocument(documentId, destination);
     }
 
     @GetMapping("/{id}/download")

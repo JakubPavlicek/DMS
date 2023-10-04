@@ -2,6 +2,7 @@ package com.dms.repository;
 
 import com.dms.entity.Document;
 import com.dms.entity.DocumentOperation;
+import com.dms.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -29,7 +30,7 @@ public interface DocumentRepository extends JpaRepository<Document, String> {
 
     @Modifying
     @Query("UPDATE Document document SET document.author = :author WHERE document = :document")
-    void updateDocumentAuthor(Document document, String author);
+    void updateDocumentAuthor(Document document, User author);
 
     @Modifying
     @Query("UPDATE Document document SET document.operation = :operation WHERE document = :document")

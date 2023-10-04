@@ -60,6 +60,8 @@ public class DocumentRevision {
     @JsonIgnore
     private Document document;
 
+    private Long version;
+
     private String name;
     private String extension;
     private String type;

@@ -6,7 +6,6 @@ import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
-import com.dms.request.DocumentDestinationRequest;
 import com.dms.request.DocumentRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,9 +74,15 @@ public class DocumentService {
                        .build();
     }
 
+    private Long getLastRevisionVersion(Document document) {
+        return documentRevisionRepository.findLastRevisionVersionByDocument(document)
+                                         .orElse(0L);
+    }
+
     private void createDocumentRevision(Document document) {
         DocumentRevision documentRevision = DocumentRevision.builder()
                                                             .document(document)
+                                                            .version(getLastRevisionVersion(document) + 1)
                                                             .name(document.getName())
                                                             .extension(document.getExtension())
                                                             .type(document.getType())
@@ -144,6 +149,18 @@ public class DocumentService {
         documentRepository.updateDocumentHashPointer(databaseFile, documentRevision.getHashPointer());
     }
 
+    private void updateRevisionVersionsForDocument(String documentId) {
+        Document document = getDocument(documentId);
+        List<DocumentRevision> documentRevisions = documentRevisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
+
+        Long version = 1L;
+        for(DocumentRevision revision : documentRevisions)
+        {
+            documentRevisionRepository.updateVersion(revision, version);
+            version++;
+        }
+    }
+
     @Transactional
     public List<DocumentRevision> getRevisions(String documentId) {
         Document document = getDocument(documentId);
@@ -158,6 +175,8 @@ public class DocumentService {
         blobStorageService.deleteBlob(hash);
         documentRevisionRepository.delete(documentRevision);
 
+        updateRevisionVersionsForDocument(documentId);
+
         return "Revision deleted successfully";
     }
 
@@ -171,14 +190,6 @@ public class DocumentService {
         documentRepository.delete(document);
 
         return "Document deleted successfully";
-    }
-
-    @Transactional
-    public String moveDocument(String documentId, DocumentDestinationRequest documentDestination) {
-        Document document = getDocument(documentId);
-        documentRepository.updateDocumentPath(document, documentDestination.getDestination());
-
-        return "Document moved successfully";
     }
 
     public ResponseEntity<Resource> downloadDocument(String documentId) {

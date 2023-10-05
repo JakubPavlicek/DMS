@@ -6,6 +6,7 @@ import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
+import com.dms.repository.UserRepository;
 import com.dms.request.DocumentRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,13 +28,15 @@ import java.util.Objects;
 public class DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentRevisionRepository documentRevisionRepository;
+    private final UserRepository userRepository;
 
     private final BlobStorageService blobStorageService;
 
     @Autowired
-    public DocumentService(DocumentRepository documentRepository, DocumentRevisionRepository documentRevisionRepository, BlobStorageService blobStorageService) {
+    public DocumentService(DocumentRepository documentRepository, DocumentRevisionRepository documentRevisionRepository, UserRepository userRepository, BlobStorageService blobStorageService) {
         this.documentRepository = documentRepository;
         this.documentRevisionRepository = documentRevisionRepository;
+        this.userRepository = userRepository;
         this.blobStorageService = blobStorageService;
     }
 
@@ -64,14 +66,12 @@ public class DocumentService {
         String name = StringUtils.getFilename(path);
         String extension = StringUtils.getFilenameExtension(path);
         String type = file.getContentType();
-        User author = getUserFromRequest(documentRequest);
 
         return Document.builder()
                        .name(name)
                        .extension(extension)
                        .type(type)
                        .path(path)
-                       .author(author)
                        .operation(DocumentOperation.INSERT)
                        .build();
     }
@@ -96,17 +96,32 @@ public class DocumentService {
         documentRevisionRepository.save(documentRevision);
     }
 
+    private User saveUser(User user) {
+        String username = user.getUsername();
+        String email = user.getEmail();
+
+        if (userRepository.existsByUsernameAndEmail(username, email))
+            return userRepository.findByUsernameAndEmail(username, email)
+                                 .orElseThrow(() -> new RuntimeException("Uzivatel nebyl nalezen"));
+
+        return userRepository.save(user);
+    }
+
     @Transactional
     public Document saveDocument(DocumentRequest documentRequest) {
         MultipartFile file = documentRequest.getFile();
         String hash = blobStorageService.storeBlob(file);
 
+        User userFromRequest = getUserFromRequest(documentRequest);
+        User author = saveUser(userFromRequest);
+
         Document document = getDocumentFromRequest(documentRequest);
         document.setHashPointer(hash);
+        document.setAuthor(author);
 
         Document savedDocument = documentRepository.save(document);
 
-        createDocumentRevision(document);
+        createDocumentRevision(savedDocument);
 
         return savedDocument;
     }
@@ -117,11 +132,15 @@ public class DocumentService {
         MultipartFile file = documentRequest.getFile();
         String hash = blobStorageService.storeBlob(file);
 
+        User userFromRequest = getUserFromRequest(documentRequest);
+        User author = saveUser(userFromRequest);
+
         Document document = getDocumentFromRequest(documentRequest);
         document.setDocumentId(documentId);
         document.setCreatedAt(databaseDocument.getCreatedAt());
         document.setOperation(DocumentOperation.UPDATE);
         document.setHashPointer(hash);
+        document.setAuthor(author);
 
         createDocumentRevision(document);
 
@@ -140,15 +159,16 @@ public class DocumentService {
         return documentRevision;
     }
 
-    private void updateDocumentToRevision(Document databaseFile, DocumentRevision documentRevision) {
-        documentRepository.updateDocumentName(databaseFile, documentRevision.getName());
-        documentRepository.updateDocumentExtension(databaseFile, documentRevision.getExtension());
-        documentRepository.updateDocumentType(databaseFile, documentRevision.getType());
-        documentRepository.updateDocumentPath(databaseFile, documentRevision.getPath());
-        documentRepository.updateDocumentAuthor(databaseFile, documentRevision.getAuthor());
-        documentRepository.updateDocumentOperation(databaseFile, documentRevision.getOperation());
-        documentRepository.updateDocumentUpdatedAt(databaseFile, LocalDateTime.now());
-        documentRepository.updateDocumentHashPointer(databaseFile, documentRevision.getHashPointer());
+    private void updateDocumentToRevision(Document databaseDocument, DocumentRevision documentRevision) {
+        databaseDocument.setName(documentRevision.getName());
+        databaseDocument.setExtension(documentRevision.getExtension());
+        databaseDocument.setType(documentRevision.getType());
+        databaseDocument.setPath(documentRevision.getPath());
+        databaseDocument.setAuthor(documentRevision.getAuthor());
+        databaseDocument.setOperation(documentRevision.getOperation());
+        databaseDocument.setHashPointer(documentRevision.getHashPointer());
+
+        documentRepository.save(databaseDocument);
     }
 
     private void updateRevisionVersionsForDocument(String documentId) {

@@ -11,8 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,10 +35,7 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String documentId;
 
-    @OneToOne(
-        fetch = FetchType.EAGER,
-        cascade = CascadeType.PERSIST
-    )
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
         name = "user_id",
         referencedColumnName = "userId"

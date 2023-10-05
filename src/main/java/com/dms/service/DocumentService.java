@@ -210,9 +210,9 @@ public class DocumentService {
 
         Long currentVersion = currentDocumentRevision.getVersion();
         DocumentRevision newRevision = documentRevisionRepository.findPreviousByDocumentAndVersion(document, currentVersion)
-                                                                      .orElse(documentRevisionRepository.findNextByDocumentAndVersion(document, currentVersion)
-                                                                                                        .orElse(null));
-        if(newRevision == null)
+                                                                 .orElse(documentRevisionRepository.findNextByDocumentAndVersion(document, currentVersion)
+                                                                                                   .orElse(null));
+        if (newRevision == null)
             throw new RuntimeException("nebyla nalezena nahrazujici revize pro revizi " + currentRevisionId);
 
         updateDocumentToRevision(document, newRevision);

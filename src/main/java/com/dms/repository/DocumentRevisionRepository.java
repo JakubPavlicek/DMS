@@ -16,6 +16,12 @@ public interface DocumentRevisionRepository extends JpaRepository<DocumentRevisi
 
     List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
 
+    @Query("SELECT revision FROM DocumentRevision revision WHERE revision.document = :document AND revision.version < :version ORDER BY revision.version DESC LIMIT 1")
+    Optional<DocumentRevision> findPreviousByDocumentAndVersion(Document document, Long version);
+
+    @Query("SELECT revision FROM DocumentRevision revision WHERE revision.document = :document AND revision.version > :version ORDER BY revision.version ASC LIMIT 1")
+    Optional<DocumentRevision> findNextByDocumentAndVersion(Document document, Long version);
+
     @Query("SELECT MAX(revision.version) FROM DocumentRevision revision WHERE revision.document = :document")
     Optional<Long> findLastRevisionVersionByDocument(Document document);
 

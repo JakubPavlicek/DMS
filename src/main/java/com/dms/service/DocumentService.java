@@ -159,16 +159,16 @@ public class DocumentService {
         return documentRevision;
     }
 
-    private void updateDocumentToRevision(Document databaseDocument, DocumentRevision documentRevision) {
-        databaseDocument.setName(documentRevision.getName());
-        databaseDocument.setExtension(documentRevision.getExtension());
-        databaseDocument.setType(documentRevision.getType());
-        databaseDocument.setPath(documentRevision.getPath());
-        databaseDocument.setAuthor(documentRevision.getAuthor());
-        databaseDocument.setOperation(documentRevision.getOperation());
-        databaseDocument.setHashPointer(documentRevision.getHashPointer());
+    private void updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
+        document.setName(documentRevision.getName());
+        document.setExtension(documentRevision.getExtension());
+        document.setType(documentRevision.getType());
+        document.setPath(documentRevision.getPath());
+        document.setAuthor(documentRevision.getAuthor());
+        document.setOperation(documentRevision.getOperation());
+        document.setHashPointer(documentRevision.getHashPointer());
 
-        documentRepository.save(databaseDocument);
+        documentRepository.save(document);
     }
 
     private void updateRevisionVersionsForDocument(String documentId) {
@@ -193,12 +193,37 @@ public class DocumentService {
         DocumentRevision documentRevision = getDocumentRevision(documentId, revisionId);
         String hash = documentRevision.getHashPointer();
 
+        if (isRevisionSetAsCurrent(documentId, revisionId))
+            replaceDocumentWithAdjacentRevision(documentId, revisionId);
+
         blobStorageService.deleteBlob(hash);
         documentRevisionRepository.delete(documentRevision);
 
         updateRevisionVersionsForDocument(documentId);
 
         return "Revision deleted successfully";
+    }
+
+    private void replaceDocumentWithAdjacentRevision(String documentId, Long currentRevisionId) {
+        Document document = getDocument(documentId);
+        DocumentRevision currentDocumentRevision = getDocumentRevision(documentId, currentRevisionId);
+
+        Long currentVersion = currentDocumentRevision.getVersion();
+        DocumentRevision newRevision = documentRevisionRepository.findPreviousByDocumentAndVersion(document, currentVersion)
+                                                                      .orElse(documentRevisionRepository.findNextByDocumentAndVersion(document, currentVersion)
+                                                                                                        .orElse(null));
+        if(newRevision == null)
+            throw new RuntimeException("nebyla nalezena nahrazujici revize pro revizi " + currentRevisionId);
+
+        updateDocumentToRevision(document, newRevision);
+    }
+
+    private boolean isRevisionSetAsCurrent(String documentId, Long revisionId) {
+        Document document = getDocument(documentId);
+        DocumentRevision documentRevision = getDocumentRevision(documentId, revisionId);
+
+        return document.getHashPointer()
+                       .equals(documentRevision.getHashPointer());
     }
 
     @Transactional

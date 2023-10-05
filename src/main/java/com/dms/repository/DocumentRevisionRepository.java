@@ -14,10 +14,10 @@ import java.util.Optional;
 public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, String> {
     Optional<DocumentRevision> findByDocument_DocumentIdAndRevisionId(String documentId, Long revisionId);
 
+    List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
+
     @Query("SELECT MAX(revision.version) FROM DocumentRevision revision WHERE revision.document = :document")
     Optional<Long> findLastRevisionVersionByDocument(Document document);
-
-    List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
 
     @Modifying
     @Query("UPDATE DocumentRevision revision SET revision.version = :version WHERE revision = :documentRevision")

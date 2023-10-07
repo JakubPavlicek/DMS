@@ -4,13 +4,11 @@ import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
-import com.dms.repository.DocumentRevisionRepository;
-import com.dms.repository.UserRepository;
 import com.dms.request.DocumentRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -24,29 +22,18 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class DocumentService {
+
     private final DocumentRepository documentRepository;
-    private final DocumentRevisionRepository documentRevisionRepository;
-    private final UserRepository userRepository;
 
+    private final DocumentRevisionService revisionService;
+    private final UserService userService;
     private final BlobStorageService blobStorageService;
-
-    @Autowired
-    public DocumentService(DocumentRepository documentRepository, DocumentRevisionRepository documentRevisionRepository, UserRepository userRepository, BlobStorageService blobStorageService) {
-        this.documentRepository = documentRepository;
-        this.documentRevisionRepository = documentRevisionRepository;
-        this.userRepository = userRepository;
-        this.blobStorageService = blobStorageService;
-    }
 
     public Document getDocument(String documentId) {
         return documentRepository.findById(documentId)
                                  .orElseThrow(() -> new RuntimeException("Soubor s id: " + documentId + " nebyl nalezen."));
-    }
-
-    public DocumentRevision getDocumentRevision(String documentId, Long revisionId) {
-        return documentRevisionRepository.findByDocument_DocumentIdAndRevisionId(documentId, revisionId)
-                                         .orElseThrow(() -> new RuntimeException("revize nenalezena"));
     }
 
     private User getUserFromRequest(DocumentRequest documentRequest) {
@@ -74,43 +61,13 @@ public class DocumentService {
                        .build();
     }
 
-    private Long getLastRevisionVersion(Document document) {
-        return documentRevisionRepository.findLastRevisionVersionByDocument(document)
-                                         .orElse(0L);
-    }
-
-    private void createDocumentRevision(Document document) {
-        DocumentRevision documentRevision = DocumentRevision.builder()
-                                                            .document(document)
-                                                            .version(getLastRevisionVersion(document) + 1)
-                                                            .name(document.getName())
-                                                            .extension(document.getExtension())
-                                                            .type(document.getType())
-                                                            .path(document.getPath())
-                                                            .author(document.getAuthor())
-                                                            .hashPointer(document.getHashPointer())
-                                                            .build();
-        documentRevisionRepository.save(documentRevision);
-    }
-
-    private User saveUser(User user) {
-        String username = user.getUsername();
-        String email = user.getEmail();
-
-        if (userRepository.existsByUsernameAndEmail(username, email))
-            return userRepository.findByUsernameAndEmail(username, email)
-                                 .orElseThrow(() -> new RuntimeException("Uzivatel nebyl nalezen"));
-
-        return userRepository.save(user);
-    }
-
     @Transactional
     public Document saveDocument(DocumentRequest documentRequest) {
         MultipartFile file = documentRequest.getFile();
         String hash = blobStorageService.storeBlob(file);
 
         User userFromRequest = getUserFromRequest(documentRequest);
-        User author = saveUser(userFromRequest);
+        User author = userService.getUser(userFromRequest);
 
         Document document = getDocumentFromRequest(documentRequest);
         document.setHashPointer(hash);
@@ -118,7 +75,7 @@ public class DocumentService {
 
         Document savedDocument = documentRepository.save(document);
 
-        createDocumentRevision(savedDocument);
+        revisionService.createDocumentRevision(savedDocument);
 
         return savedDocument;
     }
@@ -130,7 +87,7 @@ public class DocumentService {
         String hash = blobStorageService.storeBlob(file);
 
         User userFromRequest = getUserFromRequest(documentRequest);
-        User author = saveUser(userFromRequest);
+        User author = userService.getUser(userFromRequest);
 
         Document document = getDocumentFromRequest(documentRequest);
         document.setDocumentId(documentId);
@@ -138,7 +95,7 @@ public class DocumentService {
         document.setHashPointer(hash);
         document.setAuthor(author);
 
-        createDocumentRevision(document);
+        revisionService.createDocumentRevision(document);
 
         documentRepository.save(document);
 
@@ -146,16 +103,22 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentRevision switchToRevision(String documentId, Long revisionId) {
-        Document databaseDocument = getDocument(documentId);
-        DocumentRevision documentRevision = getDocumentRevision(documentId, revisionId);
+    public DocumentRevision switchToVersion(String documentId, Long version) {
+        Document document = getDocument(documentId);
+        List<DocumentRevision> revisions = document.getRevisions();
 
-        updateDocumentToRevision(databaseDocument, documentRevision);
+        DocumentRevision revision = revisions.stream()
+                                             .filter(rev -> rev.getVersion()
+                                                               .equals(version))
+                                             .findFirst()
+                                             .orElseThrow(() -> new RuntimeException("nebyla nalezena revize s verzi: " + version));
 
-        return documentRevision;
+        updateDocumentToRevision(document, revision);
+
+        return revision;
     }
 
-    private void updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
+    public void updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
         document.setName(documentRevision.getName());
         document.setExtension(documentRevision.getExtension());
         document.setType(documentRevision.getType());
@@ -166,59 +129,9 @@ public class DocumentService {
         documentRepository.save(document);
     }
 
-    private void updateRevisionVersionsForDocument(String documentId) {
-        Document document = getDocument(documentId);
-        List<DocumentRevision> documentRevisions = documentRevisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
-
-        Long version = 1L;
-        for (DocumentRevision revision : documentRevisions) {
-            documentRevisionRepository.updateVersion(revision, version);
-            version++;
-        }
-    }
-
-    @Transactional
     public List<DocumentRevision> getRevisions(String documentId) {
         Document document = getDocument(documentId);
         return document.getRevisions();
-    }
-
-    @Transactional
-    public String deleteRevision(String documentId, Long revisionId) {
-        DocumentRevision documentRevision = getDocumentRevision(documentId, revisionId);
-        String hash = documentRevision.getHashPointer();
-
-        if (isRevisionSetAsCurrent(documentId, revisionId))
-            replaceDocumentWithAdjacentRevision(documentId, revisionId);
-
-        blobStorageService.deleteBlob(hash);
-        documentRevisionRepository.delete(documentRevision);
-
-        updateRevisionVersionsForDocument(documentId);
-
-        return "Revision deleted successfully";
-    }
-
-    private void replaceDocumentWithAdjacentRevision(String documentId, Long currentRevisionId) {
-        Document document = getDocument(documentId);
-        DocumentRevision currentDocumentRevision = getDocumentRevision(documentId, currentRevisionId);
-
-        Long currentVersion = currentDocumentRevision.getVersion();
-        DocumentRevision newRevision = documentRevisionRepository.findPreviousByDocumentAndVersion(document, currentVersion)
-                                                                 .orElse(documentRevisionRepository.findNextByDocumentAndVersion(document, currentVersion)
-                                                                                                   .orElse(null));
-        if (newRevision == null)
-            throw new RuntimeException("nebyla nalezena nahrazujici revize pro revizi " + currentRevisionId);
-
-        updateDocumentToRevision(document, newRevision);
-    }
-
-    private boolean isRevisionSetAsCurrent(String documentId, Long revisionId) {
-        Document document = getDocument(documentId);
-        DocumentRevision documentRevision = getDocumentRevision(documentId, revisionId);
-
-        return document.getHashPointer()
-                       .equals(documentRevision.getHashPointer());
     }
 
     @Transactional
@@ -241,17 +154,6 @@ public class DocumentService {
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(document.getType()))
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
-                             .body(new ByteArrayResource(data));
-    }
-
-    public ResponseEntity<Resource> downloadDocumentRevision(String documentId, Long revisionId) {
-        DocumentRevision documentRevision = getDocumentRevision(documentId, revisionId);
-        String hash = documentRevision.getHashPointer();
-        byte[] data = blobStorageService.getBlob(hash);
-
-        return ResponseEntity.ok()
-                             .contentType(MediaType.parseMediaType(documentRevision.getType()))
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentRevision.getName() + "\"")
                              .body(new ByteArrayResource(data));
     }
 }

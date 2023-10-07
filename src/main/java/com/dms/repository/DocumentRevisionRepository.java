@@ -12,9 +12,13 @@ import java.util.Optional;
 
 @Repository
 public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, String> {
+    Optional<DocumentRevision> findByRevisionId(Long revisionId);
+
     Optional<DocumentRevision> findByDocument_DocumentIdAndRevisionId(String documentId, Long revisionId);
 
     List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
+
+    void deleteByRevisionId(Long revisionId);
 
     @Query("SELECT revision FROM DocumentRevision revision WHERE revision.document = :document AND revision.version < :version ORDER BY revision.version DESC LIMIT 1")
     Optional<DocumentRevision> findPreviousByDocumentAndVersion(Document document, Long version);

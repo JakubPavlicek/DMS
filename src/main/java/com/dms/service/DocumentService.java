@@ -5,8 +5,6 @@ import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
 import com.dms.request.DocumentRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -27,21 +25,12 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
 
-    private final DocumentRevisionService revisionService;
+    private final DocumentServiceCommon documentServiceCommon;
     private final UserService userService;
     private final BlobStorageService blobStorageService;
 
     public Document getDocument(String documentId) {
-        return documentRepository.findById(documentId)
-                                 .orElseThrow(() -> new RuntimeException("Soubor s id: " + documentId + " nebyl nalezen."));
-    }
-
-    private User getUserFromRequest(DocumentRequest documentRequest) {
-        try {
-            return new ObjectMapper().readValue(documentRequest.getUser(), User.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Nepodarilo se ziskat uzivatele z JSONu");
-        }
+        return documentServiceCommon.getDocument(documentId);
     }
 
     private Document getDocumentFromRequest(DocumentRequest documentRequest) {
@@ -66,7 +55,7 @@ public class DocumentService {
         MultipartFile file = documentRequest.getFile();
         String hash = blobStorageService.storeBlob(file);
 
-        User userFromRequest = getUserFromRequest(documentRequest);
+        User userFromRequest = userService.getUserFromRequest(documentRequest);
         User author = userService.getUser(userFromRequest);
 
         Document document = getDocumentFromRequest(documentRequest);
@@ -75,7 +64,7 @@ public class DocumentService {
 
         Document savedDocument = documentRepository.save(document);
 
-        revisionService.createDocumentRevision(savedDocument);
+        documentServiceCommon.createDocumentRevision(savedDocument);
 
         return savedDocument;
     }
@@ -86,7 +75,7 @@ public class DocumentService {
         MultipartFile file = documentRequest.getFile();
         String hash = blobStorageService.storeBlob(file);
 
-        User userFromRequest = getUserFromRequest(documentRequest);
+        User userFromRequest = userService.getUserFromRequest(documentRequest);
         User author = userService.getUser(userFromRequest);
 
         Document document = getDocumentFromRequest(documentRequest);
@@ -95,7 +84,7 @@ public class DocumentService {
         document.setHashPointer(hash);
         document.setAuthor(author);
 
-        revisionService.createDocumentRevision(document);
+        documentServiceCommon.createDocumentRevision(document);
 
         documentRepository.save(document);
 
@@ -113,33 +102,22 @@ public class DocumentService {
                                              .findFirst()
                                              .orElseThrow(() -> new RuntimeException("nebyla nalezena revize s verzi: " + version));
 
-        updateDocumentToRevision(document, revision);
+        documentServiceCommon.updateDocumentToRevision(document, revision);
 
         return revision;
     }
 
-    public void updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
-        document.setName(documentRevision.getName());
-        document.setExtension(documentRevision.getExtension());
-        document.setType(documentRevision.getType());
-        document.setPath(documentRevision.getPath());
-        document.setAuthor(documentRevision.getAuthor());
-        document.setHashPointer(documentRevision.getHashPointer());
-
-        documentRepository.save(document);
-    }
-
-    public List<DocumentRevision> getRevisions(String documentId) {
+    public List<DocumentRevision> getDocumentRevisions(String documentId) {
         Document document = getDocument(documentId);
         return document.getRevisions();
     }
 
     @Transactional
     public String deleteDocumentWithRevisions(String documentId) {
-        List<DocumentRevision> documentRevisions = getRevisions(documentId);
+        List<DocumentRevision> documentRevisions = getDocumentRevisions(documentId);
         documentRevisions.forEach(revision -> blobStorageService.deleteBlob(revision.getHashPointer()));
 
-        Document document = getDocument(documentId);
+        Document document = documentServiceCommon.getDocument(documentId);
         blobStorageService.deleteBlob(document.getHashPointer());
         documentRepository.delete(document);
 
@@ -156,4 +134,5 @@ public class DocumentService {
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
                              .body(new ByteArrayResource(data));
     }
+
 }

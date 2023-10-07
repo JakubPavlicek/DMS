@@ -20,7 +20,7 @@ public class DocumentRevisionService {
 
     private final DocumentRevisionRepository revisionRepository;
 
-    private final DocumentService documentService;
+    private final DocumentServiceCommon documentServiceCommon;
     private final BlobStorageService blobStorageService;
 
     public List<DocumentRevision> getRevisions() {
@@ -33,7 +33,7 @@ public class DocumentRevisionService {
     }
 
     private void replaceDocumentWithAdjacentRevision(String documentId, Long currentRevisionId) {
-        Document document = documentService.getDocument(documentId);
+        Document document = documentServiceCommon.getDocument(documentId);
         DocumentRevision currentDocumentRevision = getRevision(currentRevisionId);
 
         Long currentVersion = currentDocumentRevision.getVersion();
@@ -43,11 +43,11 @@ public class DocumentRevisionService {
         if (newRevision == null)
             throw new RuntimeException("nebyla nalezena nahrazujici revize pro revizi " + currentRevisionId);
 
-        documentService.updateDocumentToRevision(document, newRevision);
+        documentServiceCommon.updateDocumentToRevision(document, newRevision);
     }
 
     private boolean isRevisionSetAsCurrent(String documentId, Long revisionId) {
-        Document document = documentService.getDocument(documentId);
+        Document document = documentServiceCommon.getDocument(documentId);
         DocumentRevision documentRevision = getRevision(revisionId);
 
         return document.getHashPointer()
@@ -74,7 +74,7 @@ public class DocumentRevisionService {
     }
 
     private void updateRevisionVersionsForDocument(String documentId) {
-        Document document = documentService.getDocument(documentId);
+        Document document = documentServiceCommon.getDocument(documentId);
         List<DocumentRevision> documentRevisions = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
 
         Long version = 1L;
@@ -95,22 +95,4 @@ public class DocumentRevisionService {
                              .body(new ByteArrayResource(data));
     }
 
-    private Long getLastRevisionVersion(Document document) {
-        return revisionRepository.findLastRevisionVersionByDocument(document)
-                                 .orElse(0L);
-    }
-
-    public void createDocumentRevision(Document document) {
-        DocumentRevision documentRevision = DocumentRevision.builder()
-                                                            .document(document)
-                                                            .version(getLastRevisionVersion(document) + 1)
-                                                            .name(document.getName())
-                                                            .extension(document.getExtension())
-                                                            .type(document.getType())
-                                                            .path(document.getPath())
-                                                            .author(document.getAuthor())
-                                                            .hashPointer(document.getHashPointer())
-                                                            .build();
-        revisionRepository.save(documentRevision);
-    }
 }

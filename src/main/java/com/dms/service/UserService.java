@@ -2,6 +2,9 @@ package com.dms.service;
 
 import com.dms.entity.User;
 import com.dms.repository.UserRepository;
+import com.dms.request.DocumentRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,15 @@ public class UserService {
         String email = user.getEmail();
 
         return userRepository.findByUsernameAndEmail(username, email)
-                             .orElse(userRepository.save(user));
+                             .orElseGet(() -> userRepository.save(user));
     }
+
+    public User getUserFromRequest(DocumentRequest documentRequest) {
+        try {
+            return new ObjectMapper().readValue(documentRequest.getUser(), User.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Nepodarilo se ziskat uzivatele z JSONu");
+        }
+    }
+
 }

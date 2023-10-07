@@ -14,8 +14,6 @@ import java.util.Optional;
 public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, String> {
     Optional<DocumentRevision> findByRevisionId(Long revisionId);
 
-    Optional<DocumentRevision> findByDocument_DocumentIdAndRevisionId(String documentId, Long revisionId);
-
     List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
 
     void deleteByRevisionId(Long revisionId);

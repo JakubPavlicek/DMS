@@ -1,7 +1,6 @@
 package com.dms.service;
 
 import com.dms.entity.Document;
-import com.dms.entity.DocumentOperation;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
@@ -72,7 +71,6 @@ public class DocumentService {
                        .extension(extension)
                        .type(type)
                        .path(path)
-                       .operation(DocumentOperation.INSERT)
                        .build();
     }
 
@@ -90,7 +88,6 @@ public class DocumentService {
                                                             .type(document.getType())
                                                             .path(document.getPath())
                                                             .author(document.getAuthor())
-                                                            .operation(document.getOperation())
                                                             .hashPointer(document.getHashPointer())
                                                             .build();
         documentRevisionRepository.save(documentRevision);
@@ -138,7 +135,6 @@ public class DocumentService {
         Document document = getDocumentFromRequest(documentRequest);
         document.setDocumentId(documentId);
         document.setCreatedAt(databaseDocument.getCreatedAt());
-        document.setOperation(DocumentOperation.UPDATE);
         document.setHashPointer(hash);
         document.setAuthor(author);
 
@@ -165,7 +161,6 @@ public class DocumentService {
         document.setType(documentRevision.getType());
         document.setPath(documentRevision.getPath());
         document.setAuthor(documentRevision.getAuthor());
-        document.setOperation(documentRevision.getOperation());
         document.setHashPointer(documentRevision.getHashPointer());
 
         documentRepository.save(document);

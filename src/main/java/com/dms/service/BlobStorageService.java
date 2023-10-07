@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 
 @Service
 public class BlobStorageService {
+
     private final BlobStorage blobStorage;
     private final Sha256Hasher hasher;
 
@@ -57,4 +58,5 @@ public class BlobStorageService {
             throw new RuntimeException("Chyba pri mazani souboru");
         }
     }
+
 }

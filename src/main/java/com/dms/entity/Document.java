@@ -29,6 +29,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Document {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String documentId;
@@ -63,4 +64,5 @@ public class Document {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
 }

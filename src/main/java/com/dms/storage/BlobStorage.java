@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 public class BlobStorage {
+
     @Value("${storage.path}")
     private String storagePath;
+
 }

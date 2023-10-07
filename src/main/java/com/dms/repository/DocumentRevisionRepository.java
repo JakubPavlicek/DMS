@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, String> {
+
     Optional<DocumentRevision> findByRevisionId(Long revisionId);
 
     List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
@@ -30,4 +31,5 @@ public interface DocumentRevisionRepository extends JpaRepository<DocumentRevisi
     @Modifying
     @Query("UPDATE DocumentRevision revision SET revision.version = :version WHERE revision = :documentRevision")
     void updateVersion(DocumentRevision documentRevision, Long version);
+
 }

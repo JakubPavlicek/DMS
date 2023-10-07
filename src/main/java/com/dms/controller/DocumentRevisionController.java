@@ -39,4 +39,5 @@ public class DocumentRevisionController {
     public ResponseEntity<Resource> downloadRevision(@PathVariable("id") Long revisionId) {
         return revisionService.downloadRevision(revisionId);
     }
+
 }

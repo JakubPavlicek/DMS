@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class DocumentRevision {
+
     @Id
     @SequenceGenerator(
         name = "revision_id_generator",
@@ -67,4 +68,5 @@ public class DocumentRevision {
         updatable = false
     )
     private LocalDateTime createdAt;
+
 }

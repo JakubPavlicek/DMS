@@ -1,6 +1,5 @@
 package com.dms.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class User {
+
     @Id
     @SequenceGenerator(
         name = "user_id_generator",
@@ -34,10 +34,9 @@ public class User {
     )
     private Long userId;
 
-    @Column(unique = true)
     private String username;
 
-    @Column(unique = true)
     @Email
     private String email;
+
 }

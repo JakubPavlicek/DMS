@@ -54,11 +54,14 @@ public class DocumentController {
 
     @GetMapping("/{id}/revisions")
     public List<DocumentRevision> getDocumentRevisions(@PathVariable("id") String documentId) {
-        return documentService.getRevisions(documentId);
+        return documentService.getDocumentRevisions(documentId);
     }
 
-    @PutMapping("/{id}")
+    // TODO: upravit endpoint
+
+    @PutMapping("/{id}/version")
     public DocumentRevision switchToVersion(@PathVariable("id") String documentId, @RequestParam("version") Long version) {
         return documentService.switchToVersion(documentId, version);
     }
+
 }

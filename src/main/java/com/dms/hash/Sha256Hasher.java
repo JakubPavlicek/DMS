@@ -10,6 +10,7 @@ import java.util.Base64;
 
 @Component
 public class Sha256Hasher {
+
     public String hashFile(MultipartFile file) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -22,4 +23,5 @@ public class Sha256Hasher {
             throw new RuntimeException("Nepodarilo se ziskat data souboru: " + file.getName());
         }
     }
+
 }

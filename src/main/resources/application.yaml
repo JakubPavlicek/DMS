@@ -16,6 +16,9 @@ spring:
       enabled: true
       max-file-size: 200MB
       max-request-size: 200MB
+  mvc:
+    problemdetails:
+      enabled: true
 
 storage:
   path: /Users/kuba/Downloads/blob_storage

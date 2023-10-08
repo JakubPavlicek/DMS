@@ -1,5 +1,8 @@
 package com.dms.hash;
 
+import com.dms.exception.FileOperation;
+import com.dms.exception.FileOperationException;
+import com.dms.exception.HashAlgorithmNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,9 +21,9 @@ public class Sha256Hasher {
             return Base64.getUrlEncoder()
                          .encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Hashovaci algoritmus neexistuje");
+            throw new HashAlgorithmNotFoundException("Hashovaci algoritmus nebyl nalezen ci neexistuje");
         } catch (IOException e) {
-            throw new RuntimeException("Nepodarilo se ziskat data souboru: " + file.getName());
+            throw new FileOperationException(FileOperation.READ, "Nepodarilo se ziskat data souboru: " + file.getName());
         }
     }
 

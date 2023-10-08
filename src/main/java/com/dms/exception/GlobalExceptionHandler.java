@@ -13,6 +13,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final String baseUrl = "http://localhost:8080/errors";
 
+    @ExceptionHandler(HashAlgorithmNotFoundException.class)
+    public ProblemDetail handleHashAlgorithmNotFoundException(HashAlgorithmNotFoundException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+        problemDetail.setTitle("Hash Algorithm Not Found");
+        problemDetail.setType(URI.create(baseUrl + "/hash-algorithm-not-found"));
+
+        return problemDetail;
+    }
+
     @ExceptionHandler(FileAlreadyExistsException.class)
     public ProblemDetail handleFileAlreadyExistsException(FileAlreadyExistsException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());

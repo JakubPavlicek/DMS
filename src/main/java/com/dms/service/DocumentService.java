@@ -5,7 +5,6 @@ import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRepository;
-import com.dms.request.DocumentRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -34,9 +33,7 @@ public class DocumentService {
         return documentServiceCommon.getDocument(documentId);
     }
 
-    private Document getDocumentFromRequest(DocumentRequest documentRequest) {
-        MultipartFile file = documentRequest.getFile();
-
+    private Document getDocumentFromFile(MultipartFile file) {
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
         String path = StringUtils.cleanPath(originalFileName);
         String name = StringUtils.getFilename(path);
@@ -51,15 +48,11 @@ public class DocumentService {
                        .build();
     }
 
-    @Transactional
-    public Document saveDocument(DocumentRequest documentRequest) {
-        MultipartFile file = documentRequest.getFile();
+    public Document saveDocument(User user, MultipartFile file) {
         String hash = blobStorageService.storeBlob(file);
+        User author = userService.getUser(user);
 
-        User userFromRequest = userService.getUserFromRequest(documentRequest);
-        User author = userService.getUser(userFromRequest);
-
-        Document document = getDocumentFromRequest(documentRequest);
+        Document document = getDocumentFromFile(file);
         document.setHashPointer(hash);
         document.setAuthor(author);
 
@@ -70,16 +63,13 @@ public class DocumentService {
         return savedDocument;
     }
 
-    public String updateDocument(String documentId, DocumentRequest documentRequest) {
+    public String updateDocument(String documentId, User user, MultipartFile file) {
         Document databaseDocument = getDocument(documentId);
 
-        MultipartFile file = documentRequest.getFile();
         String hash = blobStorageService.storeBlob(file);
+        User author = userService.getUser(user);
 
-        User userFromRequest = userService.getUserFromRequest(documentRequest);
-        User author = userService.getUser(userFromRequest);
-
-        Document document = getDocumentFromRequest(documentRequest);
+        Document document = getDocumentFromFile(file);
         document.setDocumentId(documentId);
         document.setCreatedAt(databaseDocument.getCreatedAt());
         document.setHashPointer(hash);

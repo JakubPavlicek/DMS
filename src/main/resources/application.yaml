@@ -23,6 +23,9 @@ spring:
 storage:
   path: /Users/kuba/Downloads/blob_storage
 
+hash:
+  algorithm: SHA-256
+
 #---
 #
 #spring:

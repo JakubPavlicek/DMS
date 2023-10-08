@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum FileOperation {
+
     READ("File Read Error"),
     WRITE("File Write Error"),
     DELETE("File Deletion Error");
@@ -13,4 +14,5 @@ public enum FileOperation {
     FileOperation(String title) {
         this.title = title;
     }
+
 }

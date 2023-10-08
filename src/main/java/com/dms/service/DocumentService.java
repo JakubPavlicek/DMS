@@ -48,6 +48,7 @@ public class DocumentService {
                        .build();
     }
 
+    @Transactional
     public Document saveDocument(User user, MultipartFile file) {
         String hash = blobStorageService.storeBlob(file);
         User author = userService.getUser(user);
@@ -63,6 +64,7 @@ public class DocumentService {
         return savedDocument;
     }
 
+    @Transactional
     public String updateDocument(String documentId, User user, MultipartFile file) {
         Document databaseDocument = getDocument(documentId);
 

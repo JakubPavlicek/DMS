@@ -2,6 +2,7 @@ package com.dms.service;
 
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRevisionRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -29,7 +30,7 @@ public class DocumentRevisionService {
 
     public DocumentRevision getRevision(Long revisionId) {
         return revisionRepository.findByRevisionId(revisionId)
-                                 .orElseThrow(() -> new RuntimeException("Revize s ID: " + revisionId + " nebyla nalezena"));
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
     }
 
     private void replaceDocumentWithAdjacentRevision(String documentId, Long currentRevisionId) {
@@ -41,7 +42,7 @@ public class DocumentRevisionService {
                                                          .orElse(revisionRepository.findNextByDocumentAndVersion(document, currentVersion)
                                                                                    .orElse(null));
         if (newRevision == null)
-            throw new RuntimeException("nebyla nalezena nahrazujici revize pro revizi " + currentRevisionId);
+            throw new RevisionNotFoundException("Nebyla nalezena nahrazujici revize pro revizi " + currentRevisionId);
 
         documentServiceCommon.updateDocumentToRevision(document, newRevision);
     }

@@ -2,6 +2,7 @@ package com.dms.service;
 
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.exception.DocumentNotFoundException;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ public class DocumentServiceCommon {
 
     public Document getDocument(String documentId) {
         return documentRepository.findById(documentId)
-                                 .orElseThrow(() -> new RuntimeException("Soubor s id: " + documentId + " nebyl nalezen."));
+                                 .orElseThrow(() -> new DocumentNotFoundException("Soubor s id: " + documentId + " nebyl nalezen."));
     }
 
     public void updateDocumentToRevision(Document document, DocumentRevision documentRevision) {

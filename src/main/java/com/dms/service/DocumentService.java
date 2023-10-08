@@ -3,6 +3,7 @@ package com.dms.service;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
+import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRepository;
 import com.dms.request.DocumentRequest;
 import jakarta.transaction.Transactional;
@@ -100,7 +101,7 @@ public class DocumentService {
                                              .filter(rev -> rev.getVersion()
                                                                .equals(version))
                                              .findFirst()
-                                             .orElseThrow(() -> new RuntimeException("nebyla nalezena revize s verzi: " + version));
+                                             .orElseThrow(() -> new RevisionNotFoundException("nebyla nalezena revize s verzi: " + version));
 
         documentServiceCommon.updateDocumentToRevision(document, revision);
 

@@ -1,5 +1,8 @@
 package com.dms.service;
 
+import com.dms.exception.FileAlreadyExistsException;
+import com.dms.exception.FileOperation;
+import com.dms.exception.FileOperationException;
 import com.dms.hash.Sha256Hasher;
 import com.dms.storage.BlobStorage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +31,12 @@ public class BlobStorageService {
         Path filePath = Paths.get(blobStorage.getStoragePath(), hash);
 
         if (Files.exists(filePath))
-            throw new RuntimeException("Soubor " + file.getOriginalFilename() + " s hashem " + hash + " jiz existuje");
+            throw new FileAlreadyExistsException("Soubor " + file.getOriginalFilename() + " s hashem " + hash + " jiz existuje");
 
         try {
             Files.write(filePath, file.getBytes());
         } catch (IOException exception) {
-            throw new RuntimeException("Zapis dat do souboru " + filePath + " se nepodaril");
+            throw new FileOperationException(FileOperation.WRITE, "Zapis dat do souboru " + filePath + " s hashem: " + hash + " se nepodaril");
         }
 
         return hash;
@@ -45,7 +48,7 @@ public class BlobStorageService {
         try {
             return Files.readAllBytes(Paths.get(filePath));
         } catch (IOException e) {
-            throw new RuntimeException("Chyba pri nacitani souboru");
+            throw new FileOperationException(FileOperation.READ, "Chyba pri nacitani souboru s hashem: " + hash);
         }
     }
 
@@ -55,7 +58,7 @@ public class BlobStorageService {
         try {
             Files.deleteIfExists(Paths.get(filePath));
         } catch (IOException e) {
-            throw new RuntimeException("Chyba pri mazani souboru");
+            throw new FileOperationException(FileOperation.DELETE, "Chyba pri mazani souboru s hashem: " + hash);
         }
     }
 

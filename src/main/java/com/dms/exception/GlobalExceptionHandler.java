@@ -8,9 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.net.URI;
@@ -102,6 +105,36 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return errorMessages;
     }
 
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problemDetail.setTitle("Missing Request Part");
+        problemDetail.setType(URI.create(baseUrl + "/missing-request-part"));
+
+        return ResponseEntity.of(problemDetail)
+                             .build();
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problemDetail.setTitle("Missing Request Parameter");
+        problemDetail.setType(URI.create(baseUrl + "/missing-request-parameter"));
+
+        return ResponseEntity.of(problemDetail)
+                             .build();
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problemDetail.setTitle("Resource Not Found");
+        problemDetail.setType(URI.create(baseUrl + "/resource-not-found"));
+
+        return ResponseEntity.of(problemDetail)
+                             .build();
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
@@ -110,5 +143,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return problemDetail;
     }
+
 
 }

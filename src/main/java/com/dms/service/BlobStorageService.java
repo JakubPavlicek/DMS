@@ -3,7 +3,7 @@ package com.dms.service;
 import com.dms.exception.FileAlreadyExistsException;
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
-import com.dms.hash.Sha256Hasher;
+import com.dms.hash.Hasher;
 import com.dms.storage.BlobStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,10 +18,10 @@ import java.nio.file.Paths;
 public class BlobStorageService {
 
     private final BlobStorage blobStorage;
-    private final Sha256Hasher hasher;
+    private final Hasher hasher;
 
     @Autowired
-    public BlobStorageService(BlobStorage blobStorage, Sha256Hasher hasher) {
+    public BlobStorageService(BlobStorage blobStorage, Hasher hasher) {
         this.blobStorage = blobStorage;
         this.hasher = hasher;
     }

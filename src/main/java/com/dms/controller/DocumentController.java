@@ -2,7 +2,7 @@ package com.dms.controller;
 
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
-import com.dms.request.DocumentRequest;
+import com.dms.entity.User;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -10,13 +10,14 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -28,8 +29,8 @@ public class DocumentController {
     private final DocumentService documentService;
 
     @PostMapping("/upload")
-    public Document saveDocument(@Valid @ModelAttribute DocumentRequest documentRequest) {
-        return documentService.saveDocument(documentRequest);
+    public Document saveDocument(@Valid @RequestPart("user") User user, @RequestPart("file") MultipartFile file) {
+        return documentService.saveDocument(user, file);
     }
 
     @GetMapping("/{id}")
@@ -38,8 +39,8 @@ public class DocumentController {
     }
 
     @PutMapping("/{id}")
-    public String updateDocument(@PathVariable("id") String documentId, @Valid @ModelAttribute DocumentRequest documentRequest) {
-        return documentService.updateDocument(documentId, documentRequest);
+    public String updateDocument(@PathVariable("id") String documentId, @Valid @RequestPart("user") User user, @RequestPart("file") MultipartFile file) {
+        return documentService.updateDocument(documentId, user, file);
     }
 
     @DeleteMapping("/{id}")
@@ -57,9 +58,7 @@ public class DocumentController {
         return documentService.getDocumentRevisions(documentId);
     }
 
-    // TODO: upravit endpoint
-
-    @PutMapping("/{id}/version")
+    @PutMapping("/{id}/versions")
     public DocumentRevision switchToVersion(@PathVariable("id") String documentId, @RequestParam("version") Long version) {
         return documentService.switchToVersion(documentId, version);
     }

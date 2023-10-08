@@ -1,6 +1,7 @@
 package com.dms.service;
 
 import com.dms.entity.User;
+import com.dms.exception.UserParsingException;
 import com.dms.repository.UserRepository;
 import com.dms.request.DocumentRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,7 +27,7 @@ public class UserService {
         try {
             return new ObjectMapper().readValue(documentRequest.getUser(), User.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Nepodarilo se ziskat uzivatele z JSONu");
+            throw new UserParsingException("Nepodarilo se ziskat uzivatele z JSONu: " + documentRequest.getUser());
         }
     }
 

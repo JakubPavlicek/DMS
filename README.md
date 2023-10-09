@@ -8,6 +8,52 @@ Jedná se o aplikaci typu SaaS (Software as a Service) pro centrální uložení
 
 Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček ze Západočeské univerzity v Plzni - Fakulta aplikovaných věd.
 
+## Endpointy
+
+### /documents/upload [POST]
+
+- nahrání souboru
+
+### /documents/{id} [GET]
+
+- získání informace o souboru
+
+### /documents/{id} [PUT]
+
+- nahrání změny souboru
+
+### /documents/{id} [DELETE]
+
+- smazání souboru
+
+### /documents/{id}/download [GET]
+
+- stažení souboru
+
+### /documents/{id}/revisions [GET]
+
+- získání revizí souboru
+
+### /documents/{id}/versions [PUT]
+
+- přepnutí se na verzi souboru
+
+### /revisions [GET]
+
+- získání informací o všech revizích
+
+### /revisions/{id} [GET]
+
+- získání informace o revizi
+
+### /revisions/{id} [DELETE]
+
+- smazání revize
+
+### /revisions/{id}/download [GET]
+
+- stažení revize
+
 ## Moduly
 
 ### src

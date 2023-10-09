@@ -1,4 +1,30 @@
+storage:
+  path: /Users/kuba/Downloads/blob_storage
+
+hash:
+  algorithm: SHA-256
+
 spring:
+  profiles:
+    active: postgresql # set db you want to use - postgresql / oracle / mssql
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 200MB
+  mvc:
+    problemdetails:
+      enabled: true
+    throw-exception-if-no-handler-found: true
+
+---
+
+# PostgreSQL config
+
+spring:
+  config:
+    activate:
+      on-profile: postgresql
   datasource:
     url: jdbc:postgresql://localhost:5433/dms
     driver-class-name: org.postgresql.Driver
@@ -10,61 +36,43 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create-drop
-#    show-sql: true
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 200MB
-      max-request-size: 200MB
-  mvc:
-    problemdetails:
-      enabled: true
-    throw-exception-if-no-handler-found: true
 
-storage:
-  path: /Users/kuba/Downloads/blob_storage
+---
 
-hash:
-  algorithm: SHA-256
+# Oracle config
 
-#---
-#
-#spring:
-#  datasource:
-#    url: jdbc:oracle:thin:@localhost:1521:ORCLCDB
-#    driver-class-name: oracle.jdbc.OracleDriver
-#    username: SYSTEM
-#    password: admin123
-#  jpa:
-#    properties:
-#      hibernate:
-#        dialect: org.hibernate.dialect.OracleDialect
-#    hibernate:
-#      ddl-auto: update
-#    show-sql: true
-#  servlet:
-#    multipart:
-#      enabled: true
-#      max-file-size: 200MB
-#      max-request-size: 200MB
+spring:
+  config:
+    activate:
+      on-profile: oracle
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521:ORCLCDB
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: SYSTEM
+    password: admin123
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: update
 
-#---
-#
-#spring:
-#  datasource:
-#    url: jdbc:sqlserver://localhost:1433;databaseName=dms;encrypt=true;trustServerCertificate=true;
-#    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#    username: sa
-#    password: Admin123
-#  jpa:
-#    properties:
-#      hibernate:
-#        dialect: org.hibernate.dialect.SQLServerDialect
-#    hibernate:
-#      ddl-auto: update
-#    show-sql: true
-#  servlet:
-#    multipart:
-#      enabled: true
-#      max-file-size: 200MB
-#      max-request-size: 200MB
+---
+
+# MS SQL config
+
+spring:
+  config:
+    activate:
+      on-profile: mssql
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=dms;encrypt=true;trustServerCertificate=true;
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    username: sa
+    password: Admin123
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+    hibernate:
+      ddl-auto: update

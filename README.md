@@ -70,3 +70,8 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
    - Windows: `./mvnw.cmd spring-boot:run`
    - Linux: `./mvnw spring-boot:run`
    - macOS: `./mvnw spring-boot:run`
+   - alternativa (v případě, že již máte nastaveny správne hodnoty v konfiguračním souboru **application.yaml**):
+     - hodnota **spring-boot.run.profiles** znamená, jaký profil chcete nastavit (povolené hodnoty: **postgresql** / **mssql** / **oracle**)
+       - Windows `./mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgresql`
+       - Linux `./mvnw spring-boot:run -Dspring-boot.run.profiles=postgresql`
+       - macOS `./mvnw spring-boot:run -Dspring-boot.run.profiles=postgresql`

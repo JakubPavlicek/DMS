@@ -2,12 +2,12 @@ package com.dms.hash;
 
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.MessageDigest;
-import java.util.Base64;
 
 @Component
 public class Hasher {
@@ -19,8 +19,8 @@ public class Hasher {
         try {
             MessageDigest digest = MessageDigest.getInstance(hashAlgorithm);
             byte[] hash = digest.digest(file.getBytes());
-            return Base64.getUrlEncoder()
-                         .encodeToString(hash);
+
+            return HexUtils.toHexString(hash);
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.READ, "Nepodarilo se ziskat data souboru: " + file.getName());
         }

@@ -1,5 +1,6 @@
 package com.dms.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,10 +60,10 @@ public class DocumentRevision {
     private String name;
     private String extension;
     private String type;
-    private String path;
     private String hashPointer;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss")
     @Column(
         nullable = false,
         updatable = false

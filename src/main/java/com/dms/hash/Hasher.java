@@ -2,14 +2,11 @@ package com.dms.hash;
 
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
-import com.dms.exception.HashAlgorithmNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 @Component
@@ -24,9 +21,7 @@ public class Hasher {
             byte[] hash = digest.digest(file.getBytes());
             return Base64.getUrlEncoder()
                          .encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new HashAlgorithmNotFoundException("Hashovaci algoritmus: " + hashAlgorithm + " nebyl nalezen ci neexistuje");
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new FileOperationException(FileOperation.READ, "Nepodarilo se ziskat data souboru: " + file.getName());
         }
     }

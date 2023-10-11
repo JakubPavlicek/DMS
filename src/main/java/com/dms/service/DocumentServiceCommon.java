@@ -24,7 +24,6 @@ public class DocumentServiceCommon {
         document.setName(documentRevision.getName());
         document.setExtension(documentRevision.getExtension());
         document.setType(documentRevision.getType());
-        document.setPath(documentRevision.getPath());
         document.setAuthor(documentRevision.getAuthor());
         document.setHashPointer(documentRevision.getHashPointer());
 
@@ -38,7 +37,6 @@ public class DocumentServiceCommon {
                                                             .name(document.getName())
                                                             .extension(document.getExtension())
                                                             .type(document.getType())
-                                                            .path(document.getPath())
                                                             .author(document.getAuthor())
                                                             .hashPointer(document.getHashPointer())
                                                             .build();

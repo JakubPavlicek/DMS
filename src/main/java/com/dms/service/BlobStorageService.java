@@ -67,7 +67,7 @@ public class BlobStorageService {
             try {
                 Files.deleteIfExists(directoryPath);
             } catch (IOException e) {
-                throw new RuntimeException("Nepodarilo se smazat adresar: " + directoryPath.toString());
+                throw new RuntimeException("Nepodarilo se smazat adresar: " + directoryPath);
             }
         }
     }
@@ -100,7 +100,7 @@ public class BlobStorageService {
                 return !directory.iterator()
                                  .hasNext();
             } catch (IOException e) {
-                throw new RuntimeException("Nastala chyba pri praci s adresarem: " + directoryPath.toString());
+                throw new RuntimeException("Nastala chyba pri praci s adresarem: " + directoryPath);
             }
         }
 

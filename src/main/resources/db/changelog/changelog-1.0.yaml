@@ -1,0 +1,164 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: kuba
+      changes:
+
+        - createSequence:
+            sequenceName: user_id_sequence
+            incrementBy: 1
+            cacheSize: 100000
+            startValue: 1
+            dataType: bigint
+
+        - createSequence:
+            sequenceName: revision_id_sequence
+            incrementBy: 1
+            cacheSize: 100000
+            startValue: 1
+            dataType: bigint
+
+        - createTable:
+            tableName: app_user
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  defaultValueSequenceNext: user_id_sequence
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: document
+            columns:
+              - column:
+                  name: document_id
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_document_user
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: extension
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: hash
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: document_revision
+            columns:
+              - column:
+                  name: revision_id
+                  type: bigint
+                  defaultValueSequenceNext: revision_id_sequence
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_revision_user
+              - column:
+                  name: document_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_revision_document
+              - column:
+                  name: version
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: extension
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: hash
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: document
+            baseColumnNames: user_id
+            constraintName: fk_document_user
+            referencedTableName: app_user
+            referencedColumnNames: user_id
+
+        - addForeignKeyConstraint:
+            baseTableName: document_revision
+            baseColumnNames: user_id
+            constraintName: fk_revision_user
+            referencedTableName: app_user
+            referencedColumnNames: user_id
+
+        - addForeignKeyConstraint:
+            baseTableName: document_revision
+            baseColumnNames: document_id
+            constraintName: fk_revision_document
+            referencedTableName: document
+            referencedColumnNames: document_id
+
+
+
+

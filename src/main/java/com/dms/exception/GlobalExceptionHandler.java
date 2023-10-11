@@ -34,15 +34,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(FileAlreadyExistsException.class)
-    public ProblemDetail handleFileAlreadyExistsException(FileAlreadyExistsException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
-        problemDetail.setTitle("File Already Exists");
-        problemDetail.setType(URI.create(baseUrl + "/file-already-exists"));
-
-        return problemDetail;
-    }
-
     @ExceptionHandler(FileOperationException.class)
     public ProblemDetail handleFileOperationEception(FileOperationException eception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, eception.getMessage());

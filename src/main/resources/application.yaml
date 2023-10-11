@@ -1,12 +1,13 @@
 storage:
   path: /Users/kuba/Downloads/blob_storage
+  directory-prefix-length: 2
 
 hash:
   algorithm: SHA-256
 
 spring:
   profiles:
-    active: postgresql # set db you want to use - postgresql / oracle / mssql
+    active: postgresql # set db that you want to use - postgresql / oracle / mssql
   servlet:
     multipart:
       enabled: true

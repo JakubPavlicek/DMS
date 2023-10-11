@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, String> {
 
-    @Query("SELECT COUNT(document.hashPointer) > 1 FROM Document document WHERE document.hashPointer = :hashPointer")
-    boolean duplicateHashPointerExists(String hashPointer);
+    @Query("SELECT COUNT(document.hash) > 1 FROM Document document WHERE document.hash = :hash")
+    boolean duplicateHashExists(String hash);
 
 }

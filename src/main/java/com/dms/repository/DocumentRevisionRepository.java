@@ -19,8 +19,8 @@ public interface DocumentRevisionRepository extends JpaRepository<DocumentRevisi
 
     void deleteByRevisionId(Long revisionId);
 
-    @Query("SELECT COUNT(revision.hashPointer) > 1 FROM DocumentRevision revision WHERE revision.hashPointer = :hashPointer")
-    boolean duplicateHashPointerExists(String hashPointer);
+    @Query("SELECT COUNT(revision.hash) > 1 FROM DocumentRevision revision WHERE revision.hash = :hash")
+    boolean duplicateHashExists(String hash);
 
     @Query("SELECT revision FROM DocumentRevision revision WHERE revision.document = :document AND revision.version < :version ORDER BY revision.version DESC LIMIT 1")
     Optional<DocumentRevision> findPreviousByDocumentAndVersion(Document document, Long version);

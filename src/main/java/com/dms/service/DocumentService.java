@@ -33,6 +33,11 @@ public class DocumentService {
         return documentServiceCommon.getDocument(documentId);
     }
 
+    public List<DocumentRevision> getDocumentRevisions(String documentId) {
+        Document document = getDocument(documentId);
+        return document.getRevisions();
+    }
+
     private Document getDocumentFromFile(MultipartFile file) {
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
         String path = StringUtils.cleanPath(originalFileName);
@@ -99,19 +104,15 @@ public class DocumentService {
         return revision;
     }
 
-    public List<DocumentRevision> getDocumentRevisions(String documentId) {
-        Document document = getDocument(documentId);
-        return document.getRevisions();
-    }
-
     @Transactional
     public String deleteDocumentWithRevisions(String documentId) {
-        List<DocumentRevision> documentRevisions = getDocumentRevisions(documentId);
-        documentRevisions.forEach(revision -> blobStorageService.deleteBlob(revision.getHashPointer()));
-
         Document document = documentServiceCommon.getDocument(documentId);
-        blobStorageService.deleteBlob(document.getHashPointer());
+
+        List<DocumentRevision> documentRevisions = document.getRevisions();
+        documentRevisions.forEach(revision -> documentServiceCommon.deleteBlobIfDuplicateHashNotExists(revision.getHashPointer()));
+
         documentRepository.delete(document);
+        documentServiceCommon.deleteBlobIfDuplicateHashNotExists(document.getHashPointer());
 
         return "Document deleted successfully";
     }

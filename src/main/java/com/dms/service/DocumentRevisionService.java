@@ -33,8 +33,7 @@ public class DocumentRevisionService {
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
     }
 
-    private void replaceDocumentWithAdjacentRevision(String documentId, Long currentRevisionId) {
-        Document document = documentServiceCommon.getDocument(documentId);
+    private void replaceDocumentWithAdjacentRevision(Document document, Long currentRevisionId) {
         DocumentRevision currentDocumentRevision = getRevision(currentRevisionId);
 
         Long currentVersion = currentDocumentRevision.getVersion();
@@ -47,8 +46,7 @@ public class DocumentRevisionService {
         documentServiceCommon.updateDocumentToRevision(document, newRevision);
     }
 
-    private boolean isRevisionSetAsCurrent(String documentId, Long revisionId) {
-        Document document = documentServiceCommon.getDocument(documentId);
+    private boolean isRevisionSetAsCurrent(Document document, Long revisionId) {
         DocumentRevision documentRevision = getRevision(revisionId);
 
         return document.getHashPointer()
@@ -58,24 +56,21 @@ public class DocumentRevisionService {
     @Transactional
     public String deleteRevision(Long revisionId) {
         DocumentRevision documentRevision = getRevision(revisionId);
-        String hash = documentRevision.getHashPointer();
 
         Document document = documentRevision.getDocument();
-        String documentId = document.getDocumentId();
 
-        if (isRevisionSetAsCurrent(documentId, revisionId))
-            replaceDocumentWithAdjacentRevision(documentId, revisionId);
+        if (isRevisionSetAsCurrent(document, revisionId))
+            replaceDocumentWithAdjacentRevision(document, revisionId);
 
-        blobStorageService.deleteBlob(hash);
+        documentServiceCommon.deleteBlobIfDuplicateHashNotExists(documentRevision.getHashPointer());
         revisionRepository.deleteByRevisionId(revisionId);
 
-        updateRevisionVersionsForDocument(documentId);
+        updateRevisionVersionsForDocument(document);
 
         return "Revision deleted successfully";
     }
 
-    private void updateRevisionVersionsForDocument(String documentId) {
-        Document document = documentServiceCommon.getDocument(documentId);
+    private void updateRevisionVersionsForDocument(Document document) {
         List<DocumentRevision> documentRevisions = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
 
         Long version = 1L;

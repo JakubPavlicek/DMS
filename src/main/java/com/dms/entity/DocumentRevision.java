@@ -60,7 +60,7 @@ public class DocumentRevision {
     private String name;
     private String extension;
     private String type;
-    private String hashPointer;
+    private String hash;
 
     @CreationTimestamp
     @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss")

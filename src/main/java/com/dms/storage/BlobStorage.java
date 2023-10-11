@@ -11,4 +11,7 @@ public class BlobStorage {
     @Value("${storage.path}")
     private String storagePath;
 
+    @Value("${storage.directory-prefix-length}")
+    private int directoryPrefixLength;
+
 }

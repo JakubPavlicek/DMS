@@ -14,10 +14,20 @@ public class DocumentServiceCommon {
 
     private final DocumentRepository documentRepository;
     private final DocumentRevisionRepository revisionRepository;
+    private final BlobStorageService blobStorageService;
 
     public Document getDocument(String documentId) {
         return documentRepository.findById(documentId)
                                  .orElseThrow(() -> new DocumentNotFoundException("Soubor s id: " + documentId + " nebyl nalezen."));
+    }
+
+    private boolean isDuplicateHashPresent(String hashPointer) {
+        return documentRepository.duplicateHashPointerExists(hashPointer) || revisionRepository.duplicateHashPointerExists(hashPointer);
+    }
+
+    public void deleteBlobIfDuplicateHashNotExists(String hash) {
+        if (!isDuplicateHashPresent(hash))
+            blobStorageService.deleteBlob(hash);
     }
 
     public void updateDocumentToRevision(Document document, DocumentRevision documentRevision) {

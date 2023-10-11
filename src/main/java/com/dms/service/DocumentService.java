@@ -44,7 +44,6 @@ public class DocumentService {
                        .name(name)
                        .extension(extension)
                        .type(type)
-                       .path(path)
                        .build();
     }
 

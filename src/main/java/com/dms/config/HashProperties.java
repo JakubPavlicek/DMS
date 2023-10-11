@@ -30,7 +30,7 @@ public class HashProperties implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         try {
-            MessageDigest digest = MessageDigest.getInstance(algorithm);
+            MessageDigest.getInstance(algorithm);
         } catch (NoSuchAlgorithmException e) {
             errors.rejectValue("algorithm", "Hash Algorithm Not Found", "Hashovaci algoritmus neexistuje");
         }

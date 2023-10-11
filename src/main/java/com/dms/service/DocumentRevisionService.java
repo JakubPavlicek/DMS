@@ -49,8 +49,8 @@ public class DocumentRevisionService {
     private boolean isRevisionSetAsCurrent(Document document, Long revisionId) {
         DocumentRevision documentRevision = getRevision(revisionId);
 
-        return document.getHashPointer()
-                       .equals(documentRevision.getHashPointer());
+        return document.getHash()
+                       .equals(documentRevision.getHash());
     }
 
     @Transactional
@@ -62,7 +62,7 @@ public class DocumentRevisionService {
         if (isRevisionSetAsCurrent(document, revisionId))
             replaceDocumentWithAdjacentRevision(document, revisionId);
 
-        documentServiceCommon.deleteBlobIfDuplicateHashNotExists(documentRevision.getHashPointer());
+        documentServiceCommon.deleteBlobIfDuplicateHashNotExists(documentRevision.getHash());
         revisionRepository.deleteByRevisionId(revisionId);
 
         updateRevisionVersionsForDocument(document);
@@ -82,7 +82,7 @@ public class DocumentRevisionService {
 
     public ResponseEntity<Resource> downloadRevision(Long revisionId) {
         DocumentRevision revision = getRevision(revisionId);
-        String hash = revision.getHashPointer();
+        String hash = revision.getHash();
         byte[] data = blobStorageService.getBlob(hash);
 
         return ResponseEntity.ok()

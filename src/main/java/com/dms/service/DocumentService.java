@@ -58,7 +58,7 @@ public class DocumentService {
         User author = userService.getUser(user);
 
         Document document = getDocumentFromFile(file);
-        document.setHashPointer(hash);
+        document.setHash(hash);
         document.setAuthor(author);
 
         Document savedDocument = documentRepository.save(document);
@@ -78,7 +78,7 @@ public class DocumentService {
         Document document = getDocumentFromFile(file);
         document.setDocumentId(documentId);
         document.setCreatedAt(databaseDocument.getCreatedAt());
-        document.setHashPointer(hash);
+        document.setHash(hash);
         document.setAuthor(author);
 
         documentServiceCommon.createDocumentRevision(document);
@@ -109,17 +109,17 @@ public class DocumentService {
         Document document = documentServiceCommon.getDocument(documentId);
 
         List<DocumentRevision> documentRevisions = document.getRevisions();
-        documentRevisions.forEach(revision -> documentServiceCommon.deleteBlobIfDuplicateHashNotExists(revision.getHashPointer()));
+        documentRevisions.forEach(revision -> documentServiceCommon.deleteBlobIfDuplicateHashNotExists(revision.getHash()));
 
         documentRepository.delete(document);
-        documentServiceCommon.deleteBlobIfDuplicateHashNotExists(document.getHashPointer());
+        documentServiceCommon.deleteBlobIfDuplicateHashNotExists(document.getHash());
 
         return "Document deleted successfully";
     }
 
     public ResponseEntity<Resource> downloadDocument(String documentId) {
         Document document = getDocument(documentId);
-        String hash = document.getHashPointer();
+        String hash = document.getHash();
         byte[] data = blobStorageService.getBlob(hash);
 
         return ResponseEntity.ok()

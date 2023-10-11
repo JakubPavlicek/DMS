@@ -21,8 +21,8 @@ public class DocumentServiceCommon {
                                  .orElseThrow(() -> new DocumentNotFoundException("Soubor s id: " + documentId + " nebyl nalezen."));
     }
 
-    private boolean isDuplicateHashPresent(String hashPointer) {
-        return documentRepository.duplicateHashPointerExists(hashPointer) || revisionRepository.duplicateHashPointerExists(hashPointer);
+    private boolean isDuplicateHashPresent(String hash) {
+        return documentRepository.duplicateHashExists(hash) || revisionRepository.duplicateHashExists(hash);
     }
 
     public void deleteBlobIfDuplicateHashNotExists(String hash) {
@@ -35,7 +35,7 @@ public class DocumentServiceCommon {
         document.setExtension(documentRevision.getExtension());
         document.setType(documentRevision.getType());
         document.setAuthor(documentRevision.getAuthor());
-        document.setHashPointer(documentRevision.getHashPointer());
+        document.setHash(documentRevision.getHash());
 
         documentRepository.save(document);
     }
@@ -48,7 +48,7 @@ public class DocumentServiceCommon {
                                                             .extension(document.getExtension())
                                                             .type(document.getType())
                                                             .author(document.getAuthor())
-                                                            .hashPointer(document.getHashPointer())
+                                                            .hash(document.getHash())
                                                             .build();
         revisionRepository.save(documentRevision);
     }

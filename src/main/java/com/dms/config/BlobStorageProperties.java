@@ -1,5 +1,6 @@
 package com.dms.config;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,6 +21,7 @@ public class BlobStorageProperties implements Validator {
     private final String path;
 
     @Min(value = 1)
+    @Max(value = 10)
     private final int directoryPrefixLength;
 
     @ConstructorBinding

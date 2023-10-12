@@ -35,7 +35,7 @@ public class DocumentController {
 
     @GetMapping("/{id}")
     public DocumentDTO getDocument(@PathVariable("id") String documentId) {
-        return documentService.getDocumentDTO(documentId);
+        return documentService.getDocument(documentId);
     }
 
     @PutMapping("/{id}")

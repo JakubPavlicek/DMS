@@ -1,7 +1,5 @@
 package com.dms.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,7 +52,6 @@ public class Document {
         cascade = CascadeType.REMOVE,
         mappedBy = "document"
     )
-    @JsonIgnore
     private List<DocumentRevision> revisions;
 
     @Column(
@@ -76,7 +73,6 @@ public class Document {
     private String hash;
 
     @CreationTimestamp
-    @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss")
     @Column(
         nullable = false,
         updatable = false
@@ -84,7 +80,6 @@ public class Document {
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss")
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 

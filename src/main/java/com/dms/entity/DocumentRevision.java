@@ -1,7 +1,5 @@
 package com.dms.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -51,7 +49,6 @@ public class DocumentRevision {
         referencedColumnName = "userId",
         foreignKey = @ForeignKey(name = "fk_revision_user")
     )
-    @Column(nullable = false)
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,8 +57,6 @@ public class DocumentRevision {
         referencedColumnName = "documentId",
         foreignKey = @ForeignKey(name = "fk_revision_document")
     )
-    @JsonIgnore
-    @Column(nullable = false)
     private Document document;
 
     @Column(nullable = false)
@@ -86,7 +81,6 @@ public class DocumentRevision {
     private String hash;
 
     @CreationTimestamp
-    @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss")
     @Column(
         nullable = false,
         updatable = false

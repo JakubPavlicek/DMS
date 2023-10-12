@@ -8,14 +8,12 @@ databaseChangeLog:
         - createSequence:
             sequenceName: user_id_sequence
             incrementBy: 1
-            cacheSize: 100000
             startValue: 1
             dataType: bigint
 
         - createSequence:
             sequenceName: revision_id_sequence
             incrementBy: 1
-            cacheSize: 100000
             startValue: 1
             dataType: bigint
 

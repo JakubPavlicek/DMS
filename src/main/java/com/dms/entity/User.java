@@ -1,5 +1,6 @@
 package com.dms.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,10 +37,12 @@ public class User {
     private Long userId;
 
     @NotBlank(message = "Username is mandatory")
+    @Column(nullable = false)
     private String username;
 
     @Email
     @NotBlank(message = "Email is mandatory")
+    @Column(nullable = false)
     private String email;
 
 }

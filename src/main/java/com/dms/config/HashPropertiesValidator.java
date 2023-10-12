@@ -12,19 +12,19 @@ import java.security.NoSuchAlgorithmException;
 
 @Validated
 @ConfigurationProperties(prefix = "hash")
-public class HashProperties implements Validator {
+public class HashPropertiesValidator implements Validator {
 
     @NotBlank(message = "Hashovaci algoritmus musi byt uveden")
     private final String algorithm;
 
     @ConstructorBinding
-    public HashProperties(String algorithm) {
+    public HashPropertiesValidator(String algorithm) {
         this.algorithm = algorithm;
     }
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return HashProperties.class.isAssignableFrom(clazz);
+        return HashPropertiesValidator.class.isAssignableFrom(clazz);
     }
 
     @Override

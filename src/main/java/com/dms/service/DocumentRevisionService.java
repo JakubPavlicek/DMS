@@ -1,11 +1,13 @@
 package com.dms.service;
 
+import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRevisionRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -23,14 +25,24 @@ public class DocumentRevisionService {
 
     private final DocumentServiceCommon documentServiceCommon;
     private final BlobStorageService blobStorageService;
+    private final ModelMapper modelMapper;
 
-    public List<DocumentRevision> getRevisions() {
-        return revisionRepository.findAll();
-    }
-
-    public DocumentRevision getRevision(Long revisionId) {
+    private DocumentRevision getRevision(Long revisionId) {
         return revisionRepository.findByRevisionId(revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
+    }
+
+    public DocumentRevisionDTO getRevisionDTO(Long revisionId) {
+        DocumentRevision revision = getRevision(revisionId);
+        return modelMapper.map(revision, DocumentRevisionDTO.class);
+    }
+
+    public List<DocumentRevisionDTO> getRevisions() {
+        List<DocumentRevision> revisions = revisionRepository.findAll();
+
+        return revisions.stream()
+                        .map(revision -> modelMapper.map(revision, DocumentRevisionDTO.class))
+                        .toList();
     }
 
     private void replaceDocumentWithAdjacentRevision(Document document, Long currentRevisionId) {

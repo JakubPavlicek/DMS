@@ -1,5 +1,8 @@
 package com.dms.service;
 
+import com.dms.dto.DocumentDTO;
+import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
@@ -7,6 +10,7 @@ import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -28,14 +32,20 @@ public class DocumentService {
     private final DocumentServiceCommon documentServiceCommon;
     private final UserService userService;
     private final BlobStorageService blobStorageService;
+    private final ModelMapper modelMapper;
 
-    public Document getDocument(String documentId) {
-        return documentServiceCommon.getDocument(documentId);
+    public DocumentDTO getDocument(String documentId) {
+        Document document = documentServiceCommon.getDocument(documentId);
+        return modelMapper.map(document, DocumentDTO.class);
     }
 
-    public List<DocumentRevision> getDocumentRevisions(String documentId) {
-        Document document = getDocument(documentId);
-        return document.getRevisions();
+    public List<DocumentRevisionDTO> getDocumentRevisions(String documentId) {
+        Document document = documentServiceCommon.getDocument(documentId);
+        List<DocumentRevision> revisions = document.getRevisions();
+
+        return revisions.stream()
+                        .map(revision -> modelMapper.map(revision, DocumentRevisionDTO.class))
+                        .toList();
     }
 
     private Document getDocumentFromFile(MultipartFile file) {
@@ -51,26 +61,30 @@ public class DocumentService {
     }
 
     @Transactional
-    public Document saveDocument(User user, MultipartFile file) {
+    public DocumentDTO saveDocument(UserDTO userDto, MultipartFile file) {
         String hash = blobStorageService.storeBlob(file);
+
+        User user = modelMapper.map(userDto, User.class);
         User author = userService.getUser(user);
 
         Document document = getDocumentFromFile(file);
         document.setHash(hash);
         document.setAuthor(author);
 
-        Document savedDocument = documentRepository.save(document);
+        Document savedDocument = documentRepository.saveAndFlush(document);
 
         documentServiceCommon.createDocumentRevision(savedDocument);
 
-        return savedDocument;
+        return modelMapper.map(savedDocument, DocumentDTO.class);
     }
 
     @Transactional
-    public String updateDocument(String documentId, User user, MultipartFile file) {
-        Document databaseDocument = getDocument(documentId);
+    public String updateDocument(String documentId, UserDTO userDto, MultipartFile file) {
+        Document databaseDocument = documentServiceCommon.getDocument(documentId);
 
         String hash = blobStorageService.storeBlob(file);
+
+        User user = modelMapper.map(userDto, User.class);
         User author = userService.getUser(user);
 
         Document document = getDocumentFromFile(file);
@@ -87,8 +101,8 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentRevision switchToVersion(String documentId, Long version) {
-        Document document = getDocument(documentId);
+    public DocumentRevisionDTO switchToVersion(String documentId, Long version) {
+        Document document = documentServiceCommon.getDocument(documentId);
         List<DocumentRevision> revisions = document.getRevisions();
 
         DocumentRevision revision = revisions.stream()
@@ -99,7 +113,7 @@ public class DocumentService {
 
         documentServiceCommon.updateDocumentToRevision(document, revision);
 
-        return revision;
+        return modelMapper.map(revision, DocumentRevisionDTO.class);
     }
 
     @Transactional
@@ -116,7 +130,7 @@ public class DocumentService {
     }
 
     public ResponseEntity<Resource> downloadDocument(String documentId) {
-        Document document = getDocument(documentId);
+        Document document = documentServiceCommon.getDocument(documentId);
         String hash = document.getHash();
         byte[] data = blobStorageService.getBlob(hash);
 

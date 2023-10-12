@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,14 +44,16 @@ public class DocumentRevision {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
         name = "user_id",
-        referencedColumnName = "userId"
+        referencedColumnName = "userId",
+        foreignKey = @ForeignKey(name = "fk_revision_user")
     )
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "document_id",
-        referencedColumnName = "documentId"
+        referencedColumnName = "documentId",
+        foreignKey = @ForeignKey(name = "fk_revision_document")
     )
     @JsonIgnore
     private Document document;
@@ -58,7 +61,6 @@ public class DocumentRevision {
     private Long version;
 
     private String name;
-    private String extension;
     private String type;
     private String hash;
 

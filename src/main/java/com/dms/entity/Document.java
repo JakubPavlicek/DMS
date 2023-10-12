@@ -6,6 +6,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,7 +39,8 @@ public class Document {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
         name = "user_id",
-        referencedColumnName = "userId"
+        referencedColumnName = "userId",
+        foreignKey = @ForeignKey(name = "fk_document_user")
     )
     private User author;
 
@@ -51,7 +53,6 @@ public class Document {
     private List<DocumentRevision> revisions;
 
     private String name;
-    private String extension;
     private String type;
     private String hash;
 

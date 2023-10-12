@@ -3,6 +3,7 @@ package com.dms.service;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.DocumentNotFoundException;
+import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,11 @@ public class DocumentServiceCommon {
     public Document getDocument(String documentId) {
         return documentRepository.findById(documentId)
                                  .orElseThrow(() -> new DocumentNotFoundException("Soubor s id: " + documentId + " nebyl nalezen."));
+    }
+
+    public DocumentRevision getRevision(Long revisionId) {
+        return revisionRepository.findByRevisionId(revisionId)
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
     }
 
     private boolean isDuplicateHashPresent(String hash) {

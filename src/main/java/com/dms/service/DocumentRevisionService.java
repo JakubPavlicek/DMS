@@ -27,13 +27,8 @@ public class DocumentRevisionService {
     private final BlobStorageService blobStorageService;
     private final ModelMapper modelMapper;
 
-    private DocumentRevision getRevision(Long revisionId) {
-        return revisionRepository.findByRevisionId(revisionId)
-                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
-    }
-
-    public DocumentRevisionDTO getRevisionDTO(Long revisionId) {
-        DocumentRevision revision = getRevision(revisionId);
+    public DocumentRevisionDTO getRevision(Long revisionId) {
+        DocumentRevision revision = documentServiceCommon.getRevision(revisionId);
         return modelMapper.map(revision, DocumentRevisionDTO.class);
     }
 
@@ -46,7 +41,7 @@ public class DocumentRevisionService {
     }
 
     private void replaceDocumentWithAdjacentRevision(Document document, Long currentRevisionId) {
-        DocumentRevision currentDocumentRevision = getRevision(currentRevisionId);
+        DocumentRevision currentDocumentRevision = documentServiceCommon.getRevision(currentRevisionId);
 
         Long currentVersion = currentDocumentRevision.getVersion();
         DocumentRevision newRevision = revisionRepository.findPreviousByDocumentAndVersion(document, currentVersion)
@@ -59,7 +54,7 @@ public class DocumentRevisionService {
     }
 
     private boolean isRevisionSetAsCurrent(Document document, Long revisionId) {
-        DocumentRevision documentRevision = getRevision(revisionId);
+        DocumentRevision documentRevision = documentServiceCommon.getRevision(revisionId);
 
         return document.getHash()
                        .equals(documentRevision.getHash());
@@ -67,7 +62,7 @@ public class DocumentRevisionService {
 
     @Transactional
     public String deleteRevision(Long revisionId) {
-        DocumentRevision documentRevision = getRevision(revisionId);
+        DocumentRevision documentRevision = documentServiceCommon.getRevision(revisionId);
 
         Document document = documentRevision.getDocument();
 
@@ -93,7 +88,7 @@ public class DocumentRevisionService {
     }
 
     public ResponseEntity<Resource> downloadRevision(Long revisionId) {
-        DocumentRevision revision = getRevision(revisionId);
+        DocumentRevision revision = documentServiceCommon.getRevision(revisionId);
         String hash = revision.getHash();
         byte[] data = blobStorageService.getBlob(hash);
 

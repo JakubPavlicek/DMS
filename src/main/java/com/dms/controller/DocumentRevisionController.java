@@ -27,7 +27,7 @@ public class DocumentRevisionController {
 
     @GetMapping("/{id}")
     public DocumentRevisionDTO getRevision(@PathVariable("id") Long revisionId) {
-        return revisionService.getRevisionDTO(revisionId);
+        return revisionService.getRevision(revisionId);
     }
 
     @DeleteMapping("/{id}")

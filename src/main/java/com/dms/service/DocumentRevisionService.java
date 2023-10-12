@@ -41,7 +41,7 @@ public class DocumentRevisionService {
                                                          .orElse(revisionRepository.findNextByDocumentAndVersion(document, currentVersion)
                                                                                    .orElse(null));
         if (newRevision == null)
-            throw new RevisionNotFoundException("Nebyla nalezena nahrazujici revize pro revizi " + currentRevisionId);
+            throw new RevisionNotFoundException("Nebyla nalezena nahrazujici revize pro revizi s ID: " + currentRevisionId);
 
         documentServiceCommon.updateDocumentToRevision(document, newRevision);
     }

@@ -129,7 +129,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
-        problemDetail.setTitle("Unknown Problem");
+        problemDetail.setTitle("Internal Server Error");
         problemDetail.setType(URI.create(baseUrl + "/unknown"));
 
         return problemDetail;

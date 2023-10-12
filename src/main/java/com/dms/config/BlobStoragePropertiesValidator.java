@@ -41,7 +41,7 @@ public class BlobStoragePropertiesValidator implements Validator {
         Path storagePath = Paths.get(path);
 
         if(Files.notExists(storagePath))
-            errors.rejectValue("path", "Blob Storage Path Not Found", "Blob storage neexistuje");
+            errors.rejectValue("path", "Blob Storage Path Not Found", "Blob storage se zadanou cestou neexistuje");
     }
 
 }

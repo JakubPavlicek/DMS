@@ -15,17 +15,17 @@ import java.nio.file.Paths;
 
 @Validated
 @ConfigurationProperties(prefix = "storage")
-public class BlobStorageProperties implements Validator {
+public class BlobStoragePropertiesValidator implements Validator {
 
-    @NotBlank
+    @NotBlank(message = "Cesta k Blob storage musi byt zadana")
     private final String path;
 
-    @Min(value = 1)
-    @Max(value = 10)
+    @Min(value = 1, message = "Minimalni delka prefixu pro adresare je 1")
+    @Max(value = 10, message = "Maximalni delka prefixu pro adresare je 10")
     private final int directoryPrefixLength;
 
     @ConstructorBinding
-    public BlobStorageProperties(String path, int directoryPrefixLength)
+    public BlobStoragePropertiesValidator(String path, int directoryPrefixLength)
     {
         this.path = path;
         this.directoryPrefixLength = directoryPrefixLength;
@@ -33,7 +33,7 @@ public class BlobStorageProperties implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return BlobStorageProperties.class.isAssignableFrom(clazz);
+        return BlobStoragePropertiesValidator.class.isAssignableFrom(clazz);
     }
 
     @Override

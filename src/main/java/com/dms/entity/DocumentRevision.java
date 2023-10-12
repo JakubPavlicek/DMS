@@ -39,6 +39,10 @@ public class DocumentRevision {
         strategy = GenerationType.SEQUENCE,
         generator = "revision_id_generator"
     )
+    @Column(
+        nullable = false,
+        unique = true
+    )
     private Long revisionId;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -47,6 +51,7 @@ public class DocumentRevision {
         referencedColumnName = "userId",
         foreignKey = @ForeignKey(name = "fk_revision_user")
     )
+    @Column(nullable = false)
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,12 +61,28 @@ public class DocumentRevision {
         foreignKey = @ForeignKey(name = "fk_revision_document")
     )
     @JsonIgnore
+    @Column(nullable = false)
     private Document document;
 
+    @Column(nullable = false)
     private Long version;
 
+    @Column(
+        length = 255,
+        nullable = false
+    )
     private String name;
+
+    @Column(
+        length = 255,
+        nullable = false
+    )
     private String type;
+
+    @Column(
+        length = 64,
+        nullable = false
+    )
     private String hash;
 
     @CreationTimestamp

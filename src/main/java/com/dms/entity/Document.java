@@ -34,6 +34,10 @@ public class Document {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(
+        length = 36,
+        unique = true
+    )
     private String documentId;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -52,8 +56,22 @@ public class Document {
     @JsonIgnore
     private List<DocumentRevision> revisions;
 
+    @Column(
+        length = 255,
+        nullable = false
+    )
     private String name;
+
+    @Column(
+        length = 255,
+        nullable = false
+    )
     private String type;
+
+    @Column(
+        length = 64,
+        nullable = false
+    )
     private String hash;
 
     @CreationTimestamp
@@ -66,6 +84,7 @@ public class Document {
 
     @UpdateTimestamp
     @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss")
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
 }

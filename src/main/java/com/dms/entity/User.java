@@ -37,7 +37,10 @@ public class User {
     private Long userId;
 
     @NotBlank(message = "Username is mandatory")
-    @Column(nullable = false)
+    @Column(
+        length = 40,
+        nullable = false
+    )
     private String username;
 
     @Email

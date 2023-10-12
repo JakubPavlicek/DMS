@@ -1,4 +1,5 @@
 databaseChangeLog:
+
   - changeSet:
       id: 1
       author: kuba
@@ -28,14 +29,15 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
+                    unique: true
               - column:
                   name: username
-                  type: varchar(50)
+                  type: varchar(40)
                   constraints:
                     nullable: false
               - column:
                   name: email
-                  type: varchar(50)
+                  type: varchar(255)
                   constraints:
                     nullable: false
 
@@ -44,10 +46,11 @@ databaseChangeLog:
             columns:
               - column:
                   name: document_id
-                  type: varchar(255)
+                  type: varchar(36)
                   constraints:
                     primaryKey: true
                     nullable: false
+                    unique: true
               - column:
                   name: user_id
                   type: bigint
@@ -56,12 +59,7 @@ databaseChangeLog:
                     foreignKeyName: fk_document_user
               - column:
                   name: name
-                  type: varchar(50)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: extension
-                  type: varchar(50)
+                  type: varchar(255)
                   constraints:
                     nullable: false
               - column:
@@ -71,7 +69,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: hash
-                  type: varchar(255)
+                  type: varchar(64)
                   constraints:
                     nullable: false
               - column:
@@ -95,6 +93,7 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
+                    unique: true
               - column:
                   name: user_id
                   type: bigint
@@ -103,7 +102,7 @@ databaseChangeLog:
                     foreignKeyName: fk_revision_user
               - column:
                   name: document_id
-                  type: varchar(255)
+                  type: varchar(36)
                   constraints:
                     nullable: false
                     foreignKeyName: fk_revision_document
@@ -114,12 +113,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: name
-                  type: varchar(50)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: extension
-                  type: varchar(50)
+                  type: varchar(255)
                   constraints:
                     nullable: false
               - column:
@@ -129,7 +123,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: hash
-                  type: varchar(255)
+                  type: varchar(64)
                   constraints:
                     nullable: false
               - column:
@@ -158,7 +152,3 @@ databaseChangeLog:
             constraintName: fk_revision_document
             referencedTableName: document
             referencedColumnNames: document_id
-
-
-
-

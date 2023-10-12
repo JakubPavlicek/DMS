@@ -1,6 +1,6 @@
 package com.dms.controller;
 
-import com.dms.entity.DocumentRevision;
+import com.dms.dto.DocumentRevisionDTO;
 import com.dms.service.DocumentRevisionService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -21,13 +21,13 @@ public class DocumentRevisionController {
     private final DocumentRevisionService revisionService;
 
     @GetMapping
-    public List<DocumentRevision> getRevisions() {
+    public List<DocumentRevisionDTO> getRevisions() {
         return revisionService.getRevisions();
     }
 
     @GetMapping("/{id}")
-    public DocumentRevision getRevision(@PathVariable("id") Long revisionId) {
-        return revisionService.getRevision(revisionId);
+    public DocumentRevisionDTO getRevision(@PathVariable("id") Long revisionId) {
+        return revisionService.getRevisionDTO(revisionId);
     }
 
     @DeleteMapping("/{id}")

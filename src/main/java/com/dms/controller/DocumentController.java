@@ -1,8 +1,8 @@
 package com.dms.controller;
 
-import com.dms.entity.Document;
-import com.dms.entity.DocumentRevision;
-import com.dms.entity.User;
+import com.dms.dto.DocumentDTO;
+import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.UserDTO;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -29,17 +29,17 @@ public class DocumentController {
     private final DocumentService documentService;
 
     @PostMapping("/upload")
-    public Document saveDocument(@Valid @RequestPart("user") User user, @RequestPart("file") MultipartFile file) {
+    public DocumentDTO saveDocument(@Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
         return documentService.saveDocument(user, file);
     }
 
     @GetMapping("/{id}")
-    public Document getDocument(@PathVariable("id") String documentId) {
-        return documentService.getDocument(documentId);
+    public DocumentDTO getDocument(@PathVariable("id") String documentId) {
+        return documentService.getDocumentDTO(documentId);
     }
 
     @PutMapping("/{id}")
-    public String updateDocument(@PathVariable("id") String documentId, @Valid @RequestPart("user") User user, @RequestPart("file") MultipartFile file) {
+    public String updateDocument(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
         return documentService.updateDocument(documentId, user, file);
     }
 
@@ -54,12 +54,12 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}/revisions")
-    public List<DocumentRevision> getDocumentRevisions(@PathVariable("id") String documentId) {
+    public List<DocumentRevisionDTO> getDocumentRevisions(@PathVariable("id") String documentId) {
         return documentService.getDocumentRevisions(documentId);
     }
 
     @PutMapping("/{id}/versions")
-    public DocumentRevision switchToVersion(@PathVariable("id") String documentId, @RequestParam("version") Long version) {
+    public DocumentRevisionDTO switchToVersion(@PathVariable("id") String documentId, @RequestParam("version") Long version) {
         return documentService.switchToVersion(documentId, version);
     }
 

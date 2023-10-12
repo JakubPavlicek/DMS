@@ -95,16 +95,15 @@ public class BlobStorageService {
     }
 
     private boolean isDirectoryEmpty(Path directoryPath) {
-        if (Files.isDirectory(directoryPath)) {
-            try (DirectoryStream<Path> directory = Files.newDirectoryStream(directoryPath)) {
-                return !directory.iterator()
-                                 .hasNext();
-            } catch (IOException e) {
-                throw new RuntimeException("Nastala chyba pri praci s adresarem: " + directoryPath);
-            }
-        }
+        if (!Files.isDirectory(directoryPath))
+            return false;
 
-        return false;
+        try (DirectoryStream<Path> directory = Files.newDirectoryStream(directoryPath)) {
+            return !directory.iterator()
+                             .hasNext();
+        } catch (IOException e) {
+            throw new RuntimeException("Nastala chyba pri praci s adresarem: " + directoryPath);
+        }
     }
 
 }

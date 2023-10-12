@@ -7,8 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,15 +38,12 @@ public class User {
     )
     private Long userId;
 
-    @NotBlank(message = "Username is mandatory")
     @Column(
         length = 40,
         nullable = false
     )
     private String username;
 
-    @Email
-    @NotBlank(message = "Email is mandatory")
     @Column(nullable = false)
     private String email;
 

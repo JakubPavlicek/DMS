@@ -54,16 +54,10 @@ public class Document {
     )
     private List<DocumentRevision> revisions;
 
-    @Column(
-        length = 255,
-        nullable = false
-    )
+    @Column(nullable = false)
     private String name;
 
-    @Column(
-        length = 255,
-        nullable = false
-    )
+    @Column(nullable = false)
     private String type;
 
     @Column(

@@ -62,16 +62,10 @@ public class DocumentRevision {
     @Column(nullable = false)
     private Long version;
 
-    @Column(
-        length = 255,
-        nullable = false
-    )
+    @Column(nullable = false)
     private String name;
 
-    @Column(
-        length = 255,
-        nullable = false
-    )
+    @Column(nullable = false)
     private String type;
 
     @Column(

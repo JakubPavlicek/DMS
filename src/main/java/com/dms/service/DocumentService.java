@@ -42,12 +42,10 @@ public class DocumentService {
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
         String path = StringUtils.cleanPath(originalFileName);
         String name = StringUtils.getFilename(path);
-        String extension = StringUtils.getFilenameExtension(path);
         String type = file.getContentType();
 
         return Document.builder()
                        .name(name)
-                       .extension(extension)
                        .type(type)
                        .build();
     }
@@ -97,7 +95,7 @@ public class DocumentService {
                                              .filter(rev -> rev.getVersion()
                                                                .equals(version))
                                              .findFirst()
-                                             .orElseThrow(() -> new RevisionNotFoundException("nebyla nalezena revize s verzi: " + version));
+                                             .orElseThrow(() -> new RevisionNotFoundException("Nebyla nalezena revize s verzi: " + version));
 
         documentServiceCommon.updateDocumentToRevision(document, revision);
 

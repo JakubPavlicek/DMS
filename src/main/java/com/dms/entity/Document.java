@@ -36,6 +36,7 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(
         length = 36,
+        nullable = false,
         unique = true
     )
     private String documentId;

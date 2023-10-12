@@ -34,6 +34,10 @@ public class User {
         strategy = GenerationType.SEQUENCE,
         generator = "user_id_generator"
     )
+    @Column(
+        nullable = false,
+        unique = true
+    )
     private Long userId;
 
     @NotBlank(message = "Username is mandatory")

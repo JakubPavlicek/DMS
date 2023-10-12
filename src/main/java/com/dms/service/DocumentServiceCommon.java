@@ -32,7 +32,6 @@ public class DocumentServiceCommon {
 
     public void updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
         document.setName(documentRevision.getName());
-        document.setExtension(documentRevision.getExtension());
         document.setType(documentRevision.getType());
         document.setAuthor(documentRevision.getAuthor());
         document.setHash(documentRevision.getHash());
@@ -45,7 +44,6 @@ public class DocumentServiceCommon {
                                                             .document(document)
                                                             .version(getLastRevisionVersion(document) + 1)
                                                             .name(document.getName())
-                                                            .extension(document.getExtension())
                                                             .type(document.getType())
                                                             .author(document.getAuthor())
                                                             .hash(document.getHash())

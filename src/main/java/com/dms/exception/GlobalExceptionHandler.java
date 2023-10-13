@@ -1,5 +1,7 @@
 package com.dms.exception;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -75,7 +78,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
 
-        List<String> errorMessages = getErrorMessages(ex);
+        List<String> errorMessages = getMethodArgumentErrorMessages(ex);
 
         problemDetail.setTitle("Invalid Data Provided");
         problemDetail.setType(URI.create(baseUrl + "/method-argument-not-valid"));
@@ -85,7 +88,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                              .build();
     }
 
-    private List<String> getErrorMessages(MethodArgumentNotValidException ex) {
+    private List<String> getMethodArgumentErrorMessages(MethodArgumentNotValidException ex) {
         List<String> errorMessages = new ArrayList<>();
 
         BindingResult bindingResult = ex.getBindingResult();
@@ -124,6 +127,35 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.of(problemDetail)
                              .build();
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ProblemDetail handleConstraintViolationException(ConstraintViolationException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("Invalid Data Provided");
+        problemDetail.setType(URI.create(baseUrl + "/invalid-data-provided"));
+
+        Set<ConstraintViolation<?>> violations = exception.getConstraintViolations();
+
+        List<String> errors = getConstraintViolationErrorMessages(violations);
+        problemDetail.setProperty("errors", errors);
+
+        return problemDetail;
+    }
+
+    private List<String> getConstraintViolationErrorMessages(Set<ConstraintViolation<?>> violations) {
+        List<String> errorMessages = new ArrayList<>();
+
+        violations.forEach(violation -> {
+            String value = String.valueOf(violation.getInvalidValue());
+            String message = violation.getMessage();
+
+            String errorMessage = String.format("Value '%s' was rejected for the following reason: %s", value, message);
+
+            errorMessages.add(errorMessage);
+        });
+
+        return errorMessages;
     }
 
     @ExceptionHandler(Exception.class)

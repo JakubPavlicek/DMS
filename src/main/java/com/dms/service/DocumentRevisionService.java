@@ -7,7 +7,6 @@ import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRevisionRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -23,25 +22,23 @@ public class DocumentRevisionService {
 
     private final DocumentRevisionRepository revisionRepository;
 
-    private final DocumentServiceCommon documentServiceCommon;
-    private final BlobStorageService blobStorageService;
-    private final ModelMapper modelMapper;
+    private final DocumentCommonService documentCommonService;
 
     public DocumentRevisionDTO getRevision(Long revisionId) {
-        DocumentRevision revision = documentServiceCommon.getRevision(revisionId);
-        return modelMapper.map(revision, DocumentRevisionDTO.class);
+        DocumentRevision revision = documentCommonService.getRevision(revisionId);
+        return documentCommonService.mapRevisionToRevisionDto(revision);
     }
 
     public List<DocumentRevisionDTO> getRevisions() {
         List<DocumentRevision> revisions = revisionRepository.findAll();
 
         return revisions.stream()
-                        .map(revision -> modelMapper.map(revision, DocumentRevisionDTO.class))
+                        .map(documentCommonService::mapRevisionToRevisionDto)
                         .toList();
     }
 
     private void replaceDocumentWithAdjacentRevision(Document document, Long currentRevisionId) {
-        DocumentRevision currentDocumentRevision = documentServiceCommon.getRevision(currentRevisionId);
+        DocumentRevision currentDocumentRevision = documentCommonService.getRevision(currentRevisionId);
 
         Long currentVersion = currentDocumentRevision.getVersion();
         DocumentRevision newRevision = revisionRepository.findPreviousByDocumentAndVersion(document, currentVersion)
@@ -50,11 +47,11 @@ public class DocumentRevisionService {
         if (newRevision == null)
             throw new RevisionNotFoundException("Nebyla nalezena nahrazujici revize pro revizi s ID: " + currentRevisionId);
 
-        documentServiceCommon.updateDocumentToRevision(document, newRevision);
+        documentCommonService.updateDocumentToRevision(document, newRevision);
     }
 
     private boolean isRevisionSetAsCurrent(Document document, Long revisionId) {
-        DocumentRevision documentRevision = documentServiceCommon.getRevision(revisionId);
+        DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
 
         return document.getHash()
                        .equals(documentRevision.getHash());
@@ -62,14 +59,14 @@ public class DocumentRevisionService {
 
     @Transactional
     public String deleteRevision(Long revisionId) {
-        DocumentRevision documentRevision = documentServiceCommon.getRevision(revisionId);
+        DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
 
         Document document = documentRevision.getDocument();
 
         if (isRevisionSetAsCurrent(document, revisionId))
             replaceDocumentWithAdjacentRevision(document, revisionId);
 
-        documentServiceCommon.deleteBlobIfDuplicateHashNotExists(documentRevision.getHash());
+        documentCommonService.deleteBlobIfDuplicateHashNotExists(documentRevision.getHash());
         revisionRepository.deleteByRevisionId(revisionId);
 
         updateRevisionVersionsForDocument(document);
@@ -88,9 +85,9 @@ public class DocumentRevisionService {
     }
 
     public ResponseEntity<Resource> downloadRevision(Long revisionId) {
-        DocumentRevision revision = documentServiceCommon.getRevision(revisionId);
+        DocumentRevision revision = documentCommonService.getRevision(revisionId);
         String hash = revision.getHash();
-        byte[] data = blobStorageService.getBlob(hash);
+        byte[] data = documentCommonService.getBlob(hash);
 
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(revision.getType()))

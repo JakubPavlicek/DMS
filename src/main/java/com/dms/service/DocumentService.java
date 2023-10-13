@@ -10,7 +10,6 @@ import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -29,22 +28,20 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
 
-    private final DocumentServiceCommon documentServiceCommon;
+    private final DocumentCommonService documentCommonService;
     private final UserService userService;
-    private final BlobStorageService blobStorageService;
-    private final ModelMapper modelMapper;
 
     public DocumentDTO getDocument(String documentId) {
-        Document document = documentServiceCommon.getDocument(documentId);
-        return modelMapper.map(document, DocumentDTO.class);
+        Document document = documentCommonService.getDocument(documentId);
+        return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
     public List<DocumentRevisionDTO> getDocumentRevisions(String documentId) {
-        Document document = documentServiceCommon.getDocument(documentId);
+        Document document = documentCommonService.getDocument(documentId);
         List<DocumentRevision> revisions = document.getRevisions();
 
         return revisions.stream()
-                        .map(revision -> modelMapper.map(revision, DocumentRevisionDTO.class))
+                        .map(documentCommonService::mapRevisionToRevisionDto)
                         .toList();
     }
 
@@ -62,29 +59,30 @@ public class DocumentService {
 
     @Transactional
     public DocumentDTO saveDocument(UserDTO userDto, MultipartFile file) {
-        String hash = blobStorageService.storeBlob(file);
+        String hash = documentCommonService.storeBlob(file);
 
-        User user = modelMapper.map(userDto, User.class);
+        User user = documentCommonService.mapUserDtoToUser(userDto);
         User author = userService.getUser(user);
 
         Document document = getDocumentFromFile(file);
         document.setHash(hash);
         document.setAuthor(author);
 
+        // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
         Document savedDocument = documentRepository.saveAndFlush(document);
 
-        documentServiceCommon.createDocumentRevision(savedDocument);
+        documentCommonService.createDocumentRevision(savedDocument);
 
-        return modelMapper.map(savedDocument, DocumentDTO.class);
+        return documentCommonService.mapDocumentToDocumentDto(savedDocument);
     }
 
     @Transactional
     public String updateDocument(String documentId, UserDTO userDto, MultipartFile file) {
-        Document databaseDocument = documentServiceCommon.getDocument(documentId);
+        Document databaseDocument = documentCommonService.getDocument(documentId);
 
-        String hash = blobStorageService.storeBlob(file);
+        String hash = documentCommonService.storeBlob(file);
 
-        User user = modelMapper.map(userDto, User.class);
+        User user = documentCommonService.mapUserDtoToUser(userDto);
         User author = userService.getUser(user);
 
         Document document = getDocumentFromFile(file);
@@ -93,7 +91,7 @@ public class DocumentService {
         document.setHash(hash);
         document.setAuthor(author);
 
-        documentServiceCommon.createDocumentRevision(document);
+        documentCommonService.createDocumentRevision(document);
 
         documentRepository.save(document);
 
@@ -102,7 +100,7 @@ public class DocumentService {
 
     @Transactional
     public DocumentRevisionDTO switchToVersion(String documentId, Long version) {
-        Document document = documentServiceCommon.getDocument(documentId);
+        Document document = documentCommonService.getDocument(documentId);
         List<DocumentRevision> revisions = document.getRevisions();
 
         DocumentRevision revision = revisions.stream()
@@ -111,28 +109,28 @@ public class DocumentService {
                                              .findFirst()
                                              .orElseThrow(() -> new RevisionNotFoundException("Nebyla nalezena revize s verzi: " + version));
 
-        documentServiceCommon.updateDocumentToRevision(document, revision);
+        documentCommonService.updateDocumentToRevision(document, revision);
 
-        return modelMapper.map(revision, DocumentRevisionDTO.class);
+        return documentCommonService.mapRevisionToRevisionDto(revision);
     }
 
     @Transactional
     public String deleteDocumentWithRevisions(String documentId) {
-        Document document = documentServiceCommon.getDocument(documentId);
+        Document document = documentCommonService.getDocument(documentId);
 
         List<DocumentRevision> documentRevisions = document.getRevisions();
-        documentRevisions.forEach(revision -> documentServiceCommon.deleteBlobIfDuplicateHashNotExists(revision.getHash()));
+        documentRevisions.forEach(revision -> documentCommonService.deleteBlobIfDuplicateHashNotExists(revision.getHash()));
 
-        documentServiceCommon.deleteBlobIfDuplicateHashNotExists(document.getHash());
+        documentCommonService.deleteBlobIfDuplicateHashNotExists(document.getHash());
         documentRepository.delete(document);
 
         return "Document deleted successfully";
     }
 
     public ResponseEntity<Resource> downloadDocument(String documentId) {
-        Document document = documentServiceCommon.getDocument(documentId);
+        Document document = documentCommonService.getDocument(documentId);
         String hash = document.getHash();
-        byte[] data = blobStorageService.getBlob(hash);
+        byte[] data = documentCommonService.getBlob(hash);
 
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(document.getType()))

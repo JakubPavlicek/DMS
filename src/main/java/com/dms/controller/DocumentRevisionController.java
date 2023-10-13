@@ -47,7 +47,7 @@ public class DocumentRevisionController {
         @RequestParam("size") int pageSize,
         @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
     ) {
-        return revisionService.getDocumentRevisionsWithPagingAndSorting(pageNumber, pageSize, sortFieldItems);
+        return revisionService.getRevisionsWithPagingAndSorting(pageNumber, pageSize, sortFieldItems);
     }
 
 }

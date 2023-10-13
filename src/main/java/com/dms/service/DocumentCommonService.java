@@ -2,6 +2,7 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.SortFieldItem;
 import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
@@ -12,8 +13,12 @@ import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -44,7 +49,7 @@ public class DocumentCommonService {
         documentRepository.save(document);
     }
 
-    public void createDocumentRevision(Document document) {
+    public void saveRevisionFromDocument(Document document) {
         DocumentRevision documentRevision = DocumentRevision.builder()
                                                             .document(document)
                                                             .version(getLastRevisionVersion(document) + 1)
@@ -59,6 +64,26 @@ public class DocumentCommonService {
     private Long getLastRevisionVersion(Document document) {
         return revisionRepository.findLastRevisionVersionByDocument(document)
                                  .orElse(0L);
+    }
+
+    public DocumentRevision getRevisionByDocumentAndVersion(Document document, Long version) {
+        return revisionRepository.findByDocumentAndVersion(document, version)
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s verzi: " + version + " nebyla nalezena"));
+    }
+
+    public Sort getSortFromFields(List<SortFieldItem> sortFieldItems) {
+        List<Sort.Order> orders = new ArrayList<>();
+
+        for (SortFieldItem sortFieldItem : sortFieldItems) {
+            String field = sortFieldItem.getField();
+            String order = sortFieldItem.getOrder();
+
+            Sort.Direction direction = Sort.Direction.fromString(order);
+
+            orders.add(new Sort.Order(direction, field));
+        }
+
+        return Sort.by(orders);
     }
 
     public String storeBlob(MultipartFile file) {

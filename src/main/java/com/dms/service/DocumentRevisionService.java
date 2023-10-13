@@ -1,6 +1,7 @@
 package com.dms.service;
 
 import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.SortFieldItem;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionNotFoundException;
@@ -9,12 +10,18 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -29,25 +36,17 @@ public class DocumentRevisionService {
         return documentCommonService.mapRevisionToRevisionDto(revision);
     }
 
-    public List<DocumentRevisionDTO> getRevisions() {
-        List<DocumentRevision> revisions = revisionRepository.findAll();
-
-        return revisions.stream()
-                        .map(documentCommonService::mapRevisionToRevisionDto)
-                        .toList();
-    }
-
     private void replaceDocumentWithAdjacentRevision(Document document, Long currentRevisionId) {
         DocumentRevision currentDocumentRevision = documentCommonService.getRevision(currentRevisionId);
 
         Long currentVersion = currentDocumentRevision.getVersion();
-        DocumentRevision newRevision = revisionRepository.findPreviousByDocumentAndVersion(document, currentVersion)
-                                                         .orElse(revisionRepository.findNextByDocumentAndVersion(document, currentVersion)
-                                                                                   .orElse(null));
-        if (newRevision == null)
+        DocumentRevision replacingRevision = revisionRepository.findPreviousByDocumentAndVersion(document, currentVersion)
+                                                               .orElse(revisionRepository.findNextByDocumentAndVersion(document, currentVersion)
+                                                                                         .orElse(null));
+        if (replacingRevision == null)
             throw new RevisionNotFoundException("Nebyla nalezena nahrazujici revize pro revizi s ID: " + currentRevisionId);
 
-        documentCommonService.updateDocumentToRevision(document, newRevision);
+        documentCommonService.updateDocumentToRevision(document, replacingRevision);
     }
 
     private boolean isRevisionSetAsCurrent(Document document, Long revisionId) {
@@ -93,6 +92,24 @@ public class DocumentRevisionService {
                              .contentType(MediaType.parseMediaType(revision.getType()))
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + revision.getName() + "\"")
                              .body(new ByteArrayResource(data));
+    }
+
+    public Page<DocumentRevisionDTO> getRevisionsWithPagingAndSorting(int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        if (Objects.nonNull(sortFieldItems)) {
+            Sort sort = documentCommonService.getSortFromFields(sortFieldItems);
+            pageable = PageRequest.of(pageNumber, pageSize, sort);
+        }
+
+        Page<DocumentRevision> revisions = revisionRepository.findAll(pageable);
+        long totalRevisions = revisionRepository.count();
+
+        List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
+                                                          .map(documentCommonService::mapRevisionToRevisionDto)
+                                                          .toList();
+
+        return new PageImpl<>(revisionDTOs, pageable, totalRevisions);
     }
 
 }

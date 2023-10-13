@@ -2,12 +2,15 @@ package com.dms.controller;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.SortFieldItem;
 import com.dms.dto.UserDTO;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/documents")
 @AllArgsConstructor
+@Validated
 public class DocumentController {
 
     private final DocumentService documentService;
@@ -61,6 +65,15 @@ public class DocumentController {
     @PutMapping("/{id}/versions")
     public DocumentRevisionDTO switchToVersion(@PathVariable("id") String documentId, @RequestParam("version") Long version) {
         return documentService.switchToVersion(documentId, version);
+    }
+
+    @GetMapping
+    public Page<DocumentDTO> getDocumentsWithPagingAndSorting(
+        @RequestParam("page") int pageNumber,
+        @RequestParam("size") int pageSize,
+        @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
+    ) {
+        return documentService.getDocumentsWithPagingAndSorting(pageNumber, pageSize, sortFieldItems);
     }
 
 }

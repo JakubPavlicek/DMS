@@ -19,6 +19,8 @@ public interface DocumentRevisionRepository extends JpaRepository<DocumentRevisi
 
     void deleteByRevisionId(Long revisionId);
 
+    Optional<DocumentRevision> findByDocumentAndVersion(Document document, Long version);
+
     @Query("SELECT COUNT(revision.hash) > 1 FROM DocumentRevision revision WHERE revision.hash = :hash")
     boolean duplicateHashExists(String hash);
 

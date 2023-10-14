@@ -42,6 +42,15 @@ public class DocumentService {
         return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
+    public DocumentDTO getDocument(String documentId, Long version) {
+        if (Objects.isNull(version))
+            return getDocument(documentId);
+
+        Document document = documentCommonService.getDocument(documentId, version);
+
+        return documentCommonService.mapDocumentToDocumentDto(document);
+    }
+
     public Page<DocumentRevisionDTO> getDocumentRevisions(String documentId, int pageNumber, int pageSize, List<SortItem> sortItems, List<FilterItem> filterItems) {
         Document document = documentCommonService.getDocument(documentId);
 

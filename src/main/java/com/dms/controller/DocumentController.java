@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,8 +34,9 @@ public class DocumentController {
     private final DocumentService documentService;
 
     @PostMapping("/upload")
-    public DocumentDTO saveDocument(@Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
-        return documentService.saveDocument(user, file);
+    public ResponseEntity<DocumentDTO> saveDocument(@Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
+        DocumentDTO documentDTO = documentService.saveDocument(user, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
     @GetMapping("/{id}")
@@ -43,13 +45,14 @@ public class DocumentController {
     }
 
     @PutMapping("/{id}")
-    public String updateDocument(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
+    public DocumentDTO updateDocument(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
         return documentService.updateDocument(documentId, user, file);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteDocumentWithRevisions(@PathVariable("id") String documentId) {
-        return documentService.deleteDocumentWithRevisions(documentId);
+    public ResponseEntity<Void> deleteDocumentWithRevisions(@PathVariable("id") String documentId) {
+        documentService.deleteDocumentWithRevisions(documentId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/download")
@@ -58,8 +61,13 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}/revisions")
-    public List<DocumentRevisionDTO> getDocumentRevisions(@PathVariable("id") String documentId) {
-        return documentService.getDocumentRevisions(documentId);
+    public Page<DocumentRevisionDTO> getDocumentRevisions(
+        @PathVariable("id") String documentId,
+        @RequestParam("page") int pageNumber,
+        @RequestParam("size") int pageSize,
+        @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
+    ) {
+        return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sortFieldItems);
     }
 
     @PutMapping("/{id}/versions")
@@ -68,12 +76,12 @@ public class DocumentController {
     }
 
     @GetMapping
-    public Page<DocumentDTO> getDocumentsWithPagingAndSorting(
+    public Page<DocumentDTO> getDocuments(
         @RequestParam("page") int pageNumber,
         @RequestParam("size") int pageSize,
         @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
     ) {
-        return documentService.getDocumentsWithPagingAndSorting(pageNumber, pageSize, sortFieldItems);
+        return documentService.getDocuments(pageNumber, pageSize, sortFieldItems);
     }
 
 }

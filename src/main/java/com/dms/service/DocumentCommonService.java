@@ -13,6 +13,7 @@ import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +38,19 @@ public class DocumentCommonService {
 
     public Document getDocument(String documentId) {
         return documentRepository.findById(documentId)
-                                 .orElseThrow(() -> new DocumentNotFoundException("Soubor s id: " + documentId + " nebyl nalezen."));
+                                 .orElseThrow(() -> new DocumentNotFoundException("Soubor s id: " + documentId + " nebyl nalezen"));
+    }
+
+    public Document getDocument(String documentId, Long version) {
+        Document document = getDocument(documentId);
+
+        DocumentRevision revision = revisionRepository.findByDocumentAndVersion(document, version)
+                                                      .orElseThrow(() -> new DocumentNotFoundException("Soubor s verzi: " + version + " neexistuje"));
+
+        BeanUtils.copyProperties(revision, document, "createdAt");
+        document.setUpdatedAt(document.getUpdatedAt());
+
+        return document;
     }
 
     public DocumentRevision getRevision(Long revisionId) {

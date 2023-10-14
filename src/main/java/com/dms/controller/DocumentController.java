@@ -2,7 +2,8 @@ package com.dms.controller;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.SortFieldItem;
+import com.dms.dto.FilterItem;
+import com.dms.dto.SortItem;
 import com.dms.dto.UserDTO;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
@@ -60,28 +61,30 @@ public class DocumentController {
         return documentService.downloadDocument(documentId);
     }
 
+    @PutMapping("/{id}/versions")
+    public DocumentRevisionDTO switchToVersion(@PathVariable("id") String documentId, @RequestParam("version") Long version) {
+        return documentService.switchToVersion(documentId, version);
+    }
+
     @GetMapping("/{id}/revisions")
     public Page<DocumentRevisionDTO> getDocumentRevisions(
         @PathVariable("id") String documentId,
         @RequestParam("page") int pageNumber,
         @RequestParam("limit") int pageSize,
-        @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
+        @Valid @RequestParam(name = "sortItems", required = false) List<SortItem> sortItems,
+        @Valid @RequestParam(name = "filter", required = false) List<FilterItem> filterItems
     ) {
-        return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sortFieldItems);
-    }
-
-    @PutMapping("/{id}/versions")
-    public DocumentRevisionDTO switchToVersion(@PathVariable("id") String documentId, @RequestParam("version") Long version) {
-        return documentService.switchToVersion(documentId, version);
+        return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sortItems, filterItems);
     }
 
     @GetMapping
     public Page<DocumentDTO> getDocuments(
         @RequestParam("page") int pageNumber,
         @RequestParam("limit") int pageSize,
-        @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
+        @Valid @RequestParam(name = "sort", required = false) List<SortItem> sortItems,
+        @Valid @RequestParam(name = "filter", required = false) List<FilterItem> filterItems
     ) {
-        return documentService.getDocuments(pageNumber, pageSize, sortFieldItems);
+        return documentService.getDocuments(pageNumber, pageSize, sortItems, filterItems);
     }
 
 }

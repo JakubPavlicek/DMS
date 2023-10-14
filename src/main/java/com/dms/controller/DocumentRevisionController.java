@@ -1,7 +1,8 @@
 package com.dms.controller;
 
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.SortFieldItem;
+import com.dms.dto.FilterItem;
+import com.dms.dto.SortItem;
 import com.dms.service.DocumentRevisionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -43,12 +44,13 @@ public class DocumentRevisionController {
     }
 
     @GetMapping
-    public Page<DocumentRevisionDTO> getDocumentRevisionsWithPagingAndSorting(
+    public Page<DocumentRevisionDTO> getRevisions(
         @RequestParam("page") int pageNumber,
         @RequestParam("limit") int pageSize,
-        @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
+        @Valid @RequestParam(name = "sort", required = false) List<SortItem> sortItems,
+        @Valid @RequestParam(name = "filter", required = false) List<FilterItem> filterItems
     ) {
-        return revisionService.getRevisionsWithPagingAndSorting(pageNumber, pageSize, sortFieldItems);
+        return revisionService.getRevisions(pageNumber, pageSize, sortItems, filterItems);
     }
 
 }

@@ -1,7 +1,9 @@
 package com.dms.service;
 
+import com.dms.specification.DocumentFilterSpecification;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.SortFieldItem;
+import com.dms.dto.FilterItem;
+import com.dms.dto.SortItem;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionNotFoundException;
@@ -13,12 +15,14 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -88,15 +92,23 @@ public class DocumentRevisionService {
                              .body(new ByteArrayResource(data));
     }
 
-    public Page<DocumentRevisionDTO> getRevisionsWithPagingAndSorting(int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
-        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortFieldItems);
+    public Page<DocumentRevisionDTO> getRevisions(int pageNumber, int pageSize, List<SortItem> sortItems, List<FilterItem> filterItems) {
+        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortItems);
 
-        Page<DocumentRevision> revisions = revisionRepository.findAll(pageable);
+        Page<DocumentRevision> revisions = getFilteredRevisions(filterItems, pageable);
         List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
                                                           .map(documentCommonService::mapRevisionToRevisionDto)
                                                           .toList();
 
         return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
+    }
+
+    private Page<DocumentRevision> getFilteredRevisions(List<FilterItem> filterItems, Pageable pageable) {
+        if (Objects.isNull(filterItems))
+            return revisionRepository.findAll(pageable);
+
+        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filterItems);
+        return revisionRepository.findAll(specification, pageable);
     }
 
 }

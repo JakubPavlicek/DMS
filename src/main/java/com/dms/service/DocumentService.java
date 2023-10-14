@@ -2,7 +2,9 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.SortFieldItem;
+import com.dms.specification.DocumentFilterSpecification;
+import com.dms.dto.FilterItem;
+import com.dms.dto.SortItem;
 import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
@@ -15,6 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,17 +42,25 @@ public class DocumentService {
         return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
-    public Page<DocumentRevisionDTO> getDocumentRevisions(String documentId, int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
+    public Page<DocumentRevisionDTO> getDocumentRevisions(String documentId, int pageNumber, int pageSize, List<SortItem> sortItems, List<FilterItem> filterItems) {
         Document document = documentCommonService.getDocument(documentId);
 
-        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortFieldItems);
+        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortItems);
 
-        Page<DocumentRevision> revisions = documentCommonService.getRevisionsByDocumentAndPageable(document, pageable);
+        Page<DocumentRevision> revisions = getFilteredDocumentRevisions(filterItems, document, pageable);
         List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
                                                           .map(documentCommonService::mapRevisionToRevisionDto)
                                                           .toList();
 
         return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
+    }
+
+    private Page<DocumentRevision> getFilteredDocumentRevisions(List<FilterItem> filterItems, Document document, Pageable pageable) {
+        if (Objects.isNull(filterItems))
+            return documentCommonService.getRevisionsByDocument(document, pageable);
+
+        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filterItems);
+        return documentCommonService.getRevisionsBySpecification(specification, pageable);
     }
 
     private User getUserFromUserDto(UserDTO userDto) {
@@ -133,15 +144,23 @@ public class DocumentService {
                              .body(new ByteArrayResource(data));
     }
 
-    public Page<DocumentDTO> getDocuments(int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
-        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortFieldItems);
+    public Page<DocumentDTO> getDocuments(int pageNumber, int pageSize, List<SortItem> sortItems, List<FilterItem> filterItems) {
+        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortItems);
 
-        Page<Document> documents = documentRepository.findAll(pageable);
+        Page<Document> documents = getFilteredDocuments(filterItems, pageable);
         List<DocumentDTO> documentDTOs = documents.stream()
                                                   .map(documentCommonService::mapDocumentToDocumentDto)
                                                   .toList();
 
         return new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
+    }
+
+    private Page<Document> getFilteredDocuments(List<FilterItem> filterItems, Pageable pageable) {
+        if (Objects.isNull(filterItems))
+            return documentRepository.findAll(pageable);
+
+        Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
+        return documentRepository.findAll(specification, pageable);
     }
 
 }

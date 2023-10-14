@@ -32,8 +32,9 @@ public class DocumentRevisionController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteRevision(@PathVariable("id") Long revisionId) {
-        return revisionService.deleteRevision(revisionId);
+    public ResponseEntity<Void> deleteRevision(@PathVariable("id") Long revisionId) {
+        revisionService.deleteRevision(revisionId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/download")

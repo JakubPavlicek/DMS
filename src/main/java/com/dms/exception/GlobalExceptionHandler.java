@@ -2,6 +2,7 @@ package com.dms.exception;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -27,15 +28,6 @@ import java.util.Set;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final String baseUrl = "http://localhost:8080/errors";
-
-    @ExceptionHandler(HashAlgorithmNotFoundException.class)
-    public ProblemDetail handleHashAlgorithmNotFoundException(HashAlgorithmNotFoundException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
-        problemDetail.setTitle("Hash Algorithm Not Found");
-        problemDetail.setType(URI.create(baseUrl + "/hash-algorithm-not-found"));
-
-        return problemDetail;
-    }
 
     @ExceptionHandler(FileOperationException.class)
     public ProblemDetail handleFileOperationEception(FileOperationException eception) {
@@ -156,6 +148,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         });
 
         return errorMessages;
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ProblemDetail handlePropertyReferenceException(PropertyReferenceException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+        problemDetail.setTitle("Property Doesn't Exist");
+        problemDetail.setType(URI.create(baseUrl + "/property-doesnt-exist"));
+
+        return problemDetail;
     }
 
     @ExceptionHandler(Exception.class)

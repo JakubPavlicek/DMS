@@ -12,16 +12,13 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -57,9 +54,8 @@ public class DocumentRevisionService {
     }
 
     @Transactional
-    public String deleteRevision(Long revisionId) {
+    public void deleteRevision(Long revisionId) {
         DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
-
         Document document = documentRevision.getDocument();
 
         if (isRevisionSetAsCurrent(document, revisionId))
@@ -69,8 +65,6 @@ public class DocumentRevisionService {
         revisionRepository.deleteByRevisionId(revisionId);
 
         updateRevisionVersionsForDocument(document);
-
-        return "Revision deleted successfully";
     }
 
     private void updateRevisionVersionsForDocument(Document document) {
@@ -95,21 +89,14 @@ public class DocumentRevisionService {
     }
 
     public Page<DocumentRevisionDTO> getRevisionsWithPagingAndSorting(int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-
-        if (Objects.nonNull(sortFieldItems)) {
-            Sort sort = documentCommonService.getSortFromFields(sortFieldItems);
-            pageable = PageRequest.of(pageNumber, pageSize, sort);
-        }
+        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortFieldItems);
 
         Page<DocumentRevision> revisions = revisionRepository.findAll(pageable);
-        long totalRevisions = revisionRepository.count();
-
         List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
                                                           .map(documentCommonService::mapRevisionToRevisionDto)
                                                           .toList();
 
-        return new PageImpl<>(revisionDTOs, pageable, totalRevisions);
+        return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
     }
 
 }

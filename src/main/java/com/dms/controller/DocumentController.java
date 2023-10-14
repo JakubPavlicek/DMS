@@ -7,6 +7,8 @@ import com.dms.dto.SortItem;
 import com.dms.dto.UserDTO;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -41,8 +43,8 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}")
-    public DocumentDTO getDocument(@PathVariable("id") String documentId) {
-        return documentService.getDocument(documentId);
+    public DocumentDTO getDocument(@PathVariable("id") String documentId, @RequestParam(value = "version", required = false) @NotNull(message = "Version must not be null") @Min(1) Long version) {
+        return documentService.getDocument(documentId, version);
     }
 
     @PutMapping("/{id}")
@@ -79,8 +81,8 @@ public class DocumentController {
 
     @GetMapping
     public Page<DocumentDTO> getDocuments(
-        @RequestParam("page") int pageNumber,
-        @RequestParam("limit") int pageSize,
+        @RequestParam(value = "page", defaultValue = "0") int pageNumber,
+        @RequestParam(value = "limit", defaultValue = "10") int pageSize,
         @Valid @RequestParam(name = "sort", required = false) List<SortItem> sortItems,
         @Valid @RequestParam(name = "filter", required = false) List<FilterItem> filterItems
     ) {

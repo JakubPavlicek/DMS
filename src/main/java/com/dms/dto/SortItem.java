@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class SortFieldItem {
+public class SortItem {
 
     private final String separator = ":";
 
     @NotBlank(message = "A sorting item must be provided")
     @Pattern(
         regexp = "^[a-zA-Z]+:(asc|desc)$",
-        message = "The format of sorting items does not match, the correct format is: <item>:<asc/desc>"
+        message = "The format of sorting item does not match, the correct format is: <item>:<asc/desc>"
     )
     private String fieldWithOrder;
 

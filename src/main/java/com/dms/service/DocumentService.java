@@ -14,9 +14,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,13 +39,17 @@ public class DocumentService {
         return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
-    public List<DocumentRevisionDTO> getDocumentRevisions(String documentId) {
+    public Page<DocumentRevisionDTO> getDocumentRevisions(String documentId, int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
         Document document = documentCommonService.getDocument(documentId);
-        List<DocumentRevision> revisions = document.getRevisions();
 
-        return revisions.stream()
-                        .map(documentCommonService::mapRevisionToRevisionDto)
-                        .toList();
+        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortFieldItems);
+
+        Page<DocumentRevision> revisions = documentCommonService.getRevisionsByDocumentAndPageable(document, pageable);
+        List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
+                                                          .map(documentCommonService::mapRevisionToRevisionDto)
+                                                          .toList();
+
+        return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
     }
 
     private User getUserFromUserDto(UserDTO userDto) {
@@ -89,14 +91,14 @@ public class DocumentService {
     }
 
     @Transactional
-    public String updateDocument(String documentId, UserDTO userDto, MultipartFile file) {
+    public DocumentDTO updateDocument(String documentId, UserDTO userDto, MultipartFile file) {
         Document document = createDocumentFromUserDtoAndFile(userDto, file);
         document.setDocumentId(documentId);
 
         documentCommonService.saveRevisionFromDocument(document);
         documentRepository.save(document);
 
-        return "Document updated successfully";
+        return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
     @Transactional
@@ -110,7 +112,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public String deleteDocumentWithRevisions(String documentId) {
+    public void deleteDocumentWithRevisions(String documentId) {
         Document document = documentCommonService.getDocument(documentId);
 
         List<DocumentRevision> documentRevisions = document.getRevisions();
@@ -118,8 +120,6 @@ public class DocumentService {
 
         documentCommonService.deleteBlobIfDuplicateHashNotExists(document.getHash());
         documentRepository.delete(document);
-
-        return "Document deleted successfully";
     }
 
     public ResponseEntity<Resource> downloadDocument(String documentId) {
@@ -133,22 +133,15 @@ public class DocumentService {
                              .body(new ByteArrayResource(data));
     }
 
-    public Page<DocumentDTO> getDocumentsWithPagingAndSorting(int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-
-        if (Objects.nonNull(sortFieldItems)) {
-            Sort sort = documentCommonService.getSortFromFields(sortFieldItems);
-            pageable = PageRequest.of(pageNumber, pageSize, sort);
-        }
+    public Page<DocumentDTO> getDocuments(int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
+        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortFieldItems);
 
         Page<Document> documents = documentRepository.findAll(pageable);
-        long totalDocuments = documentRepository.count();
-
         List<DocumentDTO> documentDTOs = documents.stream()
                                                   .map(documentCommonService::mapDocumentToDocumentDto)
                                                   .toList();
 
-        return new PageImpl<>(documentDTOs, pageable, totalDocuments);
+        return new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
     }
 
 }

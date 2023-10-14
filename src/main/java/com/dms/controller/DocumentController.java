@@ -64,7 +64,7 @@ public class DocumentController {
     public Page<DocumentRevisionDTO> getDocumentRevisions(
         @PathVariable("id") String documentId,
         @RequestParam("page") int pageNumber,
-        @RequestParam("size") int pageSize,
+        @RequestParam("limit") int pageSize,
         @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
     ) {
         return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sortFieldItems);

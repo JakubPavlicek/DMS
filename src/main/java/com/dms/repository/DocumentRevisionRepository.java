@@ -5,6 +5,7 @@ import com.dms.entity.DocumentRevision;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,17 +14,17 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, String> {
+public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, String>, JpaSpecificationExecutor<DocumentRevision> {
 
     Optional<DocumentRevision> findByRevisionId(Long revisionId);
 
-    List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
-
-    void deleteByRevisionId(Long revisionId);
-
     Optional<DocumentRevision> findByDocumentAndVersion(Document document, Long version);
 
+    List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
+
     Page<DocumentRevision> findAllByDocument(Document document, Pageable pageable);
+
+    void deleteByRevisionId(Long revisionId);
 
     @Query("SELECT COUNT(revision.hash) > 1 FROM DocumentRevision revision WHERE revision.hash = :hash")
     boolean duplicateHashExists(String hash);

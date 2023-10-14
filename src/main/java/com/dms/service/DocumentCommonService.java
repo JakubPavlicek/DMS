@@ -13,12 +13,16 @@ import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -38,6 +42,10 @@ public class DocumentCommonService {
     public DocumentRevision getRevision(Long revisionId) {
         return revisionRepository.findByRevisionId(revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
+    }
+
+    public Page<DocumentRevision> getRevisionsByDocumentAndPageable(Document document, Pageable pageable) {
+        return revisionRepository.findAllByDocument(document, pageable);
     }
 
     public void updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
@@ -71,7 +79,7 @@ public class DocumentCommonService {
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s verzi: " + version + " nebyla nalezena"));
     }
 
-    public Sort getSortFromFields(List<SortFieldItem> sortFieldItems) {
+    private Sort getSortFromFields(List<SortFieldItem> sortFieldItems) {
         List<Sort.Order> orders = new ArrayList<>();
 
         for (SortFieldItem sortFieldItem : sortFieldItems) {
@@ -84,6 +92,15 @@ public class DocumentCommonService {
         }
 
         return Sort.by(orders);
+    }
+
+    public Pageable createPageable(int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
+        Sort sort = Sort.unsorted();
+
+        if (Objects.nonNull(sortFieldItems))
+            sort = getSortFromFields(sortFieldItems);
+
+        return PageRequest.of(pageNumber, pageSize, sort);
     }
 
     public String storeBlob(MultipartFile file) {

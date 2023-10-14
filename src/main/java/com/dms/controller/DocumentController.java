@@ -78,7 +78,7 @@ public class DocumentController {
     @GetMapping
     public Page<DocumentDTO> getDocuments(
         @RequestParam("page") int pageNumber,
-        @RequestParam("size") int pageSize,
+        @RequestParam("limit") int pageSize,
         @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
     ) {
         return documentService.getDocuments(pageNumber, pageSize, sortFieldItems);

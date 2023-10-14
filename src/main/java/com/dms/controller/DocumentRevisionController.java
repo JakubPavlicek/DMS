@@ -45,7 +45,7 @@ public class DocumentRevisionController {
     @GetMapping
     public Page<DocumentRevisionDTO> getDocumentRevisionsWithPagingAndSorting(
         @RequestParam("page") int pageNumber,
-        @RequestParam("size") int pageSize,
+        @RequestParam("limit") int pageSize,
         @Valid @RequestParam(name = "sort", required = false) List<SortFieldItem> sortFieldItems
     ) {
         return revisionService.getRevisionsWithPagingAndSorting(pageNumber, pageSize, sortFieldItems);

@@ -2,7 +2,7 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.SortFieldItem;
+import com.dms.dto.SortItem;
 import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,7 +45,11 @@ public class DocumentCommonService {
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
     }
 
-    public Page<DocumentRevision> getRevisionsByDocumentAndPageable(Document document, Pageable pageable) {
+    public Page<DocumentRevision> getRevisionsBySpecification(Specification<DocumentRevision> specification, Pageable pageable) {
+        return revisionRepository.findAll(specification, pageable);
+    }
+
+    public Page<DocumentRevision> getRevisionsByDocument(Document document, Pageable pageable) {
         return revisionRepository.findAllByDocument(document, pageable);
     }
 
@@ -79,12 +84,12 @@ public class DocumentCommonService {
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s verzi: " + version + " nebyla nalezena"));
     }
 
-    private Sort getSortFromFields(List<SortFieldItem> sortFieldItems) {
+    private Sort getSortFromFields(List<SortItem> sortItems) {
         List<Sort.Order> orders = new ArrayList<>();
 
-        for (SortFieldItem sortFieldItem : sortFieldItems) {
-            String field = sortFieldItem.getField();
-            String order = sortFieldItem.getOrder();
+        for (SortItem sortItem : sortItems) {
+            String field = sortItem.getField();
+            String order = sortItem.getOrder();
 
             Sort.Direction direction = Sort.Direction.fromString(order);
 
@@ -94,11 +99,11 @@ public class DocumentCommonService {
         return Sort.by(orders);
     }
 
-    public Pageable createPageable(int pageNumber, int pageSize, List<SortFieldItem> sortFieldItems) {
+    public Pageable createPageable(int pageNumber, int pageSize, List<SortItem> sortItems) {
         Sort sort = Sort.unsorted();
 
-        if (Objects.nonNull(sortFieldItems))
-            sort = getSortFromFields(sortFieldItems);
+        if (Objects.nonNull(sortItems))
+            sort = getSortFromFields(sortItems);
 
         return PageRequest.of(pageNumber, pageSize, sort);
     }

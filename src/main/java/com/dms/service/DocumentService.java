@@ -2,7 +2,6 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.specification.DocumentFilterSpecification;
 import com.dms.dto.FilterItem;
 import com.dms.dto.SortItem;
 import com.dms.dto.UserDTO;
@@ -10,6 +9,7 @@ import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
+import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -51,8 +51,11 @@ public class DocumentService {
         return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
-    public Page<DocumentRevisionDTO> getDocumentRevisions(String documentId, int pageNumber, int pageSize, List<SortItem> sortItems, List<FilterItem> filterItems) {
+    public Page<DocumentRevisionDTO> getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
         Document document = documentCommonService.getDocument(documentId);
+
+        List<SortItem> sortItems = documentCommonService.parseSortItems(sort);
+        List<FilterItem> filterItems = documentCommonService.parseFilterItems(filter);
 
         Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortItems);
 
@@ -153,7 +156,10 @@ public class DocumentService {
                              .body(new ByteArrayResource(data));
     }
 
-    public Page<DocumentDTO> getDocuments(int pageNumber, int pageSize, List<SortItem> sortItems, List<FilterItem> filterItems) {
+    public Page<DocumentDTO> getDocuments(int pageNumber, int pageSize, String sort, String filter) {
+        List<SortItem> sortItems = documentCommonService.parseSortItems(sort);
+        List<FilterItem> filterItems = documentCommonService.parseFilterItems(filter);
+
         Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortItems);
 
         Page<Document> documents = getFilteredDocuments(filterItems, pageable);

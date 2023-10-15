@@ -20,6 +20,8 @@ public interface DocumentRevisionRepository extends JpaRepository<DocumentRevisi
 
     Optional<DocumentRevision> findByDocumentAndVersion(Document document, Long version);
 
+    Optional<DocumentRevision> findByDocumentAndRevisionId(Document document, Long revisionId);
+
     List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
 
     Page<DocumentRevision> findAllByDocument(Document document, Pageable pageable);

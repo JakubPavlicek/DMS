@@ -29,6 +29,12 @@ spring:
 #    enabled: false
     change-log: db/changelog/changelog-master.yaml
 
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    url: /openapi.yaml
+
 ---
 
 # PostgreSQL config

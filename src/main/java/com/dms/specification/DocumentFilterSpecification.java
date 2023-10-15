@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class DocumentFilterSpecification {
             String field = filterItem.getField();
             String value = filterItem.getValue();
 
-            Predicate predicate = criteriaBuilder.like(root.get(field), "%" + value + "%");
+            Predicate predicate = criteriaBuilder.like(root.get(field), "%" + Normalizer.normalize(value, Normalizer.Form.NFKD) + "%");
             predicates.add(predicate);
         }
 

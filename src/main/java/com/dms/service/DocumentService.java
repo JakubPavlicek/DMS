@@ -16,6 +16,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
@@ -102,7 +103,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO saveDocument(UserDTO userDto, MultipartFile file) {
+    public DocumentDTO uploadDocument(UserDTO userDto, MultipartFile file) {
         Document document = createDocumentFromUserDtoAndFile(userDto, file);
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
@@ -186,6 +187,32 @@ public class DocumentService {
 
         Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
         return documentRepository.findAll(specification, pageable);
+    }
+
+    public Page<Long> getDocumentVersions(String documentId, int pageNumber, int pageSize) {
+        Document document = documentCommonService.getDocument(documentId);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return documentCommonService.getDocumentVersions(document, pageable);
+    }
+
+    @Transactional
+    public DocumentRevisionDTO uploadRevision(String documentId, UserDTO userDto, MultipartFile file) {
+        Document databaseDocument = documentCommonService.getDocument(documentId);
+        Document document = createDocumentFromUserDtoAndFile(userDto, file);
+
+        DocumentRevision revision = DocumentRevision.builder()
+                                                    .document(databaseDocument)
+                                                    .name(document.getName())
+                                                    .type(document.getType())
+                                                    .author(document.getAuthor())
+                                                    .hash(document.getHash())
+                                                    .version(documentCommonService.getLastRevisionVersion(databaseDocument))
+                                                    .build();
+
+        DocumentRevision savedRevision = documentCommonService.saveRevision(revision);
+
+        return documentCommonService.mapRevisionToRevisionDto(savedRevision);
     }
 
 }

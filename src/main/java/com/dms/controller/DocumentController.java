@@ -31,8 +31,8 @@ public class DocumentController {
     private final DocumentService documentService;
 
     @PostMapping("/upload")
-    public ResponseEntity<DocumentDTO> saveDocument(@Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
-        DocumentDTO documentDTO = documentService.saveDocument(user, file);
+    public ResponseEntity<DocumentDTO> uploadDocument(@Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
+        DocumentDTO documentDTO = documentService.uploadDocument(user, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
@@ -57,6 +57,11 @@ public class DocumentController {
         return documentService.downloadDocument(documentId);
     }
 
+    @GetMapping("/{id}/versions")
+    public Page<Long> getDocumentVersions(@PathVariable("id") String documentId, @RequestParam("page") int pageNumber, @RequestParam("limit") int pageSize) {
+        return documentService.getDocumentVersions(documentId, pageNumber, pageSize);
+    }
+
     @GetMapping("/{id}/versions/{version}")
     public DocumentDTO getDocument(@PathVariable("id") String documentId, @PathVariable("version") Long version) {
         return documentService.getDocument(documentId, version);
@@ -65,6 +70,11 @@ public class DocumentController {
     @PutMapping("/{id}/versions/{version}")
     public DocumentDTO switchToVersion(@PathVariable("id") String documentId, @PathVariable("version") Long version) {
         return documentService.switchToVersion(documentId, version);
+    }
+
+    @PostMapping("/{id}/revisions")
+    public DocumentRevisionDTO uploadRevision(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
+        return documentService.uploadRevision(documentId, user, file);
     }
 
     @PutMapping("/{id}/revisions/{revision}")

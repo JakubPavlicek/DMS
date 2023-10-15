@@ -2,14 +2,10 @@ package com.dms.controller;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.FilterItem;
-import com.dms.dto.SortItem;
 import com.dms.dto.UserDTO;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -26,11 +22,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/documents")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Validated
 public class DocumentController {
 
@@ -43,8 +37,8 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}")
-    public DocumentDTO getDocument(@PathVariable("id") String documentId, @RequestParam(value = "version", required = false) @NotNull(message = "Version must not be null") @Min(1) Long version) {
-        return documentService.getDocument(documentId, version);
+    public DocumentDTO getDocument(@PathVariable("id") String documentId) {
+        return documentService.getDocument(documentId);
     }
 
     @PutMapping("/{id}")
@@ -63,8 +57,13 @@ public class DocumentController {
         return documentService.downloadDocument(documentId);
     }
 
-    @PutMapping("/{id}/versions")
-    public DocumentRevisionDTO switchToVersion(@PathVariable("id") String documentId, @RequestParam("version") Long version) {
+    @GetMapping("/{id}/versions/{version}")
+    public DocumentDTO getDocument(@PathVariable("id") String documentId, @PathVariable("version") Long version) {
+        return documentService.getDocument(documentId, version);
+    }
+
+    @PutMapping("/{id}/versions/{version}")
+    public DocumentRevisionDTO switchToVersion(@PathVariable("id") String documentId, @PathVariable("version") Long version) {
         return documentService.switchToVersion(documentId, version);
     }
 
@@ -73,20 +72,20 @@ public class DocumentController {
         @PathVariable("id") String documentId,
         @RequestParam("page") int pageNumber,
         @RequestParam("limit") int pageSize,
-        @Valid @RequestParam(name = "sortItems", required = false) List<SortItem> sortItems,
-        @Valid @RequestParam(name = "filter", required = false) List<FilterItem> filterItems
+        @RequestParam(name = "sort", required = false) String sort,
+        @RequestParam(name = "filter", required = false) String filter
     ) {
-        return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sortItems, filterItems);
+        return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sort, filter);
     }
 
     @GetMapping
     public Page<DocumentDTO> getDocuments(
-        @RequestParam(value = "page", defaultValue = "0") int pageNumber,
-        @RequestParam(value = "limit", defaultValue = "10") int pageSize,
-        @Valid @RequestParam(name = "sort", required = false) List<SortItem> sortItems,
-        @Valid @RequestParam(name = "filter", required = false) List<FilterItem> filterItems
+        @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+        @RequestParam(name = "limit", defaultValue = "10") int pageSize,
+        @RequestParam(name = "sort", required = false) String sort,
+        @RequestParam(name = "filter", required = false) String filter
     ) {
-        return documentService.getDocuments(pageNumber, pageSize, sortItems, filterItems);
+        return documentService.getDocuments(pageNumber, pageSize, sort, filter);
     }
 
 }

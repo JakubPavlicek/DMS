@@ -20,11 +20,11 @@ components:
           type: string
 
 paths:
-  /users:
+  /documents:
     get:
-      description: Returns a list of Users.
+      description: Returns a list of documents.
       tags:
-        - users
+        - documents
       responses:
         200:
           description: A list of Users.
@@ -40,6 +40,87 @@ paths:
             text/json:
               schema:
                 type: string
+
+  /documents/{id}:
+    get:
+      description: Get document with id.
+      tags:
+        - documents
+    put:
+      description: Update document with id.
+      tags:
+        - documents
+    delete:
+      description: Delete document with id.
+      tags:
+        - documents
+
+  /documents/upload:
+    post:
+      description: Upload a document.
+      tags:
+        - documents
+
+  /documents/{id}/download:
+    get:
+      description: Download a document.
+      tags:
+        - documents
+
+  /documents/{id}/revisions:
+    get:
+      description: List document revisions.
+      tags:
+        - documents
+    post:
+      description: Upload document revision.
+      tags:
+        - documents
+
+  /documents/{id}/revisions/{revision}:
+    put:
+      description: Switch document to a specific revision.
+      tags:
+        - documents
+
+  /documents/{id}/versions:
+    get:
+      description: List document versions.
+      tags:
+        - documents
+
+  /documents/{id}/versions/{version}:
+    get:
+      description: Get document version.
+      tags:
+        - documents
+    put:
+      description: Switch document to a specific version.
+      tags:
+        - documents
+
+  /revisions:
+    get:
+      description: List all revisions.
+      tags:
+        - revisions
+
+  /revisions/{id}:
+    get:
+      description: Get a revision.
+      tags:
+        - revisions
+    delete:
+      description: Delete revision.
+      tags:
+        - revisions
+
+  /revisions/{id}/download:
+    get:
+      description: Download a revision.
+      tags:
+        - revisions
+
   /users/{id}:
     get:
       description: Returns a User by ID.

@@ -18,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -90,6 +91,11 @@ public class DocumentCommonService {
         return revisionRepository.findAllByDocument(document, pageable);
     }
 
+    public DocumentRevision saveRevision(DocumentRevision revision) {
+        // flush to immediately initialize the "createdAt" and "updatedAt" fields
+        return revisionRepository.saveAndFlush(revision);
+    }
+
     public Document copyRevisionInfoToDocument(DocumentRevision revision, Document document) {
         BeanUtils.copyProperties(revision, document, "createdAt");
         document.setUpdatedAt(document.getUpdatedAt());
@@ -119,7 +125,7 @@ public class DocumentCommonService {
         revisionRepository.save(documentRevision);
     }
 
-    private Long getLastRevisionVersion(Document document) {
+    public Long getLastRevisionVersion(Document document) {
         return revisionRepository.findLastRevisionVersionByDocument(document)
                                  .orElse(0L);
     }
@@ -218,6 +224,16 @@ public class DocumentCommonService {
 
     public User mapUserDtoToUser(UserDTO userDTO) {
         return modelMapper.map(userDTO, User.class);
+    }
+
+    public Page<Long> getDocumentVersions(Document document, Pageable pageable) {
+        Page<DocumentRevision> revisions = revisionRepository.findAllByDocument(document, pageable);
+
+        List<Long> versions = revisions.stream()
+                                       .map(DocumentRevision::getVersion)
+                                       .toList();
+
+        return new PageImpl<>(versions, pageable, revisions.getTotalElements());
     }
 
 }

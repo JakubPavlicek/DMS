@@ -159,11 +159,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(InvalidRegexInputException.class)
+    public ProblemDetail handleInvalidRegexInputException(InvalidRegexInputException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+        problemDetail.setTitle("Pattern Doesn't Match");
+        problemDetail.setType(URI.create(baseUrl + "/pattern-doesnt-match"));
+
+        return problemDetail;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
-        problemDetail.setTitle("Internal Server Error");
-        problemDetail.setType(URI.create(baseUrl + "/unknown"));
+        problemDetail.setTitle("Unexpected Error Occurred");
+        problemDetail.setType(URI.create(baseUrl + "/unexpected"));
 
         return problemDetail;
     }

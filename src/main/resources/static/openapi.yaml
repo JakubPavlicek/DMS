@@ -1,0 +1,82 @@
+openapi: 3.1.0
+
+info:
+  title: DMS
+  summary: Document Management System for Software Documentation
+  version: "1.0"
+
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        firstname:
+          type: string
+        email:
+          type: string
+
+paths:
+  /users:
+    get:
+      description: Returns a list of Users.
+      tags:
+        - users
+      responses:
+        200:
+          description: A list of Users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        400:
+          description: A JSON array of user names
+          content:
+            text/json:
+              schema:
+                type: string
+  /users/{id}:
+    get:
+      description: Returns a User by ID.
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                type: object
+                $ref: '#/components/schemas/User'
+  /files:
+    post:
+      description: List all files
+      tags:
+        - files
+      responses:
+        200:
+          description: JSON array of files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: int

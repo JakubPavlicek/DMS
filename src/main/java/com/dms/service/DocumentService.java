@@ -125,13 +125,23 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentRevisionDTO switchToVersion(String documentId, Long version) {
+    public DocumentDTO switchToVersion(String documentId, Long version) {
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
 
-        documentCommonService.updateDocumentToRevision(document, revision);
+        Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
 
-        return documentCommonService.mapRevisionToRevisionDto(revision);
+        return documentCommonService.mapDocumentToDocumentDto(documentFromRevision);
+    }
+
+    @Transactional
+    public DocumentDTO switchToRevision(String documentId, Long revisionId) {
+        Document document = documentCommonService.getDocument(documentId);
+        DocumentRevision revision = documentCommonService.getRevisionByDocumentAndId(document, revisionId);
+
+        Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
+
+        return documentCommonService.mapDocumentToDocumentDto(documentFromRevision);
     }
 
     @Transactional

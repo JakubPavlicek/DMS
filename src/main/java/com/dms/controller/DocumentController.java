@@ -63,8 +63,13 @@ public class DocumentController {
     }
 
     @PutMapping("/{id}/versions/{version}")
-    public DocumentRevisionDTO switchToVersion(@PathVariable("id") String documentId, @PathVariable("version") Long version) {
+    public DocumentDTO switchToVersion(@PathVariable("id") String documentId, @PathVariable("version") Long version) {
         return documentService.switchToVersion(documentId, version);
+    }
+
+    @PutMapping("/{id}/revisions/{revision}")
+    public DocumentDTO switchToRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId) {
+        return documentService.switchToRevision(documentId, revisionId);
     }
 
     @GetMapping("/{id}/revisions")

@@ -1,6 +1,5 @@
 package com.dms.service;
 
-import com.dms.specification.DocumentFilterSpecification;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.FilterItem;
 import com.dms.dto.SortItem;
@@ -8,8 +7,9 @@ import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRevisionRepository;
+import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DocumentRevisionService {
 
     private final DocumentRevisionRepository revisionRepository;

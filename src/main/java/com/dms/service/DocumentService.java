@@ -11,7 +11,7 @@ import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DocumentService {
 
     private final DocumentRepository documentRepository;

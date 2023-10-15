@@ -1,11 +1,7 @@
 package com.dms.controller;
 
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.FilterItem;
-import com.dms.dto.SortItem;
 import com.dms.service.DocumentRevisionService;
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -17,8 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/revisions")

@@ -92,7 +92,10 @@ public class DocumentRevisionService {
                              .body(new ByteArrayResource(data));
     }
 
-    public Page<DocumentRevisionDTO> getRevisions(int pageNumber, int pageSize, List<SortItem> sortItems, List<FilterItem> filterItems) {
+    public Page<DocumentRevisionDTO> getRevisions(int pageNumber, int pageSize, String sort, String filter) {
+        List<SortItem> sortItems = documentCommonService.parseSortItems(sort);
+        List<FilterItem> filterItems = documentCommonService.parseFilterItems(filter);
+
         Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortItems);
 
         Page<DocumentRevision> revisions = getFilteredRevisions(filterItems, pageable);

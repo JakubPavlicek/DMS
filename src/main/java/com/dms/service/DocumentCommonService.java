@@ -64,14 +64,21 @@ public class DocumentCommonService {
         DocumentRevision revision = revisionRepository.findByDocumentAndVersion(document, version)
                                                       .orElseThrow(() -> new DocumentNotFoundException("Soubor s verzi: " + version + " neexistuje"));
 
-        BeanUtils.copyProperties(revision, document, "createdAt");
-        document.setUpdatedAt(document.getUpdatedAt());
-
-        return document;
+        return copyRevisionInfoToDocument(revision, document);
     }
 
     public DocumentRevision getRevision(Long revisionId) {
         return revisionRepository.findByRevisionId(revisionId)
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
+    }
+
+    public DocumentRevision getRevisionByDocumentAndVersion(Document document, Long version) {
+        return revisionRepository.findByDocumentAndVersion(document, version)
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s verzi: " + version + " nebyla nalezena"));
+    }
+
+    public DocumentRevision getRevisionByDocumentAndId(Document document, Long revisionId) {
+        return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
     }
 
@@ -83,13 +90,21 @@ public class DocumentCommonService {
         return revisionRepository.findAllByDocument(document, pageable);
     }
 
-    public void updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
+    public Document copyRevisionInfoToDocument(DocumentRevision revision, Document document) {
+        BeanUtils.copyProperties(revision, document, "createdAt");
+        document.setUpdatedAt(document.getUpdatedAt());
+
+        return document;
+    }
+
+    public Document updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
         document.setName(documentRevision.getName());
         document.setType(documentRevision.getType());
         document.setAuthor(documentRevision.getAuthor());
         document.setHash(documentRevision.getHash());
 
-        documentRepository.save(document);
+        // flush to immediately initialize the "createdAt" and "updatedAt" fields
+        return documentRepository.saveAndFlush(document);
     }
 
     public void saveRevisionFromDocument(Document document) {
@@ -107,11 +122,6 @@ public class DocumentCommonService {
     private Long getLastRevisionVersion(Document document) {
         return revisionRepository.findLastRevisionVersionByDocument(document)
                                  .orElse(0L);
-    }
-
-    public DocumentRevision getRevisionByDocumentAndVersion(Document document, Long version) {
-        return revisionRepository.findByDocumentAndVersion(document, version)
-                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s verzi: " + version + " nebyla nalezena"));
     }
 
     private Sort getSortFromFields(List<SortItem> sortItems) {

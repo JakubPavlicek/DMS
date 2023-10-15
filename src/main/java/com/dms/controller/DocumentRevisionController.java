@@ -6,6 +6,7 @@ import com.dms.dto.SortItem;
 import com.dms.service.DocumentRevisionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/revisions")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Validated
 public class DocumentRevisionController {
 
@@ -47,10 +48,10 @@ public class DocumentRevisionController {
     public Page<DocumentRevisionDTO> getRevisions(
         @RequestParam("page") int pageNumber,
         @RequestParam("limit") int pageSize,
-        @Valid @RequestParam(name = "sort", required = false) List<SortItem> sortItems,
-        @Valid @RequestParam(name = "filter", required = false) List<FilterItem> filterItems
+        @RequestParam(name = "sort", required = false) String sort,
+        @RequestParam(name = "filter", required = false) String filter
     ) {
-        return revisionService.getRevisions(pageNumber, pageSize, sortItems, filterItems);
+        return revisionService.getRevisions(pageNumber, pageSize, sort, filter);
     }
 
 }

@@ -2,18 +2,21 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.FilterItem;
 import com.dms.dto.SortItem;
 import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
+import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,10 +28,24 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DocumentCommonService {
+
+    @Value("${regex.sort}")
+    private String sortRegex;
+
+    @Value("${regex.sort-pattern}")
+    private String sortRegexPattern;
+
+    @Value("${regex.filter}")
+    private String filterRegex;
+
+    @Value("${regex.filter-pattern}")
+    private String filterRegexPattern;
 
     private final DocumentRepository documentRepository;
     private final DocumentRevisionRepository revisionRepository;
@@ -102,9 +119,7 @@ public class DocumentCommonService {
 
         for (SortItem sortItem : sortItems) {
             String field = sortItem.getField();
-            String order = sortItem.getOrder();
-
-            Sort.Direction direction = Sort.Direction.fromString(order);
+            Sort.Direction direction = sortItem.getDirection();
 
             orders.add(new Sort.Order(direction, field));
         }
@@ -119,6 +134,51 @@ public class DocumentCommonService {
             sort = getSortFromFields(sortItems);
 
         return PageRequest.of(pageNumber, pageSize, sort);
+    }
+
+    public List<SortItem> parseSortItems(String sort) {
+        if (Objects.isNull(sort))
+            return null;
+
+        if (!sort.matches(sortRegexPattern))
+            throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
+
+        List<SortItem> sortItems = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile(sortRegex);
+        Matcher matcher = pattern.matcher(sort);
+
+        while (matcher.find()) {
+            String field = matcher.group(1);
+            String directionStr = matcher.group(2);
+            Sort.Direction direction = Sort.Direction.fromString(directionStr);
+
+            sortItems.add(new SortItem(field, direction));
+        }
+
+        return sortItems;
+    }
+
+    public List<FilterItem> parseFilterItems(String filter) {
+        if (Objects.isNull(filter))
+            return null;
+
+        if (!filter.matches(filterRegexPattern))
+            throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
+
+        List<FilterItem> filterItems = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile(filterRegex);
+        Matcher matcher = pattern.matcher(filter);
+
+        while (matcher.find()) {
+            String field = matcher.group(1);
+            String value = matcher.group(2);
+
+            filterItems.add(new FilterItem(field, value));
+        }
+
+        return filterItems;
     }
 
     public String storeBlob(MultipartFile file) {

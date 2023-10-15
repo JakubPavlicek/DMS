@@ -1,29 +1,14 @@
 package com.dms.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import org.springframework.data.domain.Sort;
 
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
 public class SortItem {
 
-    private final String separator = ":";
-
-    @NotBlank(message = "A sorting item must be provided")
-    @Pattern(
-        regexp = "^[a-zA-Z]+:(asc|desc)$",
-        message = "The format of sorting item does not match, the correct format is: <item>:<asc/desc>"
-    )
-    private String fieldWithOrder;
-
-    public String getField() {
-        return fieldWithOrder.split(separator)[0];
-    }
-
-    public String getOrder() {
-        return fieldWithOrder.split(separator)[1];
-    }
+    private String field;
+    private Sort.Direction direction;
 
 }

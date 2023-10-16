@@ -8,6 +8,7 @@ import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
+import com.dms.exception.DocumentNotFoundException;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,6 +52,11 @@ public class DocumentService {
         Document document = documentCommonService.getDocument(documentId, version);
 
         return documentCommonService.mapDocumentToDocumentDto(document);
+    }
+
+    private LocalDateTime getDocumentCreatedAt(String documentId) {
+        return documentRepository.getCreatedAtByDocumentId(documentId)
+                                 .orElseThrow(() -> new RuntimeException("Nebyl nalezen cas vytvoreni dokumentu s ID: " + documentId));
     }
 
     public Page<DocumentRevisionDTO> getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
@@ -116,13 +123,21 @@ public class DocumentService {
 
     @Transactional
     public DocumentDTO updateDocument(String documentId, UserDTO userDto, MultipartFile file) {
+        if(!documentRepository.existsById(documentId))
+            throw new DocumentNotFoundException("Nebyl nalezen soubor s ID: " + documentId + " pro nahrazeni");
+
         Document document = createDocumentFromUserDtoAndFile(userDto, file);
         document.setDocumentId(documentId);
 
-        documentCommonService.saveRevisionFromDocument(document);
-        documentRepository.save(document);
+        // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
+        Document savedDocument = documentRepository.saveAndFlush(document);
 
-        return documentCommonService.mapDocumentToDocumentDto(document);
+        LocalDateTime createdAt = getDocumentCreatedAt(documentId);
+        savedDocument.setCreatedAt(createdAt);
+
+        documentCommonService.saveRevisionFromDocument(savedDocument);
+
+        return documentCommonService.mapDocumentToDocumentDto(savedDocument);
     }
 
     @Transactional

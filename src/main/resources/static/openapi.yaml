@@ -10,50 +10,208 @@ servers:
     description: Local server
 
 components:
+
   schemas:
+
     User:
       type: object
       properties:
-        firstname:
+        userId:
+          type: integer
+          format: int64
+          example: 1
+        username:
           type: string
+          example: jakub
         email:
           type: string
+          format: email
+          example: jakub@gmail.com
+
+    Document:
+      type: object
+      properties:
+        documentId:
+          type: string
+          format: uuid
+          example: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a
+        author:
+          $ref: '#/components/schemas/User'
+        name:
+          type: string
+          example: dog.jpeg
+        type:
+          type: string
+          example: image/jpeg
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-10-14T09:32:01.485815
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-10-14T09:32:01.485815
+
+    DocumentRevision:
+      type: object
+      properties:
+        revisionId:
+          type: integer
+          format: int64
+          example: 1
+        author:
+          $ref: '#/components/schemas/User'
+        name:
+          type: string
+          example: dog.jpeg
+        type:
+          type: string
+          example: image/jpeg
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-10-14T09:32:01.485815
+
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          example: http://localhost:8080/errors/resource-not-found
+        title:
+          type: string
+          example: Resource Not Found
+        status:
+          type: integer
+          example: 404
+        detail:
+          type: string
+          example: "File with id: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 was not found"
+        instance:
+          type: string
+          format: uri
+          example: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
+
+  responses:
+
+    404DocumentNotFound:
+      description: Document not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
 
 paths:
+
   /documents:
     get:
-      description: Returns a list of documents.
+      description: Retrieve a list of the documents.
       tags:
         - documents
+      parameters:
+        - in: query
+          name: page
+          description: The page number for pagination
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: limit
+          description: The maximum number of items to return per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+        - in: query
+          name: sort
+          required: false
+          description: | 
+            A comma-separated list of sort keys.
+            Valid keys are 'documentId', 'authorAuthorId', 'name', 'type', 'hash', 'createdAt', 'updatedAt'.
+            Each key can be sorted by either: asc (ascending order) or desc (descending order).
+            Example usage: ?sort=name:desc,type:asc.
+          schema:
+            type: string
+            pattern: '(([a-zA-Z]+):(asc|desc)(?:,|$))+'
+        - in: query
+          name: filter
+          required: false
+          description: |
+            A comma-separated list of filter keys.
+            Valid keys are 'documentId', 'authorAuthorId', 'name', 'type', 'hash', 'createdAt', 'updatedAt'.
+            Each key can be filtered using any value.
+            Filtering operates by checking whether the string contains the given substring.
+            Example usage: ?filter=name:logo,type:image
+          schema:
+            type: string
+            pattern: '(([a-zA-Z]+):([^,]+)(?:,|$))+'
+
       responses:
         200:
-          description: A list of Users.
+          description: Successfully retrieved list of the documents.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/Document'
         400:
-          description: A JSON array of user names
+          description: Pattern does not match
           content:
-            text/json:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetail'
 
   /documents/{id}:
+
     get:
-      description: Get document with id.
+      description: Retrieves the details about a document.
       tags:
         - documents
+      responses:
+        200:
+          description: Successfully retrieved details about a document.
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Document'
+        404:
+          $ref: '#/components/responses/404DocumentNotFound'
+
     put:
-      description: Update document with id.
+      description: Updates a document with id.
       tags:
         - documents
+      responses:
+        200:
+          description: Document updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Document'
+        400:
+          description: Invalid data provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        404:
+          description: Document for overwriting not found.
+          $ref: '#/components/responses/404DocumentNotFound'
+
     delete:
-      description: Delete document with id.
+      description: Deletes a document with id.
       tags:
         - documents
+      responses:
+        204:
+          description: Document deleted successfully.
+        404:
+          $ref: '#/components/responses/404DocumentNotFound'
 
   /documents/upload:
     post:

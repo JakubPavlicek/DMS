@@ -30,6 +30,16 @@ public class DocumentController {
 
     private final DocumentService documentService;
 
+    @GetMapping
+    public Page<DocumentDTO> getDocuments(
+        @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+        @RequestParam(name = "limit", defaultValue = "10") int pageSize,
+        @RequestParam(name = "sort", required = false) String sort,
+        @RequestParam(name = "filter", required = false) String filter
+    ) {
+        return documentService.getDocuments(pageNumber, pageSize, sort, filter);
+    }
+
     @PostMapping("/upload")
     public ResponseEntity<DocumentDTO> uploadDocument(@Valid @RequestPart("user") UserRequest user, @RequestPart("file") MultipartFile file) {
         DocumentDTO documentDTO = documentService.uploadDocument(user, file);
@@ -57,6 +67,28 @@ public class DocumentController {
         return documentService.downloadDocument(documentId);
     }
 
+    @GetMapping("/{id}/revisions")
+    public Page<DocumentRevisionDTO> getDocumentRevisions(
+        @PathVariable("id") String documentId,
+        @RequestParam("page") int pageNumber,
+        @RequestParam("limit") int pageSize,
+        @RequestParam(name = "sort", required = false) String sort,
+        @RequestParam(name = "filter", required = false) String filter
+    ) {
+        return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sort, filter);
+    }
+
+    @PostMapping("/{id}/revisions/upload")
+    public ResponseEntity<DocumentRevisionDTO> uploadRevision(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserRequest user, @RequestPart("file") MultipartFile file) {
+        DocumentRevisionDTO documentRevisionDTO = documentService.uploadRevision(documentId, user, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentRevisionDTO);
+    }
+
+    @PutMapping("/{id}/revisions/{revision}")
+    public DocumentDTO switchToRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId) {
+        return documentService.switchToRevision(documentId, revisionId);
+    }
+
     @GetMapping("/{id}/versions")
     public Page<Long> getDocumentVersions(@PathVariable("id") String documentId, @RequestParam("page") int pageNumber, @RequestParam("limit") int pageSize) {
         return documentService.getDocumentVersions(documentId, pageNumber, pageSize);
@@ -70,38 +102,6 @@ public class DocumentController {
     @PutMapping("/{id}/versions/{version}")
     public DocumentDTO switchToVersion(@PathVariable("id") String documentId, @PathVariable("version") Long version) {
         return documentService.switchToVersion(documentId, version);
-    }
-
-    @PostMapping("/{id}/revisions")
-    public ResponseEntity<DocumentRevisionDTO> uploadRevision(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserRequest user, @RequestPart("file") MultipartFile file) {
-        DocumentRevisionDTO documentRevisionDTO = documentService.uploadRevision(documentId, user, file);
-        return ResponseEntity.status(HttpStatus.CREATED).body(documentRevisionDTO);
-    }
-
-    @PutMapping("/{id}/revisions/{revision}")
-    public DocumentDTO switchToRevision(@PathVariable("id") String documentId, @PathVariable("revision") Long revisionId) {
-        return documentService.switchToRevision(documentId, revisionId);
-    }
-
-    @GetMapping("/{id}/revisions")
-    public Page<DocumentRevisionDTO> getDocumentRevisions(
-        @PathVariable("id") String documentId,
-        @RequestParam("page") int pageNumber,
-        @RequestParam("limit") int pageSize,
-        @RequestParam(name = "sort", required = false) String sort,
-        @RequestParam(name = "filter", required = false) String filter
-    ) {
-        return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sort, filter);
-    }
-
-    @GetMapping
-    public Page<DocumentDTO> getDocuments(
-        @RequestParam(name = "page", defaultValue = "0") int pageNumber,
-        @RequestParam(name = "limit", defaultValue = "10") int pageSize,
-        @RequestParam(name = "sort", required = false) String sort,
-        @RequestParam(name = "filter", required = false) String filter
-    ) {
-        return documentService.getDocuments(pageNumber, pageSize, sort, filter);
     }
 
 }

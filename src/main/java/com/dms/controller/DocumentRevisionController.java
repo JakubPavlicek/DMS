@@ -22,6 +22,16 @@ public class DocumentRevisionController {
 
     private final DocumentRevisionService revisionService;
 
+    @GetMapping
+    public Page<DocumentRevisionDTO> getRevisions(
+        @RequestParam("page") int pageNumber,
+        @RequestParam("limit") int pageSize,
+        @RequestParam(name = "sort", required = false) String sort,
+        @RequestParam(name = "filter", required = false) String filter
+    ) {
+        return revisionService.getRevisions(pageNumber, pageSize, sort, filter);
+    }
+
     @GetMapping("/{id}")
     public DocumentRevisionDTO getRevision(@PathVariable("id") Long revisionId) {
         return revisionService.getRevision(revisionId);
@@ -36,16 +46,6 @@ public class DocumentRevisionController {
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> downloadRevision(@PathVariable("id") Long revisionId) {
         return revisionService.downloadRevision(revisionId);
-    }
-
-    @GetMapping
-    public Page<DocumentRevisionDTO> getRevisions(
-        @RequestParam("page") int pageNumber,
-        @RequestParam("limit") int pageSize,
-        @RequestParam(name = "sort", required = false) String sort,
-        @RequestParam(name = "filter", required = false) String filter
-    ) {
-        return revisionService.getRevisions(pageNumber, pageSize, sort, filter);
     }
 
 }

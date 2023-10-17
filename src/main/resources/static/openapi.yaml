@@ -341,7 +341,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-        # TODO: what if the file is too big
+        413:
+          description: File size exceeded maximum upload size.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
 
   /documents/{id}/download:
 
@@ -368,8 +373,6 @@ paths:
 
   /documents/{id}/revisions:
 
-    # TODO: tady pokracuj
-
     get:
       description: List document revisions.
       tags:
@@ -395,6 +398,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+
+  /documnets/{id}/revisions/upload:
 
     post:
       description: Upload document revision.
@@ -448,6 +453,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/DocumentId'
         - $ref: '#/components/parameters/DocumentVersion'
+
     put:
       description: Switch document to a specific version.
       tags:
@@ -476,6 +482,7 @@ paths:
         - revisions
       parameters:
         - $ref: '#/components/parameters/RevisionId'
+
     delete:
       description: Delete revision.
       tags:

@@ -2,7 +2,7 @@ package com.dms.controller;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.UserDTO;
+import com.dms.dto.UserRequest;
 import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class DocumentController {
     private final DocumentService documentService;
 
     @PostMapping("/upload")
-    public ResponseEntity<DocumentDTO> uploadDocument(@Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
+    public ResponseEntity<DocumentDTO> uploadDocument(@Valid @RequestPart("user") UserRequest user, @RequestPart("file") MultipartFile file) {
         DocumentDTO documentDTO = documentService.uploadDocument(user, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
@@ -42,7 +42,7 @@ public class DocumentController {
     }
 
     @PutMapping("/{id}")
-    public DocumentDTO updateDocument(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
+    public DocumentDTO updateDocument(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserRequest user, @RequestPart("file") MultipartFile file) {
         return documentService.updateDocument(documentId, user, file);
     }
 
@@ -73,8 +73,9 @@ public class DocumentController {
     }
 
     @PostMapping("/{id}/revisions")
-    public DocumentRevisionDTO uploadRevision(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserDTO user, @RequestPart("file") MultipartFile file) {
-        return documentService.uploadRevision(documentId, user, file);
+    public ResponseEntity<DocumentRevisionDTO> uploadRevision(@PathVariable("id") String documentId, @Valid @RequestPart("user") UserRequest user, @RequestPart("file") MultipartFile file) {
+        DocumentRevisionDTO documentRevisionDTO = documentService.uploadRevision(documentId, user, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentRevisionDTO);
     }
 
     @PutMapping("/{id}/revisions/{revision}")

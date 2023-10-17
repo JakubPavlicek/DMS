@@ -118,6 +118,13 @@ components:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
 
+    413PayloadTooLarge:
+      description: File size exceeded maximum upload size.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+
   headers:
 
     DocumentName:
@@ -342,11 +349,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
         413:
-          description: File size exceeded maximum upload size.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/413PayloadTooLarge'
 
   /documents/{id}/download:
 
@@ -423,11 +426,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
         413:
-          description: File size exceeded maximum upload size.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/413PayloadTooLarge'
 
   /documents/{id}/revisions/{revision}:
 

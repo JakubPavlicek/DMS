@@ -4,7 +4,7 @@ import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.FilterItem;
 import com.dms.dto.SortItem;
-import com.dms.dto.UserDTO;
+import com.dms.dto.UserRequest;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
@@ -83,14 +83,18 @@ public class DocumentService {
         return documentCommonService.getRevisionsBySpecification(specification, pageable);
     }
 
-    private User getUserFromUserDto(UserDTO userDto) {
-        User user = documentCommonService.mapUserDtoToUser(userDto);
+    private User getUserFromUserRequest(UserRequest userRequest) {
+        User user = User.builder()
+                        .username(userRequest.getUsername())
+                        .email(userRequest.getEmail())
+                        .build();
+
         return userService.getUser(user);
     }
 
-    private Document createDocumentFromUserDtoAndFile(UserDTO userDto, MultipartFile file) {
+    private Document createDocumentFromUserRequestAndFile(UserRequest userRequest, MultipartFile file) {
         String hash = documentCommonService.storeBlob(file);
-        User author = getUserFromUserDto(userDto);
+        User author = getUserFromUserRequest(userRequest);
 
         return createDocument(file, hash, author);
     }
@@ -110,8 +114,8 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadDocument(UserDTO userDto, MultipartFile file) {
-        Document document = createDocumentFromUserDtoAndFile(userDto, file);
+    public DocumentDTO uploadDocument(UserRequest userRequest, MultipartFile file) {
+        Document document = createDocumentFromUserRequestAndFile(userRequest, file);
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
         Document savedDocument = documentRepository.saveAndFlush(document);
@@ -122,11 +126,11 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO updateDocument(String documentId, UserDTO userDto, MultipartFile file) {
-        if(!documentRepository.existsById(documentId))
+    public DocumentDTO updateDocument(String documentId, UserRequest userRequest, MultipartFile file) {
+        if (!documentRepository.existsById(documentId))
             throw new DocumentNotFoundException("Nebyl nalezen soubor s ID: " + documentId + " pro nahrazeni");
 
-        Document document = createDocumentFromUserDtoAndFile(userDto, file);
+        Document document = createDocumentFromUserRequestAndFile(userRequest, file);
         document.setDocumentId(documentId);
 
         // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
@@ -212,9 +216,9 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentRevisionDTO uploadRevision(String documentId, UserDTO userDto, MultipartFile file) {
+    public DocumentRevisionDTO uploadRevision(String documentId, UserRequest userRequest, MultipartFile file) {
         Document databaseDocument = documentCommonService.getDocument(documentId);
-        Document document = createDocumentFromUserDtoAndFile(userDto, file);
+        Document document = createDocumentFromUserRequestAndFile(userRequest, file);
 
         DocumentRevision revision = DocumentRevision.builder()
                                                     .document(databaseDocument)

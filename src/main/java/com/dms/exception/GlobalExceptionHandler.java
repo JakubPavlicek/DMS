@@ -74,7 +74,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errorMessages = getMethodArgumentErrorMessages(ex);
 
         problemDetail.setTitle("Invalid Data Provided");
-        problemDetail.setType(URI.create(baseUrl + "/method-argument-not-valid"));
+        problemDetail.setType(URI.create(baseUrl + "/invalid-data"));
         problemDetail.setProperty("errors", errorMessages);
 
         return ResponseEntity.of(problemDetail)

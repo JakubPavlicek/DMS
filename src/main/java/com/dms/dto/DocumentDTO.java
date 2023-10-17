@@ -1,6 +1,5 @@
 package com.dms.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,11 +17,7 @@ public class DocumentDTO {
     UserDTO author;
     String name;
     String type;
-
-    @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss")
     LocalDateTime createdAt;
-
-    @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss")
     LocalDateTime updatedAt;
 
 }

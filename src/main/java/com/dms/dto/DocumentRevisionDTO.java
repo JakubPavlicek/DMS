@@ -17,6 +17,7 @@ public class DocumentRevisionDTO {
     UserDTO author;
     String name;
     String type;
+    String path;
     LocalDateTime createdAt;
 
 }

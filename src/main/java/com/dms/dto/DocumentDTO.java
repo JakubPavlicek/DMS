@@ -17,6 +17,7 @@ public class DocumentDTO {
     UserDTO author;
     String name;
     String type;
+    String path;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 

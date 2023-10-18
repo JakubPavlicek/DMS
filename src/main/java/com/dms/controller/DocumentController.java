@@ -55,9 +55,8 @@ public class DocumentController {
 
         @RequestPart("file") MultipartFile file,
 
-        @NotBlank(message = "Path is mandatory.")
         @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
-        @RequestPart(value = "path", required = false) String path
+        @RequestPart(name = "path", required = false) String path
     ) {
         DocumentDTO documentDTO = documentService.uploadDocument(user, file, path);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
@@ -83,9 +82,8 @@ public class DocumentController {
 
         @RequestPart("file") MultipartFile file,
 
-        @NotBlank(message = "Path is mandatory.")
         @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
-        @RequestPart(value = "path", required = false) String path
+        @RequestPart(name = "path", required = false) String path
     ) {
         return documentService.updateDocument(documentId, user, file, path);
     }
@@ -98,6 +96,19 @@ public class DocumentController {
     ) {
         documentService.deleteDocumentWithRevisions(documentId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/move")
+    public DocumentDTO moveDocument(
+        @NotBlank(message = "Document ID is mandatory.")
+        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @PathVariable("id") String documentId,
+
+        @NotBlank(message = "Path is mandatory.")
+        @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
+        @RequestPart("path") String path
+    ) {
+        return documentService.moveDocument(documentId, path);
     }
 
     @GetMapping("/{id}/download")
@@ -139,9 +150,8 @@ public class DocumentController {
 
         @RequestPart("file") MultipartFile file,
 
-        @NotBlank(message = "Path is mandatory.")
         @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
-        @RequestPart(value = "path", required = false) String path
+        @RequestPart(name = "path", required = false) String path
     ) {
         DocumentRevisionDTO documentRevisionDTO = documentService.uploadRevision(documentId, user, file, path);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentRevisionDTO);

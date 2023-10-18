@@ -35,17 +35,31 @@ public class DocumentController {
 
     @GetMapping
     public Page<DocumentDTO> getDocuments(
-        @RequestParam(name = "page", defaultValue = "0") @Min(0) int pageNumber,
-        @RequestParam(name = "limit", defaultValue = "10") @Min(1) int pageSize,
+        @Min(0)
+        @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+
+        @Min(1)
+        @RequestParam(name = "limit", defaultValue = "10") int pageSize,
+
         @RequestParam(name = "sort", required = false) String sort,
+
         @RequestParam(name = "filter", required = false) String filter
     ) {
         return documentService.getDocuments(pageNumber, pageSize, sort, filter);
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<DocumentDTO> uploadDocument(@Valid @RequestPart("user") UserRequest user, @RequestPart("file") MultipartFile file) {
-        DocumentDTO documentDTO = documentService.uploadDocument(user, file);
+    public ResponseEntity<DocumentDTO> uploadDocument(
+        @Valid
+        @RequestPart("user") UserRequest user,
+
+        @RequestPart("file") MultipartFile file,
+
+        @NotBlank(message = "Path is mandatory.")
+        @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
+        @RequestPart(value = "path", required = false) String path
+    ) {
+        DocumentDTO documentDTO = documentService.uploadDocument(user, file, path);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
@@ -53,8 +67,7 @@ public class DocumentController {
     public DocumentDTO getDocument(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId
+        @PathVariable("id") String documentId
     ) {
         return documentService.getDocument(documentId);
     }
@@ -63,20 +76,25 @@ public class DocumentController {
     public DocumentDTO updateDocument(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId,
-        @Valid @RequestPart("user") UserRequest user,
-        @RequestPart("file") MultipartFile file
+        @PathVariable("id") String documentId,
+
+        @Valid
+        @RequestPart("user") UserRequest user,
+
+        @RequestPart("file") MultipartFile file,
+
+        @NotBlank(message = "Path is mandatory.")
+        @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
+        @RequestPart(value = "path", required = false) String path
     ) {
-        return documentService.updateDocument(documentId, user, file);
+        return documentService.updateDocument(documentId, user, file, path);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocumentWithRevisions(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId
+        @PathVariable("id") String documentId
     ) {
         documentService.deleteDocumentWithRevisions(documentId);
         return ResponseEntity.noContent().build();
@@ -86,8 +104,7 @@ public class DocumentController {
     public ResponseEntity<Resource> downloadDocument(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId
+        @PathVariable("id") String documentId
     ) {
         return documentService.downloadDocument(documentId);
     }
@@ -96,11 +113,16 @@ public class DocumentController {
     public Page<DocumentRevisionDTO> getDocumentRevisions(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId,
-        @RequestParam(name = "page", defaultValue = "0") @Min(0) int pageNumber,
-        @RequestParam(name = "limit", defaultValue = "10") @Min(1) int pageSize,
+        @PathVariable("id") String documentId,
+
+        @Min(0)
+        @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+
+        @Min(1)
+        @RequestParam(name = "limit", defaultValue = "10") int pageSize,
+
         @RequestParam(name = "sort", required = false) String sort,
+
         @RequestParam(name = "filter", required = false) String filter
     ) {
         return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sort, filter);
@@ -110,12 +132,18 @@ public class DocumentController {
     public ResponseEntity<DocumentRevisionDTO> uploadRevision(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId,
-        @Valid @RequestPart("user") UserRequest user,
-        @RequestPart("file") MultipartFile file
+        @PathVariable("id") String documentId,
+
+        @Valid
+        @RequestPart("user") UserRequest user,
+
+        @RequestPart("file") MultipartFile file,
+
+        @NotBlank(message = "Path is mandatory.")
+        @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
+        @RequestPart(value = "path", required = false) String path
     ) {
-        DocumentRevisionDTO documentRevisionDTO = documentService.uploadRevision(documentId, user, file);
+        DocumentRevisionDTO documentRevisionDTO = documentService.uploadRevision(documentId, user, file, path);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentRevisionDTO);
     }
 
@@ -123,9 +151,10 @@ public class DocumentController {
     public DocumentDTO switchToRevision(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId,
-        @Min(value = 1, message = "Revision ID must be greater than or equal to 1.") @PathVariable("revision") Long revisionId
+        @PathVariable("id") String documentId,
+
+        @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
+        @PathVariable("revision") Long revisionId
     ) {
         return documentService.switchToRevision(documentId, revisionId);
     }
@@ -134,10 +163,13 @@ public class DocumentController {
     public Page<Long> getDocumentVersions(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId,
-        @RequestParam("page") int pageNumber,
-        @RequestParam("limit") int pageSize
+        @PathVariable("id") String documentId,
+
+        @Min(0)
+        @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+
+        @Min(1)
+        @RequestParam(name = "limit", defaultValue = "10") int pageSize
     ) {
         return documentService.getDocumentVersions(documentId, pageNumber, pageSize);
     }
@@ -146,9 +178,10 @@ public class DocumentController {
     public DocumentDTO getDocument(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId,
-        @Min(value = 1, message = "Version must be greater than or equal to 1.") @PathVariable("version") Long version
+        @PathVariable("id") String documentId,
+
+        @Min(value = 1, message = "Version must be greater than or equal to 1.")
+        @PathVariable("version") Long version
     ) {
         return documentService.getDocument(documentId, version);
     }
@@ -157,9 +190,10 @@ public class DocumentController {
     public DocumentDTO switchToVersion(
         @NotBlank(message = "Document ID is mandatory.")
         @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
-        @PathVariable("id")
-        String documentId,
-        @Min(value = 1, message = "Version must be greater than or equal to 1.") @PathVariable("version") Long version
+        @PathVariable("id") String documentId,
+
+        @Min(value = 1, message = "Version must be greater than or equal to 1.")
+        @PathVariable("version") Long version
     ) {
         return documentService.switchToVersion(documentId, version);
     }

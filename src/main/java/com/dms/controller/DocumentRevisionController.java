@@ -25,9 +25,14 @@ public class DocumentRevisionController {
 
     @GetMapping
     public Page<DocumentRevisionDTO> getRevisions(
-        @RequestParam(name = "page", defaultValue = "0") @Min(0) int pageNumber,
-        @RequestParam(name = "limit", defaultValue = "10") @Min(1) int pageSize,
+        @Min(0)
+        @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+
+        @Min(1)
+        @RequestParam(name = "limit", defaultValue = "10") int pageSize,
+
         @RequestParam(name = "sort", required = false) String sort,
+
         @RequestParam(name = "filter", required = false) String filter
     ) {
         return revisionService.getRevisions(pageNumber, pageSize, sort, filter);
@@ -36,8 +41,7 @@ public class DocumentRevisionController {
     @GetMapping("/{id}")
     public DocumentRevisionDTO getRevision(
         @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("id")
-        Long revisionId
+        @PathVariable("id") Long revisionId
     ) {
         return revisionService.getRevision(revisionId);
     }
@@ -45,8 +49,7 @@ public class DocumentRevisionController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRevision(
         @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("id")
-        Long revisionId
+        @PathVariable("id") Long revisionId
     ) {
         revisionService.deleteRevision(revisionId);
         return ResponseEntity.noContent().build();
@@ -55,8 +58,7 @@ public class DocumentRevisionController {
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> downloadRevision(
         @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("id")
-        Long revisionId
+        @PathVariable("id") Long revisionId
     ) {
         return revisionService.downloadRevision(revisionId);
     }

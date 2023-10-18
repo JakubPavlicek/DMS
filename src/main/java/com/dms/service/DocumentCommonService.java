@@ -6,6 +6,7 @@ import com.dms.dto.FilterItem;
 import com.dms.dto.SortItem;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
@@ -130,6 +131,16 @@ public class DocumentCommonService {
                                  .orElse(0L);
     }
 
+    public Page<Long> getDocumentVersions(Document document, Pageable pageable) {
+        Page<DocumentRevision> revisions = revisionRepository.findAllByDocument(document, pageable);
+
+        List<Long> versions = revisions.stream()
+                                       .map(DocumentRevision::getVersion)
+                                       .toList();
+
+        return new PageImpl<>(versions, pageable, revisions.getTotalElements());
+    }
+
     private Sort getSortFromFields(List<SortItem> sortItems) {
         List<Sort.Order> orders = new ArrayList<>();
 
@@ -214,22 +225,16 @@ public class DocumentCommonService {
         return documentRepository.duplicateHashExists(hash) || revisionRepository.duplicateHashExists(hash);
     }
 
+    public boolean pathWithFileAlreadyExists(String path, String filename, User user) {
+        return documentRepository.pathWithFileAlreadyExists(path, filename, user) || revisionRepository.pathWithFileAlreadyExists(path, filename, user);
+    }
+
     public DocumentDTO mapDocumentToDocumentDto(Document document) {
         return modelMapper.map(document, DocumentDTO.class);
     }
 
     public DocumentRevisionDTO mapRevisionToRevisionDto(DocumentRevision revision) {
         return modelMapper.map(revision, DocumentRevisionDTO.class);
-    }
-
-    public Page<Long> getDocumentVersions(Document document, Pageable pageable) {
-        Page<DocumentRevision> revisions = revisionRepository.findAllByDocument(document, pageable);
-
-        List<Long> versions = revisions.stream()
-                                       .map(DocumentRevision::getVersion)
-                                       .toList();
-
-        return new PageImpl<>(versions, pageable, revisions.getTotalElements());
     }
 
 }

@@ -104,8 +104,9 @@ public class DocumentCommonService {
     public Document updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
         document.setName(documentRevision.getName());
         document.setType(documentRevision.getType());
-        document.setAuthor(documentRevision.getAuthor());
+        document.setPath(documentRevision.getPath());
         document.setHash(documentRevision.getHash());
+        document.setAuthor(documentRevision.getAuthor());
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields
         return documentRepository.saveAndFlush(document);
@@ -117,6 +118,7 @@ public class DocumentCommonService {
                                                             .version(getLastRevisionVersion(document) + 1)
                                                             .name(document.getName())
                                                             .type(document.getType())
+                                                            .path(document.getPath())
                                                             .author(document.getAuthor())
                                                             .hash(document.getHash())
                                                             .build();

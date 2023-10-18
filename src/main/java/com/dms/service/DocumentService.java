@@ -92,30 +92,31 @@ public class DocumentService {
         return userService.getUser(user);
     }
 
-    private Document createDocumentFromUserRequestAndFile(UserRequest userRequest, MultipartFile file) {
+    private Document createDocumentFromUserRequestAndFile(UserRequest userRequest, MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
         User author = getUserFromUserRequest(userRequest);
 
-        return createDocument(file, hash, author);
+        return createDocument(file, hash, path, author);
     }
 
-    private Document createDocument(MultipartFile file, String hash, User author) {
+    private Document createDocument(MultipartFile file, String hash, String path, User author) {
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
-        String path = StringUtils.cleanPath(originalFileName);
-        String name = StringUtils.getFilename(path);
+        String cleanPath = StringUtils.cleanPath(originalFileName);
+        String name = StringUtils.getFilename(cleanPath);
         String type = file.getContentType();
 
         return Document.builder()
                        .name(name)
                        .type(type)
+                       .path(path)
                        .hash(hash)
                        .author(author)
                        .build();
     }
 
     @Transactional
-    public DocumentDTO uploadDocument(UserRequest userRequest, MultipartFile file) {
-        Document document = createDocumentFromUserRequestAndFile(userRequest, file);
+    public DocumentDTO uploadDocument(UserRequest userRequest, MultipartFile file, String path) {
+        Document document = createDocumentFromUserRequestAndFile(userRequest, file, path);
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
         Document savedDocument = documentRepository.saveAndFlush(document);
@@ -126,11 +127,11 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO updateDocument(String documentId, UserRequest userRequest, MultipartFile file) {
+    public DocumentDTO updateDocument(String documentId, UserRequest userRequest, MultipartFile file, String path) {
         if (!documentRepository.existsById(documentId))
             throw new DocumentNotFoundException("Nebyl nalezen soubor s ID: " + documentId + " pro nahrazeni");
 
-        Document document = createDocumentFromUserRequestAndFile(userRequest, file);
+        Document document = createDocumentFromUserRequestAndFile(userRequest, file, path);
         document.setDocumentId(documentId);
 
         // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
@@ -216,14 +217,15 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentRevisionDTO uploadRevision(String documentId, UserRequest userRequest, MultipartFile file) {
+    public DocumentRevisionDTO uploadRevision(String documentId, UserRequest userRequest, MultipartFile file, String path) {
         Document databaseDocument = documentCommonService.getDocument(documentId);
-        Document document = createDocumentFromUserRequestAndFile(userRequest, file);
+        Document document = createDocumentFromUserRequestAndFile(userRequest, file, path);
 
         DocumentRevision revision = DocumentRevision.builder()
                                                     .document(databaseDocument)
                                                     .name(document.getName())
                                                     .type(document.getType())
+                                                    .path(document.getPath())
                                                     .author(document.getAuthor())
                                                     .hash(document.getHash())
                                                     .version(documentCommonService.getLastRevisionVersion(databaseDocument))

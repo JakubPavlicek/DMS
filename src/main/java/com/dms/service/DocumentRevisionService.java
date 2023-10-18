@@ -114,4 +114,20 @@ public class DocumentRevisionService {
         return revisionRepository.findAll(specification, pageable);
     }
 
+    public DocumentRevisionDTO moveRevision(Long revisionId, String path) {
+        DocumentRevision revision = documentCommonService.getRevision(revisionId);
+
+        String filename = revision.getName();
+
+        // user can't have a duplicate path for a document with the same name
+        if(revisionRepository.pathWithFileAlreadyExists(path, filename, revision.getAuthor()))
+            throw new RuntimeException("Soubor: " + filename + " se jiz v zadane ceste: " + path + " vyskytuje");
+
+        revision.setPath(path);
+
+        DocumentRevision savedRevision = revisionRepository.save(revision);
+
+        return documentCommonService.mapRevisionToRevisionDto(savedRevision);
+    }
+
 }

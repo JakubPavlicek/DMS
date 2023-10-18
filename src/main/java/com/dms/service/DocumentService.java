@@ -105,6 +105,9 @@ public class DocumentService {
         String name = StringUtils.getFilename(cleanPath);
         String type = file.getContentType();
 
+        if(documentCommonService.pathWithFileAlreadyExists(path, name, author))
+            throw new RuntimeException("Soubor: " + name + " se jiz v ceste: " + path + " vyskytuje");
+
         return Document.builder()
                        .name(name)
                        .type(type)
@@ -234,6 +237,22 @@ public class DocumentService {
         DocumentRevision savedRevision = documentCommonService.saveRevision(revision);
 
         return documentCommonService.mapRevisionToRevisionDto(savedRevision);
+    }
+
+    public DocumentDTO moveDocument(String documentId, String path) {
+        Document document = documentCommonService.getDocument(documentId);
+
+        String filename = document.getName();
+
+        // user can't have a duplicate path for a document with the same name
+        if(documentCommonService.pathWithFileAlreadyExists(path, filename, document.getAuthor()))
+            throw new RuntimeException("Soubor: " + filename + " se jiz v ceste: " + path + " vyskytuje");
+
+        document.setPath(path);
+
+        Document savedDocument = documentRepository.save(document);
+
+        return documentCommonService.mapDocumentToDocumentDto(savedDocument);
     }
 
 }

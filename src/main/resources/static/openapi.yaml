@@ -393,7 +393,7 @@ components:
       description: User with a file.
       required: true
       content:
-        application/form-data:
+        multipart/form-data:
           schema:
             type: object
             properties:

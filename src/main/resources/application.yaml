@@ -26,7 +26,7 @@ spring:
       enabled: true
     throw-exception-if-no-handler-found: true
   liquibase:
-#    enabled: false
+    enabled: true
     change-log: db/changelog/changelog-master.yaml
 
 springdoc:

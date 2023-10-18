@@ -4,10 +4,8 @@ import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.FilterItem;
 import com.dms.dto.SortItem;
-import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
-import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
@@ -220,10 +218,6 @@ public class DocumentCommonService {
 
     public DocumentRevisionDTO mapRevisionToRevisionDto(DocumentRevision revision) {
         return modelMapper.map(revision, DocumentRevisionDTO.class);
-    }
-
-    public User mapUserDtoToUser(UserDTO userDTO) {
-        return modelMapper.map(userDTO, User.class);
     }
 
     public Page<Long> getDocumentVersions(Document document, Pageable pageable) {

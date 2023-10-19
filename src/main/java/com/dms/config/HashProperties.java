@@ -1,8 +1,8 @@
 package com.dms.config;
 
-import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.bind.ConstructorBinding;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
@@ -11,20 +11,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 @Validated
-@ConfigurationProperties(prefix = "hash")
-public class HashPropertiesValidator implements Validator {
+@Getter
+@ConfigurationProperties
+public class HashProperties implements Validator {
 
-    @NotBlank(message = "Hashovaci algoritmus musi byt uveden")
-    private final String algorithm;
-
-    @ConstructorBinding
-    public HashPropertiesValidator(String algorithm) {
-        this.algorithm = algorithm;
-    }
+    @Value("${hash.algorithm:SHA-256}")
+    private String algorithm;
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return HashPropertiesValidator.class.isAssignableFrom(clazz);
+        return HashProperties.class.isAssignableFrom(clazz);
     }
 
     @Override

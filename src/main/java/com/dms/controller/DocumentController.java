@@ -4,6 +4,7 @@ import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.UserRequest;
 import com.dms.service.DocumentService;
+import com.dms.validation.ValidFile;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -56,6 +57,7 @@ public class DocumentController {
         @Valid
         @RequestPart("user") UserRequest user,
 
+        @ValidFile
         @RequestPart("file") MultipartFile file,
 
         @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
@@ -67,8 +69,7 @@ public class DocumentController {
 
     @GetMapping("/{id}")
     public DocumentDTO getDocument(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId
     ) {
         return documentService.getDocument(documentId);
@@ -76,13 +77,13 @@ public class DocumentController {
 
     @PutMapping("/{id}")
     public DocumentDTO updateDocument(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId,
 
         @Valid
         @RequestPart("user") UserRequest user,
 
+        @ValidFile
         @RequestPart("file") MultipartFile file,
 
         @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
@@ -93,8 +94,7 @@ public class DocumentController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocumentWithRevisions(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId
     ) {
         documentService.deleteDocumentWithRevisions(documentId);
@@ -103,8 +103,7 @@ public class DocumentController {
 
     @PutMapping("/{id}/move")
     public DocumentDTO moveDocument(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId,
 
         @NotBlank(message = "Path is mandatory.")
@@ -116,8 +115,7 @@ public class DocumentController {
 
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> downloadDocument(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId
     ) {
         return documentService.downloadDocument(documentId);
@@ -125,8 +123,7 @@ public class DocumentController {
 
     @GetMapping("/{id}/revisions")
     public Page<DocumentRevisionDTO> getDocumentRevisions(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId,
 
         @Min(0)
@@ -150,6 +147,7 @@ public class DocumentController {
         @Valid
         @RequestPart("user") UserRequest user,
 
+        @ValidFile
         @RequestPart("file") MultipartFile file,
 
         @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
@@ -161,8 +159,7 @@ public class DocumentController {
 
     @PutMapping("/{id}/revisions/{revision}")
     public DocumentDTO switchToRevision(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId,
 
         @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
@@ -173,8 +170,7 @@ public class DocumentController {
 
     @GetMapping("/{id}/versions")
     public Page<Long> getDocumentVersions(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId,
 
         @Min(0)
@@ -188,8 +184,7 @@ public class DocumentController {
 
     @GetMapping("/{id}/versions/{version}")
     public DocumentDTO getDocument(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId,
 
         @Min(value = 1, message = "Version must be greater than or equal to 1.")
@@ -200,8 +195,7 @@ public class DocumentController {
 
     @PutMapping("/{id}/versions/{version}")
     public DocumentDTO switchToVersion(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId,
 
         @Min(value = 1, message = "Version must be greater than or equal to 1.")

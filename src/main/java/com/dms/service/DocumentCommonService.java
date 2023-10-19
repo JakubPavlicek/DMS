@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,12 +54,12 @@ public class DocumentCommonService {
     private final BlobStorageService blobStorageService;
     private final ModelMapper modelMapper;
 
-    public Document getDocument(String documentId) {
+    public Document getDocument(UUID documentId) {
         return documentRepository.findById(documentId)
                                  .orElseThrow(() -> new DocumentNotFoundException("Soubor s id: " + documentId + " nebyl nalezen"));
     }
 
-    public Document getDocument(String documentId, Long version) {
+    public Document getDocument(UUID documentId, Long version) {
         Document document = getDocument(documentId);
 
         DocumentRevision revision = revisionRepository.findByDocumentAndVersion(document, version)

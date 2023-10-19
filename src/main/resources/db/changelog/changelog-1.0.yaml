@@ -44,7 +44,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: document_id
-                  type: varchar(36)
+                  type: uuid
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -105,7 +105,7 @@ databaseChangeLog:
                     foreignKeyName: fk_revision_user
               - column:
                   name: document_id
-                  type: varchar(36)
+                  type: uuid
                   constraints:
                     nullable: false
                     foreignKeyName: fk_revision_document

@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,12 +41,12 @@ public class DocumentService {
     private final DocumentCommonService documentCommonService;
     private final UserService userService;
 
-    public DocumentDTO getDocument(String documentId) {
+    public DocumentDTO getDocument(UUID documentId) {
         Document document = documentCommonService.getDocument(documentId);
         return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
-    public DocumentDTO getDocument(String documentId, Long version) {
+    public DocumentDTO getDocument(UUID documentId, Long version) {
         if (Objects.isNull(version))
             return getDocument(documentId);
 
@@ -54,12 +55,12 @@ public class DocumentService {
         return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
-    private LocalDateTime getDocumentCreatedAt(String documentId) {
+    private LocalDateTime getDocumentCreatedAt(UUID documentId) {
         return documentRepository.getCreatedAtByDocumentId(documentId)
                                  .orElseThrow(() -> new RuntimeException("Nebyl nalezen cas vytvoreni dokumentu s ID: " + documentId));
     }
 
-    public Page<DocumentRevisionDTO> getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
+    public Page<DocumentRevisionDTO> getDocumentRevisions(UUID documentId, int pageNumber, int pageSize, String sort, String filter) {
         Document document = documentCommonService.getDocument(documentId);
 
         List<SortItem> sortItems = documentCommonService.parseSortItems(sort);
@@ -130,7 +131,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO updateDocument(String documentId, UserRequest userRequest, MultipartFile file, String path) {
+    public DocumentDTO updateDocument(UUID documentId, UserRequest userRequest, MultipartFile file, String path) {
         if (!documentRepository.existsById(documentId))
             throw new DocumentNotFoundException("Nebyl nalezen soubor s ID: " + documentId + " pro nahrazeni");
 
@@ -149,7 +150,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO switchToVersion(String documentId, Long version) {
+    public DocumentDTO switchToVersion(UUID documentId, Long version) {
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
 
@@ -159,7 +160,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO switchToRevision(String documentId, Long revisionId) {
+    public DocumentDTO switchToRevision(UUID documentId, Long revisionId) {
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndId(document, revisionId);
 
@@ -169,7 +170,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public void deleteDocumentWithRevisions(String documentId) {
+    public void deleteDocumentWithRevisions(UUID documentId) {
         Document document = documentCommonService.getDocument(documentId);
 
         List<DocumentRevision> documentRevisions = document.getRevisions();
@@ -179,7 +180,7 @@ public class DocumentService {
         documentRepository.delete(document);
     }
 
-    public ResponseEntity<Resource> downloadDocument(String documentId) {
+    public ResponseEntity<Resource> downloadDocument(UUID documentId) {
         Document document = documentCommonService.getDocument(documentId);
         String hash = document.getHash();
         byte[] data = documentCommonService.getBlob(hash);
@@ -212,7 +213,7 @@ public class DocumentService {
         return documentRepository.findAll(specification, pageable);
     }
 
-    public Page<Long> getDocumentVersions(String documentId, int pageNumber, int pageSize) {
+    public Page<Long> getDocumentVersions(UUID documentId, int pageNumber, int pageSize) {
         Document document = documentCommonService.getDocument(documentId);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
@@ -220,7 +221,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentRevisionDTO uploadRevision(String documentId, UserRequest userRequest, MultipartFile file, String path) {
+    public DocumentRevisionDTO uploadRevision(UUID documentId, UserRequest userRequest, MultipartFile file, String path) {
         Document databaseDocument = documentCommonService.getDocument(documentId);
         Document document = createDocumentFromUserRequestAndFile(userRequest, file, path);
 
@@ -239,7 +240,7 @@ public class DocumentService {
         return documentCommonService.mapRevisionToRevisionDto(savedRevision);
     }
 
-    public DocumentDTO moveDocument(String documentId, String path) {
+    public DocumentDTO moveDocument(UUID documentId, String path) {
         Document document = documentCommonService.getDocument(documentId);
 
         String filename = document.getName();

@@ -21,6 +21,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -37,7 +38,7 @@ public class Document {
         nullable = false,
         unique = true
     )
-    private String documentId;
+    private UUID documentId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(

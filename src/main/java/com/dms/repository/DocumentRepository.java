@@ -9,15 +9,16 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface DocumentRepository extends JpaRepository<Document, String>, JpaSpecificationExecutor<Document> {
+public interface DocumentRepository extends JpaRepository<Document, UUID>, JpaSpecificationExecutor<Document> {
 
     @Query("SELECT COUNT(document.hash) > 1 FROM Document document WHERE document.hash = :hash")
     boolean duplicateHashExists(String hash);
 
     @Query("SELECT document.createdAt FROM Document document WHERE document.documentId = :documentId")
-    Optional<LocalDateTime> getCreatedAtByDocumentId(String documentId);
+    Optional<LocalDateTime> getCreatedAtByDocumentId(UUID documentId);
 
     @Query("SELECT COUNT(document.path) >= 1 FROM Document document WHERE document.path = :path AND document.name = :filename AND document.author = :user")
     boolean pathWithFileAlreadyExists(String path, String filename, User user);

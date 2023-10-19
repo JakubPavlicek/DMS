@@ -1,9 +1,9 @@
 package com.dms.service;
 
+import com.dms.config.BlobStorageProperties;
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
 import com.dms.hash.Hasher;
-import com.dms.storage.BlobStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 public class BlobStorageService {
 
-    private final BlobStorage blobStorage;
+    private final BlobStorageProperties blobStorageProperties;
     private final Hasher hasher;
 
     public String storeBlob(MultipartFile file) {
@@ -74,10 +74,10 @@ public class BlobStorageService {
 
     private Path getDirectoryPath(String hash) {
         try {
-            String directoryName = hash.substring(0, blobStorage.getDirectoryPrefixLength());
-            return Paths.get(blobStorage.getStoragePath(), directoryName);
+            String directoryName = hash.substring(0, blobStorageProperties.getDirectoryPrefixLength());
+            return Paths.get(blobStorageProperties.getPath(), directoryName);
         } catch (IndexOutOfBoundsException e) {
-            throw new RuntimeException("Nepodarilo se vytvorit prefix delky: " + blobStorage.getDirectoryPrefixLength() + " pro adresar z hashe: " + hash);
+            throw new RuntimeException("Nepodarilo se vytvorit prefix delky: " + blobStorageProperties.getDirectoryPrefixLength() + " pro adresar z hashe: " + hash);
         }
     }
 
@@ -87,8 +87,8 @@ public class BlobStorageService {
                                             .toString();
 
         try {
-            String fileName = hash.substring(blobStorage.getDirectoryPrefixLength());
-            return Paths.get(blobStorage.getStoragePath(), directoryName, fileName);
+            String fileName = hash.substring(blobStorageProperties.getDirectoryPrefixLength());
+            return Paths.get(blobStorageProperties.getPath(), directoryName, fileName);
         } catch (IndexOutOfBoundsException e) {
             throw new RuntimeException("Nepodarilo se ziskat nazev souboru z hashe: " + hash);
         }

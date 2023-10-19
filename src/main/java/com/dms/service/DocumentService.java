@@ -237,6 +237,9 @@ public class DocumentService {
 
         DocumentRevision savedRevision = documentCommonService.saveRevision(revision);
 
+        documentCommonService.updateDocumentToRevision(databaseDocument, savedRevision);
+        documentCommonService.updateRevisionVersionsForDocument(databaseDocument);
+
         return documentCommonService.mapRevisionToRevisionDto(savedRevision);
     }
 

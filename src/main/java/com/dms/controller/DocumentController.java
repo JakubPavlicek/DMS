@@ -7,6 +7,7 @@ import com.dms.service.DocumentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -143,8 +144,7 @@ public class DocumentController {
 
     @PostMapping("/{id}/revisions/upload")
     public ResponseEntity<DocumentRevisionDTO> uploadRevision(
-        @NotBlank(message = "Document ID is mandatory.")
-        @Size(min = 36, max = 36, message = "Length of document ID must be 36 characters.")
+        @NotNull(message = "Document ID is mandatory.")
         @PathVariable("id") UUID documentId,
 
         @Valid

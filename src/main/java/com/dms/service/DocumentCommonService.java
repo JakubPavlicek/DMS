@@ -132,6 +132,16 @@ public class DocumentCommonService {
                                  .orElse(0L);
     }
 
+    public void updateRevisionVersionsForDocument(Document document) {
+        List<DocumentRevision> documentRevisions = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
+
+        Long version = 1L;
+        for (DocumentRevision revision : documentRevisions) {
+            revisionRepository.updateVersion(revision, version);
+            version++;
+        }
+    }
+
     public Page<Long> getDocumentVersions(Document document, Pageable pageable) {
         Page<DocumentRevision> revisions = revisionRepository.findAllByDocument(document, pageable);
 

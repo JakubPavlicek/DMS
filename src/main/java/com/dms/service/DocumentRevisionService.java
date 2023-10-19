@@ -68,17 +68,7 @@ public class DocumentRevisionService {
         documentCommonService.deleteBlobIfDuplicateHashNotExists(documentRevision.getHash());
         revisionRepository.deleteByRevisionId(revisionId);
 
-        updateRevisionVersionsForDocument(document);
-    }
-
-    private void updateRevisionVersionsForDocument(Document document) {
-        List<DocumentRevision> documentRevisions = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
-
-        Long version = 1L;
-        for (DocumentRevision revision : documentRevisions) {
-            revisionRepository.updateVersion(revision, version);
-            version++;
-        }
+        documentCommonService.updateRevisionVersionsForDocument(document);
     }
 
     public ResponseEntity<Resource> downloadRevision(Long revisionId) {

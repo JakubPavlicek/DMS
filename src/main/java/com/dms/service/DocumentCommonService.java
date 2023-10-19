@@ -36,18 +36,6 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class DocumentCommonService {
 
-    @Value("${regex.sort}")
-    private String sortRegex;
-
-    @Value("${regex.sort-pattern}")
-    private String sortRegexPattern;
-
-    @Value("${regex.filter}")
-    private String filterRegex;
-
-    @Value("${regex.filter-pattern}")
-    private String filterRegexPattern;
-
     private final DocumentRepository documentRepository;
     private final DocumentRevisionRepository revisionRepository;
 
@@ -178,12 +166,12 @@ public class DocumentCommonService {
         if (Objects.isNull(sort))
             return null;
 
-        if (!sort.matches(sortRegexPattern))
+        if (!sort.matches("(([a-zA-Z]+):(asc|desc)(?:,|$))+"))
             throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
 
         List<SortItem> sortItems = new ArrayList<>();
 
-        Pattern pattern = Pattern.compile(sortRegex);
+        Pattern pattern = Pattern.compile("([a-zA-Z]+):(asc|desc)(?:,|$)");
         Matcher matcher = pattern.matcher(sort);
 
         while (matcher.find()) {
@@ -201,12 +189,12 @@ public class DocumentCommonService {
         if (Objects.isNull(filter))
             return null;
 
-        if (!filter.matches(filterRegexPattern))
+        if (!filter.matches("(([a-zA-Z]+):([^,]+)(?:,|$))+"))
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
 
         List<FilterItem> filterItems = new ArrayList<>();
 
-        Pattern pattern = Pattern.compile(filterRegex);
+        Pattern pattern = Pattern.compile("([a-zA-Z]+):([^,]+)(?:,|$)");
         Matcher matcher = pattern.matcher(filter);
 
         while (matcher.find()) {

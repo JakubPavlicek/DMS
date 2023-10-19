@@ -52,8 +52,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-#    hibernate:
-#      ddl-auto: create-drop
 
 ---
 
@@ -72,8 +70,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.OracleDialect
-    hibernate:
-      ddl-auto: update
 
 ---
 
@@ -92,5 +88,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
-    hibernate:
-      ddl-auto: update

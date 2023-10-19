@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 @ConfigurationProperties(prefix = "storage")
 public class BlobStorageProperties implements Validator {
 
-    @Value("${storage.path:${user.home}/blob_storage}")
+    @Value("${storage.path:#{systemProperties['user.home'] + systemProperties['file.separator'] + 'blob_storage'}}")
     private String path;
 
     @Min(value = 1, message = "Minimalni delka prefixu pro adresare je 1")

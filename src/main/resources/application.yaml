@@ -5,15 +5,9 @@ storage:
 hash:
   algorithm: SHA-256
 
-regex:
-    sort: ([a-zA-Z]+):(asc|desc)(?:,|$)
-    sort-pattern: (([a-zA-Z]+):(asc|desc)(?:,|$))+
-    filter: ([a-zA-Z]+):([^,]+)(?:,|$)
-    filter-pattern: (([a-zA-Z]+):([^,]+)(?:,|$))+
-
 spring:
   profiles:
-    active: postgresql # set db that you want to use - postgresql / oracle / mssql
+    active: postgresql # set db that you want to use
   servlet:
     multipart:
       enabled: true
@@ -27,7 +21,7 @@ spring:
     throw-exception-if-no-handler-found: true
   liquibase:
     enabled: true
-    change-log: db/changelog/changelog-master.yaml
+    change-log: classpath:db/changelog/changelog-master.yaml
 
 springdoc:
   api-docs:

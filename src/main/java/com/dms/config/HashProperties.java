@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 
 @Validated
 @Getter
-@ConfigurationProperties
+@ConfigurationProperties(prefix = "hash")
 public class HashProperties implements Validator {
 
     @Value("${hash.algorithm:SHA-256}")

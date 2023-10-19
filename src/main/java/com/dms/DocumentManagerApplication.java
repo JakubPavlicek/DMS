@@ -1,13 +1,14 @@
 package com.dms;
 
-import com.dms.config.BlobStoragePropertiesValidator;
-import com.dms.config.HashPropertiesValidator;
+import com.dms.config.BlobStorageProperties;
+import com.dms.config.HashProperties;
+import com.dms.config.SpringProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({BlobStoragePropertiesValidator.class, HashPropertiesValidator.class})
+@EnableConfigurationProperties({SpringProperties.class, BlobStorageProperties.class, HashProperties.class})
 public class DocumentManagerApplication {
 
     public static void main(String[] args) {

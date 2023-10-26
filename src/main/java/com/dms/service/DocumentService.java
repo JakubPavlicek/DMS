@@ -77,9 +77,6 @@ public class DocumentService {
     }
 
     private Page<DocumentRevision> getFilteredDocumentRevisions(List<FilterItem> filterItems, Document document, Pageable pageable) {
-        if (Objects.isNull(filterItems))
-            return documentCommonService.getRevisionsByDocument(document, pageable);
-
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filterItems);
         return documentCommonService.getRevisionsBySpecification(specification, pageable);
     }
@@ -206,9 +203,6 @@ public class DocumentService {
     }
 
     private Page<Document> getFilteredDocuments(List<FilterItem> filterItems, Pageable pageable) {
-        if (Objects.isNull(filterItems))
-            return documentRepository.findAll(pageable);
-
         Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
         return documentRepository.findAll(specification, pageable);
     }

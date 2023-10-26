@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -97,9 +96,6 @@ public class DocumentRevisionService {
     }
 
     private Page<DocumentRevision> getFilteredRevisions(List<FilterItem> filterItems, Pageable pageable) {
-        if (Objects.isNull(filterItems))
-            return revisionRepository.findAll(pageable);
-
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filterItems);
         return revisionRepository.findAll(specification, pageable);
     }

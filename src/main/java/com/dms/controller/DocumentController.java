@@ -76,7 +76,7 @@ public class DocumentController {
     }
 
     @PutMapping("/{documentId}")
-    public DocumentDTO updateDocument(
+    public DocumentDTO uploadNewDocumentVersion(
         @NotNull(message = "Document ID is mandatory.")
         @PathVariable("documentId") UUID documentId,
 
@@ -89,7 +89,7 @@ public class DocumentController {
         @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
         @RequestPart(name = "path", required = false) String path
     ) {
-        return documentService.updateDocument(documentId, user, file, path);
+        return documentService.uploadNewDocumentVersion(documentId, user, file, path);
     }
 
     @DeleteMapping("/{documentId}")
@@ -137,24 +137,6 @@ public class DocumentController {
         @RequestParam(name = "filter", defaultValue = "name:") String filter
     ) {
         return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sort, filter);
-    }
-
-    @PostMapping("/{documentId}/revisions/upload")
-    public ResponseEntity<DocumentRevisionDTO> uploadRevision(
-        @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("documentId") UUID documentId,
-
-        @Valid
-        @RequestPart("user") UserRequest user,
-
-        @ValidFile
-        @RequestPart("file") MultipartFile file,
-
-        @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
-        @RequestPart(name = "path", required = false) String path
-    ) {
-        DocumentRevisionDTO documentRevisionDTO = documentService.uploadRevision(documentId, user, file, path);
-        return ResponseEntity.status(HttpStatus.CREATED).body(documentRevisionDTO);
     }
 
     @PutMapping("/{documentId}/revisions/{revisionId}")

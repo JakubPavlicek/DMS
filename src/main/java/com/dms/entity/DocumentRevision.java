@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +17,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -28,20 +28,13 @@ import java.time.LocalDateTime;
 public class DocumentRevision {
 
     @Id
-    @SequenceGenerator(
-        name = "revision_id_generator",
-        sequenceName = "revision_id_sequence",
-        allocationSize = 1
-    )
-    @GeneratedValue(
-        strategy = GenerationType.SEQUENCE,
-        generator = "revision_id_generator"
-    )
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(
+        length = 36,
         nullable = false,
         unique = true
     )
-    private Long revisionId;
+    private UUID revisionId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(

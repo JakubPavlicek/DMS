@@ -162,15 +162,15 @@ public class DocumentCommonService {
     }
 
     public List<SortItem> parseSortItems(String sort) {
-        if (Objects.isNull(sort))
-            return null;
+        // valid sort format: <field>:<asc/desc> -> group 1: field, group 2: order by, group 3: "," or end of line
+        String sortRegex = "([a-zA-Z]+):(asc|desc)(?:,|$)";
 
-        if (!sort.matches("(([a-zA-Z]+):(asc|desc)(?:,|$))+"))
+        if (!sort.matches("(" + sortRegex + ")+"))
             throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
 
         List<SortItem> sortItems = new ArrayList<>();
 
-        Pattern pattern = Pattern.compile("([a-zA-Z]+):(asc|desc)(?:,|$)");
+        Pattern pattern = Pattern.compile(sortRegex);
         Matcher matcher = pattern.matcher(sort);
 
         while (matcher.find()) {
@@ -185,15 +185,15 @@ public class DocumentCommonService {
     }
 
     public List<FilterItem> parseFilterItems(String filter) {
-        if (Objects.isNull(filter))
-            return null;
+        // valid filter format: <field>:<value> -> group 1: field, group 2: value to match, group 3: "," or end of line
+        String filterRegex = "([a-zA-Z]+):([^,]*)(?:,|$)";
 
-        if (!filter.matches("(([a-zA-Z]+):([^,]+)(?:,|$))+"))
+        if (!filter.matches("(" + filterRegex + ")+"))
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
 
         List<FilterItem> filterItems = new ArrayList<>();
 
-        Pattern pattern = Pattern.compile("([a-zA-Z]+):([^,]+)(?:,|$)");
+        Pattern pattern = Pattern.compile(filterRegex);
         Matcher matcher = pattern.matcher(filter);
 
         while (matcher.find()) {

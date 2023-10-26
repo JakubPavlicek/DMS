@@ -38,27 +38,27 @@ public class DocumentRevisionController {
         return revisionService.getRevisions(pageNumber, pageSize, sort, filter);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{revisionId}")
     public DocumentRevisionDTO getRevision(
         @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("id") Long revisionId
+        @PathVariable("revisionId") Long revisionId
     ) {
         return revisionService.getRevision(revisionId);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{revisionId}")
     public ResponseEntity<Void> deleteRevision(
         @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("id") Long revisionId
+        @PathVariable("revisionId") Long revisionId
     ) {
         revisionService.deleteRevision(revisionId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/download")
+    @GetMapping("/{revisionId}/download")
     public ResponseEntity<Resource> downloadRevision(
         @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("id") Long revisionId
+        @PathVariable("revisionId") Long revisionId
     ) {
         return revisionService.downloadRevision(revisionId);
     }

@@ -67,18 +67,18 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{documentId}")
     public DocumentDTO getDocument(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId
+        @PathVariable("documentId") UUID documentId
     ) {
         return documentService.getDocument(documentId);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{documentId}")
     public DocumentDTO updateDocument(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId,
+        @PathVariable("documentId") UUID documentId,
 
         @Valid
         @RequestPart("user") UserRequest user,
@@ -92,19 +92,19 @@ public class DocumentController {
         return documentService.updateDocument(documentId, user, file, path);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{documentId}")
     public ResponseEntity<Void> deleteDocumentWithRevisions(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId
+        @PathVariable("documentId") UUID documentId
     ) {
         documentService.deleteDocumentWithRevisions(documentId);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}/move")
+    @PutMapping("/{documentId}/move")
     public DocumentDTO moveDocument(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId,
+        @PathVariable("documentId") UUID documentId,
 
         @NotBlank(message = "Path is mandatory.")
         @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
@@ -113,18 +113,18 @@ public class DocumentController {
         return documentService.moveDocument(documentId, path);
     }
 
-    @GetMapping("/{id}/download")
+    @GetMapping("/{documentId}/download")
     public ResponseEntity<Resource> downloadDocument(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId
+        @PathVariable("documentId") UUID documentId
     ) {
         return documentService.downloadDocument(documentId);
     }
 
-    @GetMapping("/{id}/revisions")
+    @GetMapping("/{documentId}/revisions")
     public Page<DocumentRevisionDTO> getDocumentRevisions(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId,
+        @PathVariable("documentId") UUID documentId,
 
         @Min(0)
         @RequestParam(name = "page", defaultValue = "0") int pageNumber,
@@ -139,10 +139,10 @@ public class DocumentController {
         return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sort, filter);
     }
 
-    @PostMapping("/{id}/revisions/upload")
+    @PostMapping("/{documentId}/revisions/upload")
     public ResponseEntity<DocumentRevisionDTO> uploadRevision(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId,
+        @PathVariable("documentId") UUID documentId,
 
         @Valid
         @RequestPart("user") UserRequest user,
@@ -157,21 +157,21 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(documentRevisionDTO);
     }
 
-    @PutMapping("/{id}/revisions/{revision}")
+    @PutMapping("/{documentId}/revisions/{revisionId}")
     public DocumentDTO switchToRevision(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId,
+        @PathVariable("documentId") UUID documentId,
 
         @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("revision") Long revisionId
+        @PathVariable("revisionId") Long revisionId
     ) {
         return documentService.switchToRevision(documentId, revisionId);
     }
 
-    @GetMapping("/{id}/versions")
+    @GetMapping("/{documentId}/versions")
     public Page<Long> getDocumentVersions(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId,
+        @PathVariable("documentId") UUID documentId,
 
         @Min(0)
         @RequestParam(name = "page", defaultValue = "0") int pageNumber,
@@ -182,10 +182,10 @@ public class DocumentController {
         return documentService.getDocumentVersions(documentId, pageNumber, pageSize);
     }
 
-    @GetMapping("/{id}/versions/{version}")
+    @GetMapping("/{documentId}/versions/{version}")
     public DocumentDTO getDocument(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId,
+        @PathVariable("documentId") UUID documentId,
 
         @Min(value = 1, message = "Version must be greater than or equal to 1.")
         @PathVariable("version") Long version
@@ -193,10 +193,10 @@ public class DocumentController {
         return documentService.getDocument(documentId, version);
     }
 
-    @PutMapping("/{id}/versions/{version}")
+    @PutMapping("/{documentId}/versions/{version}")
     public DocumentDTO switchToVersion(
         @NotNull(message = "Document ID is mandatory.")
-        @PathVariable("id") UUID documentId,
+        @PathVariable("documentId") UUID documentId,
 
         @Min(value = 1, message = "Version must be greater than or equal to 1.")
         @PathVariable("version") Long version

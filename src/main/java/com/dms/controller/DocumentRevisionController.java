@@ -31,9 +31,9 @@ public class DocumentRevisionController {
         @Min(1)
         @RequestParam(name = "limit", defaultValue = "10") int pageSize,
 
-        @RequestParam(name = "sort", required = false) String sort,
+        @RequestParam(name = "sort", defaultValue = "name:asc") String sort,
 
-        @RequestParam(name = "filter", required = false) String filter
+        @RequestParam(name = "filter", defaultValue = "name:") String filter
     ) {
         return revisionService.getRevisions(pageNumber, pageSize, sort, filter);
     }

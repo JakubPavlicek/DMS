@@ -45,9 +45,9 @@ public class DocumentController {
         @Min(1)
         @RequestParam(name = "limit", defaultValue = "10") int pageSize,
 
-        @RequestParam(name = "sort", required = false) String sort,
+        @RequestParam(name = "sort", defaultValue = "name:asc") String sort,
 
-        @RequestParam(name = "filter", required = false) String filter
+        @RequestParam(name = "filter", defaultValue = "name:") String filter
     ) {
         return documentService.getDocuments(pageNumber, pageSize, sort, filter);
     }
@@ -132,9 +132,9 @@ public class DocumentController {
         @Min(1)
         @RequestParam(name = "limit", defaultValue = "10") int pageSize,
 
-        @RequestParam(name = "sort", required = false) String sort,
+        @RequestParam(name = "sort", defaultValue = "name:asc") String sort,
 
-        @RequestParam(name = "filter", required = false) String filter
+        @RequestParam(name = "filter", defaultValue = "name:") String filter
     ) {
         return documentService.getDocumentRevisions(documentId, pageNumber, pageSize, sort, filter);
     }

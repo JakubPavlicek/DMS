@@ -157,7 +157,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO switchToRevision(UUID documentId, Long revisionId) {
+    public DocumentDTO switchToRevision(UUID documentId, UUID revisionId) {
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndId(document, revisionId);
 
@@ -214,18 +214,22 @@ public class DocumentService {
         return documentCommonService.getDocumentVersions(document, pageable);
     }
 
+    @Transactional
     public DocumentDTO moveDocument(UUID documentId, String path) {
         Document document = documentCommonService.getDocument(documentId);
 
         String filename = document.getName();
+        User author = document.getAuthor();
 
         // user can't have a duplicate path for a document with the same name
-        if(documentCommonService.pathWithFileAlreadyExists(path, filename, document.getAuthor()))
+        if(documentCommonService.pathWithFileAlreadyExists(path, filename, author))
             throw new RuntimeException("Soubor: " + filename + " se jiz v ceste: " + path + " vyskytuje");
 
         document.setPath(path);
 
         Document savedDocument = documentRepository.save(document);
+
+        documentCommonService.saveRevisionFromDocument(savedDocument);
 
         return documentCommonService.mapDocumentToDocumentDto(savedDocument);
     }

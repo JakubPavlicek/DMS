@@ -128,7 +128,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO updateDocument(UUID documentId, UserRequest userRequest, MultipartFile file, String path) {
+    public DocumentDTO uploadNewDocumentVersion(UUID documentId, UserRequest userRequest, MultipartFile file, String path) {
         if (!documentRepository.existsById(documentId))
             throw new DocumentNotFoundException("Nebyl nalezen soubor s ID: " + documentId + " pro nahrazeni");
 
@@ -212,29 +212,6 @@ public class DocumentService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         return documentCommonService.getDocumentVersions(document, pageable);
-    }
-
-    @Transactional
-    public DocumentRevisionDTO uploadRevision(UUID documentId, UserRequest userRequest, MultipartFile file, String path) {
-        Document databaseDocument = documentCommonService.getDocument(documentId);
-        Document document = createDocumentFromUserRequestAndFile(userRequest, file, path);
-
-        DocumentRevision revision = DocumentRevision.builder()
-                                                    .document(databaseDocument)
-                                                    .name(document.getName())
-                                                    .type(document.getType())
-                                                    .path(document.getPath())
-                                                    .author(document.getAuthor())
-                                                    .hash(document.getHash())
-                                                    .version(documentCommonService.getLastRevisionVersion(databaseDocument))
-                                                    .build();
-
-        DocumentRevision savedRevision = documentCommonService.saveRevision(revision);
-
-        documentCommonService.updateDocumentToRevision(databaseDocument, savedRevision);
-        documentCommonService.updateRevisionVersionsForDocument(databaseDocument);
-
-        return documentCommonService.mapRevisionToRevisionDto(savedRevision);
     }
 
     public DocumentDTO moveDocument(UUID documentId, String path) {

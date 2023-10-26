@@ -74,15 +74,6 @@ public class DocumentCommonService {
         return revisionRepository.findAll(specification, pageable);
     }
 
-    public Page<DocumentRevision> getRevisionsByDocument(Document document, Pageable pageable) {
-        return revisionRepository.findAllByDocument(document, pageable);
-    }
-
-    public DocumentRevision saveRevision(DocumentRevision revision) {
-        // flush to immediately initialize the "createdAt" and "updatedAt" fields
-        return revisionRepository.saveAndFlush(revision);
-    }
-
     public Document copyRevisionInfoToDocument(DocumentRevision revision, Document document) {
         BeanUtils.copyProperties(revision, document, "createdAt");
         document.setUpdatedAt(document.getUpdatedAt());

@@ -3,6 +3,7 @@ package com.dms.controller;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.service.DocumentRevisionService;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/revisions")
@@ -40,16 +43,16 @@ public class DocumentRevisionController {
 
     @GetMapping("/{revisionId}")
     public DocumentRevisionDTO getRevision(
-        @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("revisionId") Long revisionId
+        @NotNull(message = "Revision ID is mandatory.")
+        @PathVariable("revisionId") UUID revisionId
     ) {
         return revisionService.getRevision(revisionId);
     }
 
     @DeleteMapping("/{revisionId}")
     public ResponseEntity<Void> deleteRevision(
-        @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("revisionId") Long revisionId
+        @NotNull(message = "Revision ID is mandatory.")
+        @PathVariable("revisionId") UUID revisionId
     ) {
         revisionService.deleteRevision(revisionId);
         return ResponseEntity.noContent().build();
@@ -57,8 +60,8 @@ public class DocumentRevisionController {
 
     @GetMapping("/{revisionId}/download")
     public ResponseEntity<Resource> downloadRevision(
-        @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("revisionId") Long revisionId
+        @NotNull(message = "Revision ID is mandatory.")
+        @PathVariable("revisionId") UUID revisionId
     ) {
         return revisionService.downloadRevision(revisionId);
     }

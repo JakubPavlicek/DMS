@@ -55,7 +55,7 @@ public class DocumentCommonService {
         return copyRevisionInfoToDocument(revision, document);
     }
 
-    public DocumentRevision getRevision(Long revisionId) {
+    public DocumentRevision getRevision(UUID revisionId) {
         return revisionRepository.findByRevisionId(revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
     }
@@ -65,7 +65,7 @@ public class DocumentCommonService {
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s verzi: " + version + " nebyla nalezena"));
     }
 
-    public DocumentRevision getRevisionByDocumentAndId(Document document, Long revisionId) {
+    public DocumentRevision getRevisionByDocumentAndId(Document document, UUID revisionId) {
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
     }

@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +32,12 @@ public class DocumentRevisionService {
 
     private final DocumentCommonService documentCommonService;
 
-    public DocumentRevisionDTO getRevision(Long revisionId) {
+    public DocumentRevisionDTO getRevision(UUID revisionId) {
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
         return documentCommonService.mapRevisionToRevisionDto(revision);
     }
 
-    private void replaceDocumentWithAdjacentRevision(Document document, Long currentRevisionId) {
+    private void replaceDocumentWithAdjacentRevision(Document document, UUID currentRevisionId) {
         DocumentRevision currentDocumentRevision = documentCommonService.getRevision(currentRevisionId);
 
         Long currentVersion = currentDocumentRevision.getVersion();
@@ -49,7 +50,7 @@ public class DocumentRevisionService {
         documentCommonService.updateDocumentToRevision(document, replacingRevision);
     }
 
-    private boolean isRevisionSetAsCurrent(Document document, Long revisionId) {
+    private boolean isRevisionSetAsCurrent(Document document, UUID revisionId) {
         DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
 
         return document.getHash()
@@ -57,7 +58,7 @@ public class DocumentRevisionService {
     }
 
     @Transactional
-    public void deleteRevision(Long revisionId) {
+    public void deleteRevision(UUID revisionId) {
         DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
         Document document = documentRevision.getDocument();
 
@@ -70,7 +71,7 @@ public class DocumentRevisionService {
         documentCommonService.updateRevisionVersionsForDocument(document);
     }
 
-    public ResponseEntity<Resource> downloadRevision(Long revisionId) {
+    public ResponseEntity<Resource> downloadRevision(UUID revisionId) {
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
         String hash = revision.getHash();
         byte[] data = documentCommonService.getBlob(hash);

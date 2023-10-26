@@ -144,8 +144,8 @@ public class DocumentController {
         @NotNull(message = "Document ID is mandatory.")
         @PathVariable("documentId") UUID documentId,
 
-        @Min(value = 1, message = "Revision ID must be greater than or equal to 1.")
-        @PathVariable("revisionId") Long revisionId
+        @NotNull(message = "Revision ID is mandatory.")
+        @PathVariable("revisionId") UUID revisionId
     ) {
         return documentService.switchToRevision(documentId, revisionId);
     }

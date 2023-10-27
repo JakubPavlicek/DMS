@@ -1,8 +1,7 @@
 package com.dms.service;
 
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.FilterItem;
-import com.dms.dto.SortItem;
+import com.dms.filter.FilterItem;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionNotFoundException;
@@ -14,7 +13,9 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -83,10 +84,10 @@ public class DocumentRevisionService {
     }
 
     public Page<DocumentRevisionDTO> getRevisions(int pageNumber, int pageSize, String sort, String filter) {
-        List<SortItem> sortItems = documentCommonService.parseSortItems(sort);
-        List<FilterItem> filterItems = documentCommonService.parseFilterItems(filter);
+        List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
+        List<FilterItem> filterItems = documentCommonService.parseRevisionFilterItems(filter);
 
-        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortItems);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
 
         Page<DocumentRevision> revisions = getFilteredRevisions(filterItems, pageable);
         List<DocumentRevisionDTO> revisionDTOs = revisions.stream()

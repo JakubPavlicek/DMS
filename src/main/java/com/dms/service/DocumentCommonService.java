@@ -2,8 +2,13 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.FilterItem;
-import com.dms.dto.SortItem;
+import com.dms.filter.DocumentFilter;
+import com.dms.filter.RevisionFilter;
+import com.dms.mapper.DocumentMapper;
+import com.dms.mapper.RevisionMapper;
+import com.dms.sort.DocumentSort;
+import com.dms.filter.FilterItem;
+import com.dms.sort.RevisionSort;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
@@ -17,7 +22,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,71 +133,80 @@ public class DocumentCommonService {
         return new PageImpl<>(versions, pageable, revisions.getTotalElements());
     }
 
-    private Sort getSortFromFields(List<SortItem> sortItems) {
-        List<Sort.Order> orders = new ArrayList<>();
-
-        for (SortItem sortItem : sortItems) {
-            String field = sortItem.getField();
-            Sort.Direction direction = sortItem.getDirection();
-
-            orders.add(new Sort.Order(direction, field));
-        }
-
-        return Sort.by(orders);
-    }
-
-    public Pageable createPageable(int pageNumber, int pageSize, List<SortItem> sortItems) {
-        Sort sort = Sort.unsorted();
-
-        if (Objects.nonNull(sortItems))
-            sort = getSortFromFields(sortItems);
-
-        return PageRequest.of(pageNumber, pageSize, sort);
-    }
-
-    public List<SortItem> parseSortItems(String sort) {
-        // valid sort format: <field>:<asc/desc> -> group 1: field, group 2: order by, group 3: "," or end of line
-        String sortRegex = "(name|type|path|createdAt):(asc|desc)(?:,|$)";
-
-        if (!sort.matches("(" + sortRegex + ")+"))
-            throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
-
-        List<SortItem> sortItems = new ArrayList<>();
-
-        Pattern pattern = Pattern.compile(sortRegex);
-        Matcher matcher = pattern.matcher(sort);
-
-        while (matcher.find()) {
-            String field = matcher.group(1);
-            String directionStr = matcher.group(2);
-            Sort.Direction direction = Sort.Direction.fromString(directionStr);
-
-            sortItems.add(new SortItem(field, direction));
-        }
-
-        return sortItems;
-    }
-
-    public List<FilterItem> parseFilterItems(String filter) {
-        // valid filter format (comma-separated): <name/type/path>:<value> -> group 1: field, group 2: value
-        String filterRegex = "(name|type|path):\"([^,]*)\"(?:,|$)";
-
-        if (!filter.matches("(" + filterRegex + ")+"))
+    public List<FilterItem> getDocumentFilterItemsFromFilter(String filter) {
+        if (!filter.matches("(" + DocumentFilter.FILTER_REGEX + ")+"))
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
 
         List<FilterItem> filterItems = new ArrayList<>();
 
-        Pattern pattern = Pattern.compile(filterRegex);
+        Pattern pattern = Pattern.compile(DocumentFilter.FILTER_REGEX);
         Matcher matcher = pattern.matcher(filter);
 
         while (matcher.find()) {
-            String field = matcher.group(1);
+            String field = DocumentMapper.getMappedDocumentField(matcher.group(1));
             String value = matcher.group(2);
 
             filterItems.add(new FilterItem(field, value));
         }
 
         return filterItems;
+    }
+
+    public List<FilterItem> getRevisionFilterItemsFromFilter(String filter) {
+        if (!filter.matches("(" + RevisionFilter.FILTER_REGEX + ")+"))
+            throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
+
+        List<FilterItem> filterItems = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile(RevisionFilter.FILTER_REGEX);
+        Matcher matcher = pattern.matcher(filter);
+
+        while (matcher.find()) {
+            String field = RevisionMapper.getMappedRevisionField(matcher.group(1));
+            String value = matcher.group(2);
+
+            filterItems.add(new FilterItem(field, value));
+        }
+
+        return filterItems;
+    }
+
+    public List<Sort.Order> getOrdersFromDocumentSort(String sort) {
+        if (!sort.matches("(" + DocumentSort.DOCUMENT_SORT_REGEX + ")+"))
+            throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
+
+        List<Sort.Order> orders = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile(DocumentSort.DOCUMENT_SORT_REGEX);
+        Matcher matcher = pattern.matcher(sort);
+
+        while (matcher.find()) {
+            String documentField = DocumentMapper.getMappedDocumentField(matcher.group(1));
+            Sort.Direction direction = Sort.Direction.fromString(matcher.group(2));
+
+            orders.add(new Sort.Order(direction, documentField));
+        }
+
+        return orders;
+    }
+
+    public List<Sort.Order> getOrdersFromRevisionSort(String sort) {
+        if (!sort.matches("(" + RevisionSort.REVISION_SORT_REGEX + ")+"))
+            throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
+
+        List<Sort.Order> orders = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile(RevisionSort.REVISION_SORT_REGEX);
+        Matcher matcher = pattern.matcher(sort);
+
+        while (matcher.find()) {
+            String revisionField = RevisionMapper.getMappedRevisionField(matcher.group(1));
+            Sort.Direction direction = Sort.Direction.fromString(matcher.group(2));
+
+            orders.add(new Sort.Order(direction, revisionField));
+        }
+
+        return orders;
     }
 
     public String storeBlob(MultipartFile file) {

@@ -2,6 +2,8 @@ package com.dms.specification;
 
 import com.dms.dto.FilterItem;
 import com.dms.entity.Document;
+import com.dms.entity.DocumentRevision_;
+import com.dms.entity.Document_;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -25,7 +27,7 @@ public class DocumentFilterSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = getPredicatesFromFilterItems(filterItems, root, criteriaBuilder);
 
-            Predicate documentPredicate = criteriaBuilder.equal(root.get("document"), document);
+            Predicate documentPredicate = criteriaBuilder.equal(root.get(DocumentRevision_.DOCUMENT), document);
             predicates.add(documentPredicate);
 
             return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
@@ -39,8 +41,13 @@ public class DocumentFilterSpecification {
             String field = filterItem.getField();
             String value = filterItem.getValue();
 
-            Predicate predicate = criteriaBuilder.like(root.get(field), "%" + Normalizer.normalize(value, Normalizer.Form.NFKD) + "%");
-            predicates.add(predicate);
+            String pattern = "%" + Normalizer.normalize(value, Normalizer.Form.NFKD) + "%";
+
+            switch (field) {
+                case "name" -> predicates.add(criteriaBuilder.like(root.get(Document_.NAME), pattern));
+                case "type" -> predicates.add(criteriaBuilder.like(root.get(Document_.TYPE), pattern));
+                case "path" -> predicates.add(criteriaBuilder.like(root.get(Document_.PATH), pattern));
+            }
         }
 
         return predicates;

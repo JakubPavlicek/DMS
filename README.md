@@ -10,31 +10,51 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
 
 ## Endpointy
 
+### /documents [GET]
+
+- získání souborů
+
 ### /documents/upload [POST]
 
 - nahrání souboru
 
-### /documents/{id} [GET]
+### /documents/{documentId} [GET]
 
 - získání informace o souboru
 
-### /documents/{id} [PUT]
+### /documents/{documentId} [PUT]
 
 - nahrání změny souboru
 
-### /documents/{id} [DELETE]
+### /documents/{documentId} [DELETE]
 
 - smazání souboru
 
-### /documents/{id}/download [GET]
+### /documents/{documentId}/download [GET]
 
 - stažení souboru
 
-### /documents/{id}/revisions [GET]
+### /document/{documentId}/move [PUT]
+
+- přesunutí souboru
+
+### /documents/{documentId}/revisions [GET]
 
 - získání revizí souboru
 
-### /documents/{id}/versions [PUT]
+### /documents/{documentId}/revisions/{revisionId} [GET]
+
+- přepnutí se na revizi
+
+### /documents/{documentId}/versions [GET]
+
+- získání verzí souboru
+
+### /documents/{documentId}/versions/{version} [GET]
+
+- získání souboru dané verze
+
+### /documents/{documentId}/versions/{version} [PUT]
 
 - přepnutí se na verzi souboru
 
@@ -42,15 +62,15 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
 
 - získání informací o všech revizích
 
-### /revisions/{id} [GET]
+### /revisions/{documentId} [GET]
 
 - získání informace o revizi
 
-### /revisions/{id} [DELETE]
+### /revisions/{documentId} [DELETE]
 
 - smazání revize
 
-### /revisions/{id}/download [GET]
+### /revisions/{documentId}/download [GET]
 
 - stažení revize
 
@@ -68,9 +88,17 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
 
 ### src/main/java/com/dms
 
+#### config
+
+- konfigurace Springu + přepravky na hodnoty v konfiguračním souboru
+
 #### controller
 
 - jednotlivé endpointy REST-API
+
+#### dto
+
+- data transfer objects
 
 #### entity
 
@@ -93,9 +121,23 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
 
 - business logic
 
-#### storage
+#### specification
 
-- blob storage, kam se budou ukládat bloby souborů
+- specifikace k filtrování hodnot
+
+#### validation
+
+- validace hodnot z requestu
+
+### src/main/resources
+
+#### db.changelog
+
+- LiquiBase soubory
+
+#### static
+
+- OpenAPI
 
 ## Spuštění aplikace
 

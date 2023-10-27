@@ -1,9 +1,9 @@
 package com.dms.specification;
 
-import com.dms.dto.FilterItem;
+import com.dms.filter.FilterItem;
 import com.dms.entity.Document;
+import com.dms.entity.DocumentRevision;
 import com.dms.entity.DocumentRevision_;
-import com.dms.entity.Document_;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -23,7 +23,7 @@ public class DocumentFilterSpecification {
         };
     }
 
-    public static <E> Specification<E> filterByDocumentAndFilterItems(Document document, List<FilterItem> filterItems) {
+    public static Specification<DocumentRevision> filterByDocumentAndFilterItems(Document document, List<FilterItem> filterItems) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = getPredicatesFromFilterItems(filterItems, root, criteriaBuilder);
 
@@ -42,12 +42,9 @@ public class DocumentFilterSpecification {
             String value = filterItem.getValue();
 
             String pattern = "%" + Normalizer.normalize(value, Normalizer.Form.NFKD) + "%";
+            Predicate predicate = criteriaBuilder.like(root.get(field), pattern);
 
-            switch (field) {
-                case "name" -> predicates.add(criteriaBuilder.like(root.get(Document_.NAME), pattern));
-                case "type" -> predicates.add(criteriaBuilder.like(root.get(Document_.TYPE), pattern));
-                case "path" -> predicates.add(criteriaBuilder.like(root.get(Document_.PATH), pattern));
-            }
+            predicates.add(predicate);
         }
 
         return predicates;

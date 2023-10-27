@@ -64,7 +64,7 @@ public class DocumentService {
         Document document = documentCommonService.getDocument(documentId);
 
         List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
-        List<FilterItem> filterItems = documentCommonService.parseRevisionFilterItems(filter);
+        List<FilterItem> filterItems = documentCommonService.getRevisionFilterItemsFromFilter(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
 
@@ -190,7 +190,7 @@ public class DocumentService {
 
     public Page<DocumentDTO> getDocuments(int pageNumber, int pageSize, String sort, String filter) {
         List<Sort.Order> orders = documentCommonService.getOrdersFromDocumentSort(sort);
-        List<FilterItem> filterItems = documentCommonService.parseDocumentFilterItems(filter);
+        List<FilterItem> filterItems = documentCommonService.getDocumentFilterItemsFromFilter(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
 

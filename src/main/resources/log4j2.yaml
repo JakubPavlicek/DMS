@@ -1,0 +1,15 @@
+Configuration:
+  name: default
+
+  Appenders:
+    Console:
+      name: Console
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "%d %highlight{%-5p} [%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable"
+
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: Console

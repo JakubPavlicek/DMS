@@ -154,7 +154,7 @@ public class DocumentCommonService {
 
     public List<SortItem> parseSortItems(String sort) {
         // valid sort format: <field>:<asc/desc> -> group 1: field, group 2: order by, group 3: "," or end of line
-        String sortRegex = "([a-zA-Z]+):(asc|desc)(?:,|$)";
+        String sortRegex = "(name|type|path|createdAt):(asc|desc)(?:,|$)";
 
         if (!sort.matches("(" + sortRegex + ")+"))
             throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
@@ -176,8 +176,8 @@ public class DocumentCommonService {
     }
 
     public List<FilterItem> parseFilterItems(String filter) {
-        // valid filter format: <field>:<value> -> group 1: field, group 2: value to match, group 3: "," or end of line
-        String filterRegex = "([a-zA-Z]+):([^,]*)(?:,|$)";
+        // valid filter format (comma-separated): <name/type/path>:<value> -> group 1: field, group 2: value
+        String filterRegex = "(name|type|path):\"([^,]*)\"(?:,|$)";
 
         if (!filter.matches("(" + filterRegex + ")+"))
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");

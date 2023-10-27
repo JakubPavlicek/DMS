@@ -2,8 +2,7 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.FilterItem;
-import com.dms.dto.SortItem;
+import com.dms.filter.FilterItem;
 import com.dms.dto.UserRequest;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -63,10 +63,10 @@ public class DocumentService {
     public Page<DocumentRevisionDTO> getDocumentRevisions(UUID documentId, int pageNumber, int pageSize, String sort, String filter) {
         Document document = documentCommonService.getDocument(documentId);
 
-        List<SortItem> sortItems = documentCommonService.parseSortItems(sort);
-        List<FilterItem> filterItems = documentCommonService.parseFilterItems(filter);
+        List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
+        List<FilterItem> filterItems = documentCommonService.parseRevisionFilterItems(filter);
 
-        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortItems);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
 
         Page<DocumentRevision> revisions = getFilteredDocumentRevisions(filterItems, document, pageable);
         List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
@@ -189,10 +189,10 @@ public class DocumentService {
     }
 
     public Page<DocumentDTO> getDocuments(int pageNumber, int pageSize, String sort, String filter) {
-        List<SortItem> sortItems = documentCommonService.parseSortItems(sort);
-        List<FilterItem> filterItems = documentCommonService.parseFilterItems(filter);
+        List<Sort.Order> orders = documentCommonService.getOrdersFromDocumentSort(sort);
+        List<FilterItem> filterItems = documentCommonService.parseDocumentFilterItems(filter);
 
-        Pageable pageable = documentCommonService.createPageable(pageNumber, pageSize, sortItems);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
 
         Page<Document> documents = getFilteredDocuments(filterItems, pageable);
         List<DocumentDTO> documentDTOs = documents.stream()

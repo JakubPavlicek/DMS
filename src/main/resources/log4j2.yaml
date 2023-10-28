@@ -4,8 +4,12 @@ Configuration:
   Properties:
 
     Property:
-      name: LOG_DIR
-      value: log
+      - name: LOG_DIR
+        value: log
+      - name: LOG_FILE
+        value: log.log
+      - name: LOG_PATTERN
+        value: log_%i.log
 
   Appenders:
 
@@ -14,27 +18,57 @@ Configuration:
       target: SYSTEM_OUT
 
       PatternLayout:
-        pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5level} [%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable"
+        pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5p} [%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable"
 
     RollingFile:
-      name: File
-      fileName: ${LOG_DIR}/log.log
-      filePattern: ${LOG_DIR}/log_%i.log
-      append: false
-      immediateFlush: true
+      - name: InfoFile
+        fileName: ${LOG_DIR}/${LOG_FILE}
+        filePattern: ${LOG_DIR}/${LOG_PATTERN}
+        append: false
+        immediateFlush: true
 
-      PatternLayout:
-        pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] %C{1.}: %msg%n%throwable"
-        disableAnsi: true
+        LevelRangeFilter:
+          maxLevel: INFO
+          onMatch: accept
+          onMismatch: deny
 
-      Policies:
-        SizeBasedTriggeringPolicy:
-          size: 10MB
+        PatternLayout:
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t] %C{1.}: %msg%n%throwable"
+          disableAnsi: true
 
-      DefaultRolloverStrategy:
-        fileIndex: max
-        min: 1
-        max: 3
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 10MB
+
+        DefaultRolloverStrategy:
+          fileIndex: max
+          min: 1
+          max: 3
+
+      - name: TraceAndDebugFile
+        fileName: ${LOG_DIR}/${LOG_FILE}
+        filePattern: ${LOG_DIR}/${LOG_PATTERN}
+        append: false
+        immediateFlush: true
+
+        LevelRangeFilter:
+          maxLevel: TRACE
+          minLevel: DEBUG
+          onMatch: accept
+          onMismatch: deny
+
+        PatternLayout:
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t] %C{1.}::%M line %L: %msg%n%throwable"
+          disableAnsi: true
+
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 10MB
+
+        DefaultRolloverStrategy:
+          fileIndex: max
+          min: 1
+          max: 3
 
   Loggers:
 
@@ -48,4 +82,5 @@ Configuration:
       level: TRACE
       additivity: false
       AppenderRef:
-        - ref: File
+        - ref: InfoFile
+        - ref: TraceAndDebugFile

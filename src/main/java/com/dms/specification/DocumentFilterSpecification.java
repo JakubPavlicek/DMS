@@ -17,7 +17,7 @@ public class DocumentFilterSpecification {
 
     public static <E> Specification<E> filterByItems(List<FilterItem> filterItems) {
         return (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = getPredicatesFromFilterItems(filterItems, root, criteriaBuilder);
+            List<Predicate> predicates = getLikePredicatesFromFilterItems(filterItems, root, criteriaBuilder);
 
             return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
         };
@@ -25,7 +25,7 @@ public class DocumentFilterSpecification {
 
     public static Specification<DocumentRevision> filterByDocumentAndFilterItems(Document document, List<FilterItem> filterItems) {
         return (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = getPredicatesFromFilterItems(filterItems, root, criteriaBuilder);
+            List<Predicate> predicates = getLikePredicatesFromFilterItems(filterItems, root, criteriaBuilder);
 
             Predicate documentPredicate = criteriaBuilder.equal(root.get(DocumentRevision_.DOCUMENT), document);
             predicates.add(documentPredicate);
@@ -34,7 +34,7 @@ public class DocumentFilterSpecification {
         };
     }
 
-    private static <E> List<Predicate> getPredicatesFromFilterItems(List<FilterItem> filterItems, Root<E> root, CriteriaBuilder criteriaBuilder) {
+    private static <E> List<Predicate> getLikePredicatesFromFilterItems(List<FilterItem> filterItems, Root<E> root, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         for (FilterItem filterItem : filterItems) {

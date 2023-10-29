@@ -68,7 +68,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(RevisionDeletionException.class)
-    public ProblemDetail handleRevisionDeletionException(RevisionNotFoundException exception) {
+    public ProblemDetail handleRevisionDeletionException(RevisionDeletionException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Revision Deletion Error");
         problemDetail.setType(URI.create(baseUrl + "/revision-deletion-error"));

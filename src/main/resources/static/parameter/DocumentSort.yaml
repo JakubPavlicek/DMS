@@ -8,3 +8,4 @@ description: |
   Example usage: ?sort=name:desc,type:asc.
 schema:
   type: string
+  default: "name:asc"

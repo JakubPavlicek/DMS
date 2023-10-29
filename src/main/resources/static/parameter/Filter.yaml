@@ -9,3 +9,4 @@ description: |
   Example usage: ?filter=name:"logo",type:"image"
 schema:
   type: string
+  default: 'name:""'

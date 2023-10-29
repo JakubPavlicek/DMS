@@ -2,24 +2,24 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.filter.DocumentFilter;
-import com.dms.filter.RevisionFilter;
-import com.dms.mapper.DocumentMapper;
-import com.dms.mapper.RevisionMapper;
-import com.dms.sort.DocumentSort;
-import com.dms.filter.FilterItem;
-import com.dms.sort.RevisionSort;
+import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
+import com.dms.filter.DocumentFilter;
+import com.dms.filter.FilterItem;
+import com.dms.filter.RevisionFilter;
+import com.dms.mapper.DocumentMapper;
+import com.dms.mapper.RevisionMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
+import com.dms.sort.DocumentSort;
+import com.dms.sort.RevisionSort;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -46,42 +46,26 @@ public class DocumentCommonService {
 
     public Document getDocument(UUID documentId) {
         return documentRepository.findById(documentId)
-                                 .orElseThrow(() -> new DocumentNotFoundException("Soubor s id: " + documentId + " nebyl nalezen"));
-    }
-
-    public Document getDocument(UUID documentId, Long version) {
-        Document document = getDocument(documentId);
-
-        DocumentRevision revision = revisionRepository.findByDocumentAndVersion(document, version)
-                                                      .orElseThrow(() -> new DocumentNotFoundException("Soubor s verzi: " + version + " neexistuje"));
-
-        return copyRevisionInfoToDocument(revision, document);
+                                 .orElseThrow(() -> new DocumentNotFoundException("File with ID: " + documentId + " not found"));
     }
 
     public DocumentRevision getRevision(UUID revisionId) {
         return revisionRepository.findByRevisionId(revisionId)
-                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
     }
 
     public DocumentRevision getRevisionByDocumentAndVersion(Document document, Long version) {
         return revisionRepository.findByDocumentAndVersion(document, version)
-                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s verzi: " + version + " nebyla nalezena"));
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revision with version: " + version + " not found"));
     }
 
     public DocumentRevision getRevisionByDocumentAndId(Document document, UUID revisionId) {
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
-                                 .orElseThrow(() -> new RevisionNotFoundException("Revize s ID: " + revisionId + " nebyla nalezena"));
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
     }
 
     public Page<DocumentRevision> getRevisionsBySpecification(Specification<DocumentRevision> specification, Pageable pageable) {
         return revisionRepository.findAll(specification, pageable);
-    }
-
-    public Document copyRevisionInfoToDocument(DocumentRevision revision, Document document) {
-        BeanUtils.copyProperties(revision, document, "createdAt");
-        document.setUpdatedAt(document.getUpdatedAt());
-
-        return document;
     }
 
     public Document updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
@@ -89,6 +73,7 @@ public class DocumentCommonService {
         document.setType(documentRevision.getType());
         document.setPath(documentRevision.getPath());
         document.setHash(documentRevision.getHash());
+        document.setVersion(documentRevision.getVersion());
         document.setAuthor(documentRevision.getAuthor());
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields
@@ -236,6 +221,10 @@ public class DocumentCommonService {
 
     public DocumentRevisionDTO mapRevisionToRevisionDto(DocumentRevision revision) {
         return modelMapper.map(revision, DocumentRevisionDTO.class);
+    }
+
+    public UserDTO mapUserToUserDto(User user) {
+        return modelMapper.map(user, UserDTO.class);
     }
 
 }

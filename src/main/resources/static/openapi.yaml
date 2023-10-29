@@ -67,11 +67,6 @@ components:
     Filter:
       $ref: './parameter/Filter.yaml'
 
-  requestBodies:
-
-    UploadFileBody:
-      $ref: './request_body/UploadFileBody.yaml'
-
 paths:
 
   # TODO: DOCUMENTS
@@ -130,7 +125,25 @@ paths:
       tags:
         - documents
       requestBody:
-        $ref: '#/components/requestBodies/UploadFileBody'
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+                - file
+              properties:
+                user:
+                  $ref: '#/components/schemas/UserRequest'
+                file:
+                  type: string
+                  format: binary
+                path:
+                  type: string
+                  description: Path in which the document will be moved.
+                  example: /home
+                  minLength: 1
+                  maxLength: 255
       responses:
         201:
           description: Document uploaded successfully.
@@ -251,7 +264,25 @@ paths:
       parameters:
         - $ref: '#/components/parameters/DocumentId'
       requestBody:
-        $ref: '#/components/requestBodies/UploadFileBody'
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+                - file
+              properties:
+                user:
+                  $ref: '#/components/schemas/UserRequest'
+                file:
+                  type: string
+                  format: binary
+                path:
+                  type: string
+                  description: Path in which the document will be moved.
+                  example: /home
+                  minLength: 1
+                  maxLength: 255
       responses:
         201:
           description: New document version uploaded successfully.

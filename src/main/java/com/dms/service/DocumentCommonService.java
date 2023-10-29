@@ -2,6 +2,7 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.PageWithDocuments;
 import com.dms.dto.PageWithRevisions;
 import com.dms.dto.PageWithVersions;
 import com.dms.dto.UserDTO;
@@ -110,14 +111,15 @@ public class DocumentCommonService {
         }
     }
 
-    public Page<Long> getDocumentVersions(Document document, Pageable pageable) {
+    public PageWithVersions getDocumentVersions(Document document, Pageable pageable) {
         Page<DocumentRevision> revisions = revisionRepository.findAllByDocument(document, pageable);
 
         List<Long> versions = revisions.stream()
                                        .map(DocumentRevision::getVersion)
                                        .toList();
 
-        return new PageImpl<>(versions, pageable, revisions.getTotalElements());
+        PageImpl<Long> longs = new PageImpl<>(versions, pageable, revisions.getTotalElements());
+        return mapPageToPageWithVersions(longs);
     }
 
     public List<FilterItem> getDocumentFilterItemsFromFilter(String filter) {
@@ -229,11 +231,15 @@ public class DocumentCommonService {
         return modelMapper.map(user, UserDTO.class);
     }
 
+    public PageWithDocuments mapPageToPageWithDocuments(Page<DocumentDTO> page) {
+        return modelMapper.map(page, PageWithDocuments.class);
+    }
+
     public PageWithRevisions mapPageToPageWithRevisions(Page<DocumentRevisionDTO> page) {
         return modelMapper.map(page, PageWithRevisions.class);
     }
 
-    public PageWithVersions mapPageToDocumentVersions(Page<Long> pageDocumentVersions) {
+    public PageWithVersions mapPageToPageWithVersions(Page<Long> pageDocumentVersions) {
         return modelMapper.map(pageDocumentVersions, PageWithVersions.class);
     }
 

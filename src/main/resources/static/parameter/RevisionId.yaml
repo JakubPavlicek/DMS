@@ -1,7 +1,7 @@
-name: id
+name: revisionId
 in: path
 required: true
 description: The revision ID.
 schema:
-  type: integer
-  format: int64
+  type: string
+  format: uuid

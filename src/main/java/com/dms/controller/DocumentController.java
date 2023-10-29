@@ -11,6 +11,7 @@ import com.dms.dto.UserRequest;
 import com.dms.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,48 +46,49 @@ public class DocumentController implements DocumentsApi {
 
     @Override
     public ResponseEntity<PageWithRevisions> getDocumentRevisions(UUID id, Integer page, Integer limit, String sort, String filter) {
-//        return ResponseEntity.ok(documentService.getDocumentRevisions(id, page, limit, sort, filter));
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(documentService.getDocumentRevisions(id, page, limit, sort, filter));
     }
 
     @Override
     public ResponseEntity<PageWithVersions> getDocumentVersions(UUID id, Integer page, Integer limit) {
-        return DocumentsApi.super.getDocumentVersions(id, page, limit);
+        return ResponseEntity.ok(documentService.getDocumentVersions(id, page, limit));
     }
 
     @Override
     public ResponseEntity<DocumentWithVersionDTO> getDocumentWithVersion(UUID id, Long version) {
-        return DocumentsApi.super.getDocumentWithVersion(id, version);
+        return ResponseEntity.ok(documentService.getDocumentWithVersion(id, version));
     }
 
     @Override
     public ResponseEntity<PageWithDocuments> getDocuments(Integer page, Integer limit, String sort, String filter) {
-        return DocumentsApi.super.getDocuments(page, limit, sort, filter);
+        return ResponseEntity.ok(documentService.getDocuments(page, limit, sort, filter));
     }
 
     @Override
     public ResponseEntity<DocumentDTO> moveDocument(UUID id, MoveDocumentRequest moveDocumentRequest) {
-        return DocumentsApi.super.moveDocument(id, moveDocumentRequest);
+        return ResponseEntity.ok(documentService.moveDocument(id, moveDocumentRequest.getPath()));
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> switchToRevision(Long id) {
-        return DocumentsApi.super.switchToRevision(id);
+    public ResponseEntity<DocumentDTO> switchToRevision(UUID documentId, UUID revisionId) {
+        return ResponseEntity.ok(documentService.switchToRevision(documentId, revisionId));
     }
 
     @Override
     public ResponseEntity<DocumentDTO> switchToVersion(UUID id, Long version) {
-        return DocumentsApi.super.switchToVersion(id, version);
+        return ResponseEntity.ok(documentService.switchToVersion(id, version));
     }
 
     @Override
     public ResponseEntity<DocumentDTO> uploadDocument(UserRequest user, MultipartFile file, String path) {
-        return DocumentsApi.super.uploadDocument(user, file, path);
+        DocumentDTO documentDTO = documentService.uploadDocument(user, file, path);
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
     @Override
     public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(UUID id, UserRequest user, MultipartFile file, String path) {
-        return DocumentsApi.super.uploadNewDocumentVersion(id, user, file, path);
+        DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(id, user, file, path);
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
     //    @GetMapping

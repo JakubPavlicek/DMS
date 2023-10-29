@@ -1,6 +1,7 @@
 package com.dms.service;
 
 import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.PageWithRevisions;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionDeletionException;
@@ -81,7 +82,7 @@ public class DocumentRevisionService {
                              .body(new ByteArrayResource(data));
     }
 
-    public Page<DocumentRevisionDTO> getRevisions(int pageNumber, int pageSize, String sort, String filter) {
+    public PageWithRevisions getRevisions(int pageNumber, int pageSize, String sort, String filter) {
         List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
         List<FilterItem> filterItems = documentCommonService.getRevisionFilterItemsFromFilter(filter);
 
@@ -93,7 +94,8 @@ public class DocumentRevisionService {
                                                           .map(documentCommonService::mapRevisionToRevisionDto)
                                                           .toList();
 
-        return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
+        PageImpl<DocumentRevisionDTO> documentRevisionDTOS = new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
+        return documentCommonService.mapPageToPageWithRevisions(documentRevisionDTOS);
     }
 
 }

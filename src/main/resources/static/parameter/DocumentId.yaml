@@ -1,4 +1,4 @@
-name: id
+name: documentId
 in: path
 required: true
 description: The document ID.

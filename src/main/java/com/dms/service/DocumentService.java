@@ -3,6 +3,9 @@ package com.dms.service;
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.DocumentWithVersionDTO;
+import com.dms.dto.PageWithDocuments;
+import com.dms.dto.PageWithRevisions;
+import com.dms.dto.PageWithVersions;
 import com.dms.dto.UserRequest;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
@@ -184,7 +187,7 @@ public class DocumentService {
                              .body(new ByteArrayResource(data));
     }
 
-    public Page<DocumentDTO> getDocuments(int pageNumber, int pageSize, String sort, String filter) {
+    public PageWithDocuments getDocuments(int pageNumber, int pageSize, String sort, String filter) {
         List<Sort.Order> orders = documentCommonService.getOrdersFromDocumentSort(sort);
         List<FilterItem> filterItems = documentCommonService.getDocumentFilterItemsFromFilter(filter);
 
@@ -196,10 +199,11 @@ public class DocumentService {
                                                   .map(documentCommonService::mapDocumentToDocumentDto)
                                                   .toList();
 
-        return new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
+        PageImpl<DocumentDTO> documentDTOS = new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
+        return documentCommonService.mapPageToPageWithDocuments(documentDTOS);
     }
 
-    public Page<DocumentRevisionDTO> getDocumentRevisions(UUID documentId, int pageNumber, int pageSize, String sort, String filter) {
+    public PageWithRevisions getDocumentRevisions(UUID documentId, int pageNumber, int pageSize, String sort, String filter) {
         Document document = documentCommonService.getDocument(documentId);
 
         List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
@@ -213,10 +217,11 @@ public class DocumentService {
                                                           .map(documentCommonService::mapRevisionToRevisionDto)
                                                           .toList();
 
-        return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
+        PageImpl<DocumentRevisionDTO> documentRevisionDTOS = new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
+        return documentCommonService.mapPageToPageWithRevisions(documentRevisionDTOS);
     }
 
-    public Page<Long> getDocumentVersions(UUID documentId, int pageNumber, int pageSize) {
+    public PageWithVersions getDocumentVersions(UUID documentId, int pageNumber, int pageSize) {
         Document document = documentCommonService.getDocument(documentId);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 

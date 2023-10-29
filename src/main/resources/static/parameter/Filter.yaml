@@ -1,0 +1,11 @@
+name: filter
+in: query
+required: false
+description: |
+  A comma-separated list of filter keys.
+  Valid keys are 'name', 'type', 'path'.
+  Each key can be filtered using any value wrapped in quotation marks.
+  Filtering works by checking whether the string contains the given substring.
+  Example usage: ?filter=name:"logo",type:"image"
+schema:
+  type: string

@@ -13,8 +13,8 @@ public class RevisionSort {
         NAME,
         TYPE,
         PATH,
-        CREATED_AT,
-        VERSION
+        VERSION,
+        CREATED_AT
     }
 
     private static String getFieldOptions() {

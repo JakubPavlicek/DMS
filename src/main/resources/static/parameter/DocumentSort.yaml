@@ -1,0 +1,10 @@
+name: sort
+in: query
+required: false
+description: |
+  A comma-separated list of sort keys.
+  Valid keys are 'name', 'type', 'path', 'version', 'created_at', 'updated_at'.
+  Each key can be sorted by either: asc (ascending order) or desc (descending order).
+  Example usage: ?sort=name:desc,type:asc.
+schema:
+  type: string

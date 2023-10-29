@@ -8,6 +8,7 @@ import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
+import com.dms.exception.FileWithPathAlreadyExistsException;
 import com.dms.filter.FilterItem;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
@@ -101,7 +102,7 @@ public class DocumentService {
 
         // user can't have a duplicate path for a document with the same name
         if (documentCommonService.pathWithFileAlreadyExists(path, filename, author))
-            throw new RuntimeException("File: " + filename + " with path: " + path + " already exists");
+            throw new FileWithPathAlreadyExistsException("Document: " + filename + " with path: " + path + " already exists");
     }
 
     @Transactional

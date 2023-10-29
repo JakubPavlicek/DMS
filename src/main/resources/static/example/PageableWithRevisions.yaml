@@ -1,0 +1,33 @@
+summary: Pageable with revisions
+value:
+  content:
+    - revisionId: 4
+      author:
+        userId: 2
+        username: "adam"
+        email: "adam@gmail.com"
+      name: "school.pdf"
+      type: "application/pdf"
+      createdAt: "2023-10-14T11:20:00.646173"
+  pageable:
+    pageNumber: 0
+    pageSize: 3
+    sort:
+      empty: false
+      sorted: true
+      unsorted: false
+    offset: 0
+    paged: true
+    unpaged: false
+  last: true
+  totalElements: 1
+  totalPages: 1
+  first: true
+  size: 3
+  number: 0
+  sort:
+    empty: false
+    sorted: true
+    unsorted: false
+  numberOfElements: 1
+  empty: false

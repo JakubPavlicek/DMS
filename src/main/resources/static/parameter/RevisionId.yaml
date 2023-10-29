@@ -1,0 +1,7 @@
+name: id
+in: path
+required: true
+description: The revision ID.
+schema:
+  type: integer
+  format: int64

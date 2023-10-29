@@ -1,0 +1,14 @@
+type: object
+required:
+  - username
+  - email
+properties:
+  username:
+    type: string
+    maxLength: 40
+    example: jakub
+  email:
+    type: string
+    format: email
+    maxLength: 255
+    example: jakub@gmail.com

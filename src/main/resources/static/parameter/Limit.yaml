@@ -1,0 +1,7 @@
+name: limit
+in: query
+description: The maximum number of items to return per page.
+schema:
+  type: integer
+  minimum: 1
+  default: 10

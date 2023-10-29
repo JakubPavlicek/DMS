@@ -40,6 +40,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(FileWithPathAlreadyExistsException.class)
+    public ProblemDetail handleFileWithPathAlreadyExistsException(FileWithPathAlreadyExistsException eception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, eception.getMessage());
+        problemDetail.setTitle("File With Path Already Exists");
+        problemDetail.setType(URI.create(baseUrl + "/document-with-path-already-exists"));
+
+        return problemDetail;
+    }
+
     @ExceptionHandler(DocumentNotFoundException.class)
     public ProblemDetail handleDocumentNotFoundException(DocumentNotFoundException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());

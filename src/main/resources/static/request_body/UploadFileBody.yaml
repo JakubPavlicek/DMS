@@ -1,0 +1,19 @@
+content:
+  multipart/form-data:
+    schema:
+      type: object
+      required:
+        - user
+        - file
+      properties:
+        user:
+          $ref: '../schema/UserRequest.yaml'
+        file:
+          type: string
+          format: binary
+        path:
+          type: string
+          description: Path in which the document will be moved.
+          example: /home
+          minLength: 1
+          maxLength: 255

@@ -167,7 +167,7 @@ public class DocumentController {
     }
 
     @GetMapping("/{documentId}/versions/{version}")
-    public DocumentWithVersionDTO getDocument(
+    public DocumentWithVersionDTO getDocumentWithVersion(
         @NotNull(message = "Document ID is mandatory.")
         @PathVariable("documentId") UUID documentId,
 

@@ -1,0 +1,7 @@
+name: page
+in: query
+description: The page number for pagination.
+schema:
+  type: integer
+  minimum: 0
+  default: 0

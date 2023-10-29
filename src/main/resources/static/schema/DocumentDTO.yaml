@@ -1,0 +1,29 @@
+type: object
+properties:
+  documentId:
+    type: string
+    format: uuid
+    example: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a
+  author:
+    $ref: './UserDTO.yaml'
+  version:
+    type: integer
+    format: int64
+    example: 1
+  name:
+    type: string
+    example: dog.jpeg
+  type:
+    type: string
+    example: image/jpeg
+  path:
+    type: string
+    example: /home
+  createdAt:
+    type: string
+    format: date-time
+    example: 2023-10-14T09:32:01.485815
+  updatedAt:
+    type: string
+    format: date-time
+    example: 2023-10-14T09:32:01.485815

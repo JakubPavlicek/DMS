@@ -3,7 +3,7 @@ package com.dms.service;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
-import com.dms.exception.RevisionNotFoundException;
+import com.dms.exception.RevisionDeletionException;
 import com.dms.filter.FilterItem;
 import com.dms.repository.DocumentRevisionRepository;
 import com.dms.specification.DocumentFilterSpecification;
@@ -44,7 +44,7 @@ public class DocumentRevisionService {
                                                                .orElse(revisionRepository.findNextByDocumentAndVersion(document, currentVersion)
                                                                                          .orElse(null));
         if (replacingRevision == null)
-            throw new RevisionNotFoundException(
+            throw new RevisionDeletionException(
                 "Revision cannnot be deleted because this is the only version left for the document with ID: " + document.getDocumentId()
             );
 

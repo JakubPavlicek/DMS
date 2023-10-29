@@ -2,6 +2,8 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.PageWithRevisions;
+import com.dms.dto.PageWithVersions;
 import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
@@ -225,6 +227,14 @@ public class DocumentCommonService {
 
     public UserDTO mapUserToUserDto(User user) {
         return modelMapper.map(user, UserDTO.class);
+    }
+
+    public PageWithRevisions mapPageToPageWithRevisions(Page<DocumentRevisionDTO> page) {
+        return modelMapper.map(page, PageWithRevisions.class);
+    }
+
+    public PageWithVersions mapPageToDocumentVersions(Page<Long> pageDocumentVersions) {
+        return modelMapper.map(pageDocumentVersions, PageWithVersions.class);
     }
 
 }

@@ -77,7 +77,7 @@ public class DocumentController {
     }
 
     @PutMapping("/{documentId}")
-    public DocumentDTO uploadNewDocumentVersion(
+    public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(
         @NotNull(message = "Document ID is mandatory.")
         @PathVariable("documentId") UUID documentId,
 
@@ -90,7 +90,8 @@ public class DocumentController {
         @Size(min = 1, max = 255, message = "Length of path must be between 1 and 255 characters.")
         @RequestPart(name = "path", required = false) String path
     ) {
-        return documentService.uploadNewDocumentVersion(documentId, user, file, path);
+        DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(documentId, user, file, path);
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
     @DeleteMapping("/{documentId}")

@@ -1,8 +1,8 @@
-openapi: 3.1.0
+openapi: 3.0.3
 
 info:
   title: DMS
-  summary: Document Management System for Software Documentation
+  description: Document Management System for Software Documentation
   version: "1.0"
 
 servers:
@@ -74,6 +74,9 @@ components:
 
     UserRequest:
       type: object
+      required:
+        - username
+        - email
       properties:
         username:
           type: string
@@ -84,9 +87,6 @@ components:
           format: email
           maxLength: 255
           example: jakub@gmail.com
-      required:
-        - username
-        - email
 
     ProblemDetail:
       type: object
@@ -122,11 +122,124 @@ components:
           items:
             type: string
 
-    Pageable:
+    PageWithDocuments:
       type: object
       properties:
         content:
           type: array
+          items:
+            $ref: '#/components/schemas/DocumentDTO'
+        pageable:
+          type: object
+          properties:
+            pageNumber:
+              type: integer
+            pageSize:
+              type: integer
+            sort:
+              type: object
+              properties:
+                empty:
+                  type: boolean
+                sorted:
+                  type: boolean
+                unsorted:
+                  type: boolean
+            offset:
+              type: integer
+            paged:
+              type: boolean
+            unpaged:
+              type: boolean
+        last:
+          type: boolean
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        first:
+          type: boolean
+        size:
+          type: integer
+        number:
+          type: integer
+        sort:
+          type: object
+          properties:
+            empty:
+              type: boolean
+            sorted:
+              type: boolean
+            unsorted:
+              type: boolean
+        numberOfElements:
+          type: integer
+        empty:
+          type: boolean
+
+    PageWithRevisions:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentRevisionDTO'
+        pageable:
+          type: object
+          properties:
+            pageNumber:
+              type: integer
+            pageSize:
+              type: integer
+            sort:
+              type: object
+              properties:
+                empty:
+                  type: boolean
+                sorted:
+                  type: boolean
+                unsorted:
+                  type: boolean
+            offset:
+              type: integer
+            paged:
+              type: boolean
+            unpaged:
+              type: boolean
+        last:
+          type: boolean
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        first:
+          type: boolean
+        size:
+          type: integer
+        number:
+          type: integer
+        sort:
+          type: object
+          properties:
+            empty:
+              type: boolean
+            sorted:
+              type: boolean
+            unsorted:
+              type: boolean
+        numberOfElements:
+          type: integer
+        empty:
+          type: boolean
+
+    PageWithVersions:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            type: integer
+            format: int64
         pageable:
           type: object
           properties:
@@ -286,83 +399,6 @@ components:
 
   responses:
 
-    20*DocumentDTOObject:
-      content:
-        application/json:
-          schema:
-            type: object
-            $ref: '#/components/schemas/DocumentDTO'
-
-    20*DocumentDTOArray:
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/DocumentDTO'
-
-    20*DocumentRevisionDTOObject:
-      content:
-        application/json:
-          schema:
-            type: object
-            $ref: '#/components/schemas/DocumentRevisionDTO'
-
-    20*DocumentRevisionDTOArray:
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/DocumentRevisionDTO'
-
-    200DocumentDownload:
-      description: "Document downloaded successfully."
-      content:
-        application/octet-stream:
-          schema:
-            type: string
-            format: binary
-      headers:
-        Content-Disposition:
-          description: Specifies the filename for the downloaded document.
-          schema:
-            type: string
-
-    200RevisionDownload:
-      description: Revision downloaded successfully.
-      content:
-        application/octet-stream:
-          schema:
-            type: string
-            format: binary
-      headers:
-        Content-Disposition:
-          description: Specifies the filename for the downloaded revision.
-          schema:
-            type: string
-
-    400MissingRequestPart:
-      description: Missing request part.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetail'
-
-    400InvalidDataProvided:
-      description: Invalid data provided.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetail'
-
-    400PatternDoesntMatch:
-      description: Pattern does not match.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetail'
-
     404DocumentOrVersionNotFound:
       description: Either document or version was not found.
       content:
@@ -386,24 +422,6 @@ components:
                 status: 404
                 detail: "Document with version: 5 was not found"
                 instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/5
-
-  requestBodies:
-
-    UserAndFile:
-      description: User with a file.
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            type: object
-            properties:
-              user:
-                name: user
-                $ref: '#/components/schemas/UserRequest'
-              file:
-                name: file
-                type: string
-                format: binary
 
   parameters:
 
@@ -494,6 +512,7 @@ paths:
 
     get:
       description: Retrieve a list of the documents.
+      operationId: getDocuments
       tags:
         - documents
       parameters:
@@ -507,10 +526,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pageable'
+                $ref: '#/components/schemas/PageWithDocuments'
               examples:
                 PageableWithVersions:
-                  summary: List Documents
                   $ref: '#/components/examples/PageableWithDocuments'
         400:
           description: Pattern does not match.
@@ -529,6 +547,7 @@ paths:
 
     get:
       description: Retrieves the details about a document.
+      operationId: getDocument
       tags:
         - documents
       parameters:
@@ -536,7 +555,10 @@ paths:
       responses:
         200:
           description: Successfully retrieved details about a document.
-          $ref: '#/components/responses/20*DocumentDTOObject'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDTO'
         404:
           description: Document not found.
           content:
@@ -552,24 +574,41 @@ paths:
 
     put:
       description: Updates a document.
+      operationId: updateDocument
       tags:
         - documents
       parameters:
         - $ref: '#/components/parameters/DocumentId'
       requestBody:
-        $ref: '#/components/requestBodies/UserAndFile'
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+                - file
+              properties:
+                user:
+                  $ref: '#/components/schemas/UserRequest'
+                file:
+                  type: string
+                  format: binary
+            encoding:
+              user:
+                contentType: application/json
       responses:
         200:
           description: Document updated successfully.
-          $ref: '#/components/responses/20*DocumentDTOObject'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDTO'
         400:
           description: Either invalid data provided or some request parts are missing.
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/responses/400InvalidDataProvided'
-                  - $ref: '#/components/responses/400MissingRequestPart'
+                $ref: '#/components/schemas/ProblemDetail'
               examples:
                 InvalidDataProvided:
                   summary: Invalid Data Provided
@@ -602,6 +641,7 @@ paths:
 
     delete:
       description: Deletes a document and all revisions associated with that document.
+      operationId: deleteDocumentWithRevisions
       tags:
         - documents
       parameters:
@@ -626,14 +666,33 @@ paths:
 
     post:
       description: Upload a document.
+      operationId: uploadDocument
       tags:
         - documents
       requestBody:
-        $ref: '#/components/requestBodies/UserAndFile'
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+                - file
+              properties:
+                user:
+                  $ref: '#/components/schemas/UserRequest'
+                file:
+                  type: string
+                  format: binary
+            encoding:
+              user:
+                contentType: application/json
       responses:
         201:
           description: Document uploaded successfully.
-          $ref: '#/components/responses/20*DocumentDTOObject'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDTO'
         400:
           description: Either invalid data provided or some request parts are missing.
           content:
@@ -676,13 +735,24 @@ paths:
 
     get:
       description: Downloads a document.
+      operationId: downloadDocument
       tags:
         - documents
       parameters:
         - $ref: '#/components/parameters/DocumentId'
       responses:
         200:
-          $ref: '#/components/responses/200DocumentDownload'
+          description: "Document downloaded successfully."
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: Specifies the filename for the downloaded document.
+              schema:
+                type: string
         404:
           description: Document not found for download.
           content:
@@ -700,6 +770,7 @@ paths:
 
     get:
       description: List document revisions.
+      operationId: getDocumentRevisions
       tags:
         - documents
       parameters:
@@ -714,11 +785,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pageable'
-              examples:
-                PageableWithVersions:
-                  summary: List Document Revisions
-                  $ref: '#/components/examples/PageableWithRevisions'
+                $ref: '#/components/schemas/PageWithRevisions'
+        #              examples:
+        #                PageableWithVersions:
+        #                  $ref: '#/components/examples/PageableWithRevisions'
         400:
           description: Pattern does not match.
           content:
@@ -736,16 +806,35 @@ paths:
 
     post:
       description: Upload document revision.
+      operationId: uploadRevision
       tags:
         - documents
       parameters:
         - $ref: '#/components/parameters/DocumentId'
       requestBody:
-        $ref: '#/components/requestBodies/UserAndFile'
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+                - file
+              properties:
+                user:
+                  $ref: '#/components/schemas/UserRequest'
+                file:
+                  type: string
+                  format: binary
+            encoding:
+              user:
+                contentType: application/json
       responses:
         201:
           description: Revision uploaded successfully.
-          $ref: '#/components/responses/20*DocumentRevisionDTOObject'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentRevisionDTO'
         400:
           description: Either invalid data provided or some request parts are missing.
           content:
@@ -788,6 +877,7 @@ paths:
 
     put:
       description: Switch document to a specific revision.
+      operationId: switchToRevision
       tags:
         - documents
       parameters:
@@ -796,7 +886,10 @@ paths:
       responses:
         200:
           description: Successfully switched document to revision.
-          $ref: '#/components/responses/20*DocumentDTOObject'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDTO'
         404:
           description: Either document or revision was not found.
           content:
@@ -825,6 +918,7 @@ paths:
 
     get:
       description: List document versions.
+      operationId: getDocumentVersions
       tags:
         - documents
       parameters:
@@ -837,10 +931,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pageable'
+                $ref: '#/components/schemas/PageWithVersions'
               examples:
                 PageableWithVersions:
-                  summary: List Document Versions
                   $ref: '#/components/examples/PageableWithVersions'
         404:
           description: Document not found for listing versions.
@@ -859,6 +952,7 @@ paths:
 
     get:
       description: Get document version.
+      operationId: getDocumentWithVersion
       tags:
         - documents
       parameters:
@@ -867,12 +961,16 @@ paths:
       responses:
         200:
           description: Successfully retrieved document version.
-          $ref: '#/components/responses/20*DocumentDTOObject'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDTO'
         404:
           $ref: '#/components/responses/404DocumentOrVersionNotFound'
 
     put:
       description: Switch document to a specific version.
+      operationId: switchToVersion
       tags:
         - documents
       parameters:
@@ -881,7 +979,10 @@ paths:
       responses:
         200:
           description: Successfully switched document to a version.
-          $ref: '#/components/responses/20*DocumentDTOObject'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDTO'
         404:
           $ref: '#/components/responses/404DocumentOrVersionNotFound'
 
@@ -889,6 +990,7 @@ paths:
 
     get:
       description: List all revisions.
+      operationId: getRevisions
       tags:
         - revisions
       parameters:
@@ -902,10 +1004,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pageable'
+                $ref: '#/components/schemas/PageWithRevisions'
               examples:
                 PageableWithVersions:
-                  summary: List Revisions
                   $ref: '#/components/examples/PageableWithRevisions'
         400:
           description: Pattern does not match.
@@ -924,6 +1025,7 @@ paths:
 
     get:
       description: Get a revision.
+      operationId: getRevision
       tags:
         - revisions
       parameters:
@@ -959,6 +1061,7 @@ paths:
 
     delete:
       description: Delete revision.
+      operationId: deleteRevision
       tags:
         - revisions
       parameters:
@@ -983,13 +1086,24 @@ paths:
 
     get:
       description: Download a revision.
+      operationId: downloadRevision
       tags:
         - revisions
       parameters:
         - $ref: '#/components/parameters/RevisionId'
       responses:
         200:
-          $ref: '#/components/responses/200RevisionDownload'
+          description: Revision downloaded successfully.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: Specifies the filename for the downloaded revision.
+              schema:
+                type: string
         404:
           description: Revision not found.
           content:

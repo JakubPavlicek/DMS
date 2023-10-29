@@ -11,7 +11,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User getUser(User user) {
+    public User getSavedUser(User user) {
         String username = user.getUsername();
         String email = user.getEmail();
 

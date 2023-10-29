@@ -7,7 +7,8 @@ public enum FileOperation {
 
     READ("File Read Error"),
     WRITE("File Write Error"),
-    DELETE("File Deletion Error");
+    DELETE("File Deletion Error"),
+    DEFAULT("File Operation Error");
 
     private final String title;
 

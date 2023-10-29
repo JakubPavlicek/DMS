@@ -1,10 +1,10 @@
 package com.dms.service;
 
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.filter.FilterItem;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionNotFoundException;
+import com.dms.filter.FilterItem;
 import com.dms.repository.DocumentRevisionRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -38,24 +38,22 @@ public class DocumentRevisionService {
         return documentCommonService.mapRevisionToRevisionDto(revision);
     }
 
-    private void replaceDocumentWithAdjacentRevision(Document document, UUID currentRevisionId) {
-        DocumentRevision currentDocumentRevision = documentCommonService.getRevision(currentRevisionId);
-
-        Long currentVersion = currentDocumentRevision.getVersion();
+    private void replaceDocumentWithAdjacentRevision(Document document) {
+        Long currentVersion = document.getVersion();
         DocumentRevision replacingRevision = revisionRepository.findPreviousByDocumentAndVersion(document, currentVersion)
                                                                .orElse(revisionRepository.findNextByDocumentAndVersion(document, currentVersion)
                                                                                          .orElse(null));
         if (replacingRevision == null)
-            throw new RevisionNotFoundException("Nebyla nalezena nahrazujici revize pro revizi s ID: " + currentRevisionId);
+            throw new RevisionNotFoundException(
+                "Revision cannnot be deleted because this is the only version left for the document with ID: " + document.getDocumentId()
+            );
 
         documentCommonService.updateDocumentToRevision(document, replacingRevision);
     }
 
-    private boolean isRevisionSetAsCurrent(Document document, UUID revisionId) {
-        DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
-
-        return document.getHash()
-                       .equals(documentRevision.getHash());
+    private boolean isRevisionSetAsCurrent(DocumentRevision revision, Document document) {
+        return revision.getVersion()
+                       .equals(document.getVersion());
     }
 
     @Transactional
@@ -63,8 +61,8 @@ public class DocumentRevisionService {
         DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
         Document document = documentRevision.getDocument();
 
-        if (isRevisionSetAsCurrent(document, revisionId))
-            replaceDocumentWithAdjacentRevision(document, revisionId);
+        if (isRevisionSetAsCurrent(documentRevision, document))
+            replaceDocumentWithAdjacentRevision(document);
 
         documentCommonService.deleteBlobIfDuplicateHashNotExists(documentRevision.getHash());
         revisionRepository.deleteByRevisionId(revisionId);
@@ -88,18 +86,14 @@ public class DocumentRevisionService {
         List<FilterItem> filterItems = documentCommonService.getRevisionFilterItemsFromFilter(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
+        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filterItems);
 
-        Page<DocumentRevision> revisions = getFilteredRevisions(filterItems, pageable);
+        Page<DocumentRevision> revisions = revisionRepository.findAll(specification, pageable);
         List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
                                                           .map(documentCommonService::mapRevisionToRevisionDto)
                                                           .toList();
 
         return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
-    }
-
-    private Page<DocumentRevision> getFilteredRevisions(List<FilterItem> filterItems, Pageable pageable) {
-        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filterItems);
-        return revisionRepository.findAll(specification, pageable);
     }
 
 }

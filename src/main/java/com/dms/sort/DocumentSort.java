@@ -13,6 +13,7 @@ public class DocumentSort {
         NAME,
         TYPE,
         PATH,
+        VERSION,
         CREATED_AT,
         UPDATED_AT
     }

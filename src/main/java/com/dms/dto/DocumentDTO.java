@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,8 +14,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DocumentDTO {
 
-    String documentId;
+    UUID documentId;
     UserDTO author;
+    Long version;
     String name;
     String type;
     String path;

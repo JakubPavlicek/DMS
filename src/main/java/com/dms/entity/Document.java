@@ -56,6 +56,9 @@ public class Document {
     private List<DocumentRevision> revisions;
 
     @Column(nullable = false)
+    private Long version;
+
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)

@@ -2,6 +2,7 @@ package com.dms.controller;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.DocumentWithVersionDTO;
 import com.dms.dto.UserRequest;
 import com.dms.service.DocumentService;
 import com.dms.validation.ValidFile;
@@ -165,14 +166,14 @@ public class DocumentController {
     }
 
     @GetMapping("/{documentId}/versions/{version}")
-    public DocumentDTO getDocument(
+    public DocumentWithVersionDTO getDocument(
         @NotNull(message = "Document ID is mandatory.")
         @PathVariable("documentId") UUID documentId,
 
         @Min(value = 1, message = "Version must be greater than or equal to 1.")
         @PathVariable("version") Long version
     ) {
-        return documentService.getDocument(documentId, version);
+        return documentService.getDocumentWithVersion(documentId, version);
     }
 
     @PutMapping("/{documentId}/versions/{version}")

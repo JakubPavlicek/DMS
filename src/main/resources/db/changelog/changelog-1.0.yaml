@@ -5,12 +5,19 @@ databaseChangeLog:
       author: kuba
       changes:
 
+        - createSequence:
+            sequenceName: user_id_sequence
+            incrementBy: 1
+            startValue: 1
+            dataType: bigint
+
         - createTable:
             tableName: app_user
             columns:
               - column:
                   name: user_id
-                  type: uuid
+                  type: bigint
+                  defaultValueSequenceNext: user_id_sequence
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -38,10 +45,15 @@ databaseChangeLog:
                     unique: true
               - column:
                   name: user_id
-                  type: uuid
+                  type: bigint
                   constraints:
                     nullable: false
                     foreignKeyName: fk_document_user
+              - column:
+                  name: version
+                  type: bigint
+                  constraints:
+                    nullable: false
               - column:
                   name: name
                   type: varchar(255)
@@ -85,7 +97,7 @@ databaseChangeLog:
                     unique: true
               - column:
                   name: user_id
-                  type: uuid
+                  type: bigint
                   constraints:
                     nullable: false
                     foreignKeyName: fk_revision_user

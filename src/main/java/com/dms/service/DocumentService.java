@@ -2,12 +2,13 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.filter.FilterItem;
+import com.dms.dto.DocumentWithVersionDTO;
 import com.dms.dto.UserRequest;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
+import com.dms.filter.FilterItem;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -46,39 +47,24 @@ public class DocumentService {
         return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
-    public DocumentDTO getDocument(UUID documentId, Long version) {
-        if (Objects.isNull(version))
-            return getDocument(documentId);
+    public DocumentWithVersionDTO getDocumentWithVersion(UUID documentId, Long version) {
+        Document document = documentCommonService.getDocument(documentId);
+        DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
 
-        Document document = documentCommonService.getDocument(documentId, version);
-
-        return documentCommonService.mapDocumentToDocumentDto(document);
+        return DocumentWithVersionDTO.builder()
+                                     .documentId(document.getDocumentId())
+                                     .version(revision.getVersion())
+                                     .author(documentCommonService.mapUserToUserDto(revision.getAuthor()))
+                                     .name(revision.getName())
+                                     .type(revision.getType())
+                                     .path(revision.getPath())
+                                     .createdAt(revision.getCreatedAt())
+                                     .build();
     }
 
     private LocalDateTime getDocumentCreatedAt(UUID documentId) {
         return documentRepository.getCreatedAtByDocumentId(documentId)
-                                 .orElseThrow(() -> new RuntimeException("Nebyl nalezen cas vytvoreni dokumentu s ID: " + documentId));
-    }
-
-    public Page<DocumentRevisionDTO> getDocumentRevisions(UUID documentId, int pageNumber, int pageSize, String sort, String filter) {
-        Document document = documentCommonService.getDocument(documentId);
-
-        List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
-        List<FilterItem> filterItems = documentCommonService.getRevisionFilterItemsFromFilter(filter);
-
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
-
-        Page<DocumentRevision> revisions = getFilteredDocumentRevisions(filterItems, document, pageable);
-        List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
-                                                          .map(documentCommonService::mapRevisionToRevisionDto)
-                                                          .toList();
-
-        return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
-    }
-
-    private Page<DocumentRevision> getFilteredDocumentRevisions(List<FilterItem> filterItems, Document document, Pageable pageable) {
-        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filterItems);
-        return documentCommonService.getRevisionsBySpecification(specification, pageable);
+                                 .orElseThrow(() -> new RuntimeException("Creation time not found for file with ID: " + documentId));
     }
 
     private User getUserFromUserRequest(UserRequest userRequest) {
@@ -87,37 +73,42 @@ public class DocumentService {
                         .email(userRequest.getEmail())
                         .build();
 
-        return userService.getUser(user);
+        return userService.getSavedUser(user);
     }
 
-    private Document createDocumentFromUserRequestAndFile(UserRequest userRequest, MultipartFile file, String path) {
+    private Document createDocument(UserRequest userRequest, MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
         User author = getUserFromUserRequest(userRequest);
 
-        return createDocument(file, hash, path, author);
-    }
-
-    private Document createDocument(MultipartFile file, String hash, String path, User author) {
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
         String cleanPath = StringUtils.cleanPath(originalFileName);
         String name = StringUtils.getFilename(cleanPath);
         String type = file.getContentType();
-
-        if(documentCommonService.pathWithFileAlreadyExists(path, name, author))
-            throw new RuntimeException("Soubor: " + name + " se jiz v ceste: " + path + " vyskytuje");
 
         return Document.builder()
                        .name(name)
                        .type(type)
                        .path(path)
                        .hash(hash)
+                       .version(1L)
                        .author(author)
                        .build();
     }
 
+    private void validateUniquePath(String path, Document document) {
+        String filename = document.getName();
+        User author = document.getAuthor();
+
+        // user can't have a duplicate path for a document with the same name
+        if (documentCommonService.pathWithFileAlreadyExists(path, filename, author))
+            throw new RuntimeException("File: " + filename + " with path: " + path + " already exists");
+    }
+
     @Transactional
     public DocumentDTO uploadDocument(UserRequest userRequest, MultipartFile file, String path) {
-        Document document = createDocumentFromUserRequestAndFile(userRequest, file, path);
+        Document document = createDocument(userRequest, file, path);
+
+        validateUniquePath(path, document);
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
         Document savedDocument = documentRepository.saveAndFlush(document);
@@ -130,14 +121,18 @@ public class DocumentService {
     @Transactional
     public DocumentDTO uploadNewDocumentVersion(UUID documentId, UserRequest userRequest, MultipartFile file, String path) {
         if (!documentRepository.existsById(documentId))
-            throw new DocumentNotFoundException("Nebyl nalezen soubor s ID: " + documentId + " pro nahrazeni");
+            throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
 
-        Document document = createDocumentFromUserRequestAndFile(userRequest, file, path);
+        Document document = createDocument(userRequest, file, path);
         document.setDocumentId(documentId);
+        document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);
+
+        validateUniquePath(path, document);
 
         // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
         Document savedDocument = documentRepository.saveAndFlush(document);
 
+        // createdAt column is not initialized because of "updatable = false" -> set it manually
         LocalDateTime createdAt = getDocumentCreatedAt(documentId);
         savedDocument.setCreatedAt(createdAt);
 
@@ -193,8 +188,9 @@ public class DocumentService {
         List<FilterItem> filterItems = documentCommonService.getDocumentFilterItemsFromFilter(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
+        Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
 
-        Page<Document> documents = getFilteredDocuments(filterItems, pageable);
+        Page<Document> documents = documentRepository.findAll(specification, pageable);
         List<DocumentDTO> documentDTOs = documents.stream()
                                                   .map(documentCommonService::mapDocumentToDocumentDto)
                                                   .toList();
@@ -202,9 +198,21 @@ public class DocumentService {
         return new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
     }
 
-    private Page<Document> getFilteredDocuments(List<FilterItem> filterItems, Pageable pageable) {
-        Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
-        return documentRepository.findAll(specification, pageable);
+    public Page<DocumentRevisionDTO> getDocumentRevisions(UUID documentId, int pageNumber, int pageSize, String sort, String filter) {
+        Document document = documentCommonService.getDocument(documentId);
+
+        List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
+        List<FilterItem> filterItems = documentCommonService.getRevisionFilterItemsFromFilter(filter);
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
+        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filterItems);
+
+        Page<DocumentRevision> revisions = documentCommonService.getRevisionsBySpecification(specification, pageable);
+        List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
+                                                          .map(documentCommonService::mapRevisionToRevisionDto)
+                                                          .toList();
+
+        return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
     }
 
     public Page<Long> getDocumentVersions(UUID documentId, int pageNumber, int pageSize) {
@@ -218,15 +226,9 @@ public class DocumentService {
     public DocumentDTO moveDocument(UUID documentId, String path) {
         Document document = documentCommonService.getDocument(documentId);
 
-        String filename = document.getName();
-        User author = document.getAuthor();
-
-        // user can't have a duplicate path for a document with the same name
-        if(documentCommonService.pathWithFileAlreadyExists(path, filename, author))
-            throw new RuntimeException("Soubor: " + filename + " se jiz v ceste: " + path + " vyskytuje");
+        validateUniquePath(path, document);
 
         document.setPath(path);
-
         Document savedDocument = documentRepository.save(document);
 
         documentCommonService.saveRevisionFromDocument(savedDocument);

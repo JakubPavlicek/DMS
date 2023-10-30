@@ -23,28 +23,28 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
     ├── main
     │   ├── java
     │   │   └── com.dms
-    │   │       ├── config                              // configurations and properties validation
-    │   │       ├── controller                          // REST-API controller
-    │   │       ├── entity                              // database tables
-    │   │       ├── exception                           // exceptions and exception handling
-    │   │       ├── filter                              // filtering in requests
-    │   │       ├── hash                                // hasher for blobs
-    │   │       ├── mapper                              // mapping between objects
-    │   │       ├── repository                          // DAOs
-    │   │       ├── service                             // service
-    │   │       ├── sort                                // sorting in requests
-    │   │       ├── specification                       // specification used for filtering
-    │   │       └── DocumentManagerApplication.java     // Main application class
+    │   │       ├── config                            // configurations and properties validation
+    │   │       ├── controller                        // REST-API controller
+    │   │       ├── entity                            // database tables
+    │   │       ├── exception                         // exceptions and exception handling
+    │   │       ├── filter                            // filtering in requests
+    │   │       ├── hash                              // hasher for blobs
+    │   │       ├── mapper                            // mapping between objects
+    │   │       ├── repository                        // DAOs
+    │   │       ├── service                           // service
+    │   │       ├── sort                              // sorting in requests
+    │   │       ├── specification                     // specification used for filtering
+    │   │       └── DocumentManagerApplication.java   // Main application class
     │   └── resources
-    │       ├── db.changelog                            // LiquiBase changelogs
-    │       ├── static                                  // OpenAPI files
-    │       │   ├── example                             // OpenAPI examples
-    │       │   ├── parameter                           // OpenAPI parameters
-    │       │   ├── response                            // OpenAPI responses
-    │       │   ├── schema                              // OpenAPI schemas
-    │       │   └── openapi.yaml                        // main OpenAPI file 
-    │       ├── application.yaml                        // SpringBoot + application config
-    │       └── log4j2.yaml                             // Logger config
+    │       ├── db.changelog                          // LiquiBase changelogs
+    │       ├── static                                // OpenAPI files
+    │       │   ├── example                           // OpenAPI examples
+    │       │   ├── parameter                         // OpenAPI parameters
+    │       │   ├── response                          // OpenAPI responses
+    │       │   ├── schema                            // OpenAPI schemas
+    │       │   └── openapi.yaml                      // main OpenAPI file 
+    │       ├── application.yaml                      // SpringBoot + application config
+    │       └── log4j2.yaml                           // Logger config
     └── test
 
 ```

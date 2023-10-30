@@ -140,7 +140,7 @@ paths:
                   format: binary
                 path:
                   type: string
-                  description: Path in which the document will be moved.
+                  description: Path in which the document will be stored.
                   example: /home
                   minLength: 1
                   maxLength: 255
@@ -281,7 +281,7 @@ paths:
                   format: binary
                 path:
                   type: string
-                  description: Path in which the document will be moved.
+                  description: Path in which the document will be stored.
                   example: /home
                   minLength: 1
                   maxLength: 255

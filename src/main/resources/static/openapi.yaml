@@ -606,7 +606,7 @@ paths:
                     type: http://localhost:8080/errors/revision-not-found
                     title: Revision Not Found
                     status: 404
-                    detail: "Revision with ID: 1 was not found"
+                    detail: "Revision with ID: 1 was not found for document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5"
                     instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/revisions/1
 
   /documents/{documentId}/versions:

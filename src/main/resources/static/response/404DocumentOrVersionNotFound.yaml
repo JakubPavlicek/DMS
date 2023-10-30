@@ -18,5 +18,5 @@ content:
           type: http://localhost:8080/errors/revision-not-found
           title: Revision Not Found
           status: 404
-          detail: "Revision with version: 5 not found"
+          detail: "Revision with version: 5 not found for document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5"
           instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/5

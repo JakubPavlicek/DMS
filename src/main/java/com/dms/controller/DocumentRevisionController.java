@@ -18,18 +18,18 @@ public class DocumentRevisionController implements RevisionsApi {
     private final DocumentRevisionService revisionService;
 
     @Override
-    public ResponseEntity<Void> deleteRevision(UUID revisionId) {
+    public ResponseEntity<Void> deleteRevision(String revisionId) {
         revisionService.deleteRevision(revisionId);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Resource> downloadRevision(UUID revisionId) {
+    public ResponseEntity<Resource> downloadRevision(String revisionId) {
         return revisionService.downloadRevision(revisionId);
     }
 
     @Override
-    public ResponseEntity<DocumentRevisionDTO> getRevision(UUID revisionId) {
+    public ResponseEntity<DocumentRevisionDTO> getRevision(String revisionId) {
         return ResponseEntity.ok(revisionService.getRevision(revisionId));
     }
 

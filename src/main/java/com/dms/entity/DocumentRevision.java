@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,18 +30,25 @@ import java.util.UUID;
 public class DocumentRevision {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @SequenceGenerator(
+        name = "revision_id_generator",
+        sequenceName = "revision_id_sequence",
+        allocationSize = 1
+    )
+    @GeneratedValue(
+        strategy = GenerationType.SEQUENCE,
+        generator = "revision_id_generator"
+    )
     @Column(
-        length = 36,
         nullable = false,
         unique = true
     )
-    private UUID revisionId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
         name = "user_id",
-        referencedColumnName = "userId",
+        referencedColumnName = "id",
         foreignKey = @ForeignKey(name = "fk_revision_user")
     )
     private User author;
@@ -47,10 +56,16 @@ public class DocumentRevision {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "document_id",
-        referencedColumnName = "documentId",
+        referencedColumnName = "id",
         foreignKey = @ForeignKey(name = "fk_revision_document")
     )
     private Document document;
+
+    @Column(
+        nullable = false,
+        unique = true
+    )
+    private String revisionId;
 
     @Column(nullable = false)
     private Long version;
@@ -75,5 +90,11 @@ public class DocumentRevision {
         updatable = false
     )
     private LocalDateTime createdAt;
+
+    @PrePersist
+    private void generateId() {
+        if (revisionId == null)
+            revisionId = UUID.randomUUID().toString();
+    }
 
 }

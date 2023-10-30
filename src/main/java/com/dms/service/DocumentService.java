@@ -35,7 +35,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -46,12 +45,12 @@ public class DocumentService {
     private final DocumentCommonService documentCommonService;
     private final UserService userService;
 
-    public DocumentDTO getDocument(UUID documentId) {
+    public DocumentDTO getDocument(String documentId) {
         Document document = documentCommonService.getDocument(documentId);
         return documentCommonService.mapDocumentToDocumentDto(document);
     }
 
-    public DocumentWithVersionDTO getDocumentWithVersion(UUID documentId, Long version) {
+    public DocumentWithVersionDTO getDocumentWithVersion(String documentId, Long version) {
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
 
@@ -66,7 +65,7 @@ public class DocumentService {
                                      .build();
     }
 
-    private LocalDateTime getDocumentCreatedAt(UUID documentId) {
+    private LocalDateTime getDocumentCreatedAt(String documentId) {
         return documentRepository.getCreatedAtByDocumentId(documentId)
                                  .orElseThrow(() -> new RuntimeException("Creation time not found for file with ID: " + documentId));
     }
@@ -123,11 +122,14 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadNewDocumentVersion(UUID documentId, UserRequest userRequest, MultipartFile file, String path) {
-        if (!documentRepository.existsById(documentId))
+    public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequest userRequest, MultipartFile file, String path) {
+        if (!documentRepository.existsByDocumentId(documentId))
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
 
+        Document databaseDocument = documentCommonService.getDocument(documentId);
+
         Document document = createDocument(userRequest, file, path);
+        document.setId(databaseDocument.getId());
         document.setDocumentId(documentId);
         document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);
 
@@ -146,7 +148,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO switchToVersion(UUID documentId, Long version) {
+    public DocumentDTO switchToVersion(String documentId, Long version) {
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
 
@@ -156,7 +158,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO switchToRevision(UUID documentId, UUID revisionId) {
+    public DocumentDTO switchToRevision(String documentId, String revisionId) {
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndId(document, revisionId);
 
@@ -166,7 +168,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public void deleteDocumentWithRevisions(UUID documentId) {
+    public void deleteDocumentWithRevisions(String documentId) {
         Document document = documentCommonService.getDocument(documentId);
 
         List<DocumentRevision> documentRevisions = document.getRevisions();
@@ -176,7 +178,7 @@ public class DocumentService {
         documentRepository.delete(document);
     }
 
-    public ResponseEntity<Resource> downloadDocument(UUID documentId) {
+    public ResponseEntity<Resource> downloadDocument(String documentId) {
         Document document = documentCommonService.getDocument(documentId);
         String hash = document.getHash();
         byte[] data = documentCommonService.getBlob(hash);
@@ -203,7 +205,7 @@ public class DocumentService {
         return documentCommonService.mapPageToPageWithDocuments(documentDTOS);
     }
 
-    public PageWithRevisions getDocumentRevisions(UUID documentId, int pageNumber, int pageSize, String sort, String filter) {
+    public PageWithRevisions getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
         Document document = documentCommonService.getDocument(documentId);
 
         List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
@@ -221,7 +223,7 @@ public class DocumentService {
         return documentCommonService.mapPageToPageWithRevisions(documentRevisionDTOS);
     }
 
-    public PageWithVersions getDocumentVersions(UUID documentId, int pageNumber, int pageSize) {
+    public PageWithVersions getDocumentVersions(String documentId, int pageNumber, int pageSize) {
         Document document = documentCommonService.getDocument(documentId);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
@@ -229,7 +231,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO moveDocument(UUID documentId, String path) {
+    public DocumentDTO moveDocument(String documentId, String path) {
         Document document = documentCommonService.getDocument(documentId);
 
         validateUniquePath(path, document);

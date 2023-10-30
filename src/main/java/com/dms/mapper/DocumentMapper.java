@@ -5,6 +5,7 @@ import com.dms.entity.Document_;
 public class DocumentMapper {
 
     public enum Field {
+        DOCUMENT_ID,
         NAME,
         TYPE,
         PATH,
@@ -18,6 +19,7 @@ public class DocumentMapper {
         Field documentField = Field.valueOf(field.toUpperCase());
 
         return switch (documentField) {
+            case DOCUMENT_ID -> Document_.DOCUMENT_ID;
             case NAME -> Document_.NAME;
             case TYPE -> Document_.TYPE;
             case PATH -> Document_.PATH;

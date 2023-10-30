@@ -5,6 +5,7 @@ import com.dms.entity.DocumentRevision_;
 public class RevisionMapper {
 
     public enum Field {
+        REVISION_ID,
         NAME,
         TYPE,
         PATH,
@@ -17,6 +18,7 @@ public class RevisionMapper {
         Field revisionField = Field.valueOf(field.toUpperCase());
 
         return switch (revisionField) {
+            case REVISION_ID -> DocumentRevision_.REVISION_ID;
             case NAME -> DocumentRevision_.NAME;
             case TYPE -> DocumentRevision_.TYPE;
             case PATH -> DocumentRevision_.PATH;

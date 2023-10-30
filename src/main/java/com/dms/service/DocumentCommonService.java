@@ -33,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,12 +46,12 @@ public class DocumentCommonService {
     private final BlobStorageService blobStorageService;
     private final ModelMapper modelMapper;
 
-    public Document getDocument(UUID documentId) {
-        return documentRepository.findById(documentId)
+    public Document getDocument(String documentId) {
+        return documentRepository.findByDocumentId(documentId)
                                  .orElseThrow(() -> new DocumentNotFoundException("File with ID: " + documentId + " not found"));
     }
 
-    public DocumentRevision getRevision(UUID revisionId) {
+    public DocumentRevision getRevision(String revisionId) {
         return revisionRepository.findByRevisionId(revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
     }
@@ -62,7 +61,7 @@ public class DocumentCommonService {
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with version: " + version + " not found"));
     }
 
-    public DocumentRevision getRevisionByDocumentAndId(Document document, UUID revisionId) {
+    public DocumentRevision getRevisionByDocumentAndId(Document document, String revisionId) {
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
     }

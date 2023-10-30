@@ -36,7 +36,7 @@ public class User {
         nullable = false,
         unique = true
     )
-    private Long userId;
+    private Long id;
 
     @Column(
         length = 40,

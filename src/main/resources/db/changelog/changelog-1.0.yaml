@@ -2,20 +2,32 @@ databaseChangeLog:
 
   - changeSet:
       id: 1
-      author: kuba
+      author: JakubPavlicek
       changes:
 
         - createSequence:
             sequenceName: user_id_sequence
-            incrementBy: 1
             startValue: 1
+            incrementBy: 1
+            dataType: bigint
+
+        - createSequence:
+            sequenceName: document_id_sequence
+            startValue: 1
+            incrementBy: 1
+            dataType: bigint
+
+        - createSequence:
+            sequenceName: revision_id_sequence
+            startValue: 1
+            incrementBy: 1
             dataType: bigint
 
         - createTable:
             tableName: app_user
             columns:
               - column:
-                  name: user_id
+                  name: id
                   type: bigint
                   defaultValueSequenceNext: user_id_sequence
                   constraints:
@@ -37,8 +49,9 @@ databaseChangeLog:
             tableName: document
             columns:
               - column:
-                  name: document_id
-                  type: uuid
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: document_id_sequence
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -49,6 +62,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     foreignKeyName: fk_document_user
+              - column:
+                  name: document_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
               - column:
                   name: version
                   type: bigint
@@ -89,8 +108,9 @@ databaseChangeLog:
             tableName: document_revision
             columns:
               - column:
-                  name: revision_id
-                  type: uuid
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: revision_id_sequence
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -103,10 +123,16 @@ databaseChangeLog:
                     foreignKeyName: fk_revision_user
               - column:
                   name: document_id
-                  type: uuid
+                  type: bigint
                   constraints:
                     nullable: false
                     foreignKeyName: fk_revision_document
+              - column:
+                  name: revision_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
               - column:
                   name: version
                   type: bigint
@@ -143,18 +169,18 @@ databaseChangeLog:
             baseColumnNames: user_id
             constraintName: fk_document_user
             referencedTableName: app_user
-            referencedColumnNames: user_id
+            referencedColumnNames: id
 
         - addForeignKeyConstraint:
             baseTableName: document_revision
             baseColumnNames: user_id
             constraintName: fk_revision_user
             referencedTableName: app_user
-            referencedColumnNames: user_id
+            referencedColumnNames: id
 
         - addForeignKeyConstraint:
             baseTableName: document_revision
             baseColumnNames: document_id
             constraintName: fk_revision_document
             referencedTableName: document
-            referencedColumnNames: document_id
+            referencedColumnNames: id

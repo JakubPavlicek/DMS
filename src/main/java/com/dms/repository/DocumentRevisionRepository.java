@@ -13,22 +13,21 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, UUID>, JpaSpecificationExecutor<DocumentRevision> {
+public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, Long>, JpaSpecificationExecutor<DocumentRevision> {
 
-    Optional<DocumentRevision> findByRevisionId(UUID revisionId);
+    Optional<DocumentRevision> findByRevisionId(String revisionId);
 
     Optional<DocumentRevision> findByDocumentAndVersion(Document document, Long version);
 
-    Optional<DocumentRevision> findByDocumentAndRevisionId(Document document, UUID revisionId);
+    Optional<DocumentRevision> findByDocumentAndRevisionId(Document document, String revisionId);
 
     List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
 
     Page<DocumentRevision> findAllByDocument(Document document, Pageable pageable);
 
-    void deleteByRevisionId(UUID revisionId);
+    void deleteByRevisionId(String revisionId);
 
     @Query("SELECT COUNT(revision.hash) > 1 FROM DocumentRevision revision WHERE revision.hash = :hash")
     boolean duplicateHashExists(String hash);

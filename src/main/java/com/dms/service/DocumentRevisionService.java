@@ -24,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class DocumentRevisionService {
 
     private final DocumentCommonService documentCommonService;
 
-    public DocumentRevisionDTO getRevision(UUID revisionId) {
+    public DocumentRevisionDTO getRevision(String revisionId) {
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
         return documentCommonService.mapRevisionToRevisionDto(revision);
     }
@@ -58,7 +57,7 @@ public class DocumentRevisionService {
     }
 
     @Transactional
-    public void deleteRevision(UUID revisionId) {
+    public void deleteRevision(String revisionId) {
         DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
         Document document = documentRevision.getDocument();
 
@@ -71,7 +70,7 @@ public class DocumentRevisionService {
         documentCommonService.updateRevisionVersionsForDocument(document);
     }
 
-    public ResponseEntity<Resource> downloadRevision(UUID revisionId) {
+    public ResponseEntity<Resource> downloadRevision(String revisionId) {
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
         String hash = revision.getHash();
         byte[] data = documentCommonService.getBlob(hash);

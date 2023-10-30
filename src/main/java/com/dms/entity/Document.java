@@ -11,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,18 +34,25 @@ import java.util.UUID;
 public class Document {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @SequenceGenerator(
+        name = "document_id_generator",
+        sequenceName = "document_id_sequence",
+        allocationSize = 1
+    )
+    @GeneratedValue(
+        strategy = GenerationType.SEQUENCE,
+        generator = "document_id_generator"
+    )
     @Column(
-        length = 36,
         nullable = false,
         unique = true
     )
-    private UUID documentId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
         name = "user_id",
-        referencedColumnName = "userId",
+        referencedColumnName = "id",
         foreignKey = @ForeignKey(name = "fk_document_user")
     )
     private User author;
@@ -54,6 +63,12 @@ public class Document {
         mappedBy = "document"
     )
     private List<DocumentRevision> revisions;
+
+    @Column(
+        nullable = false,
+        unique = true
+    )
+    private String documentId;
 
     @Column(nullable = false)
     private Long version;
@@ -82,5 +97,11 @@ public class Document {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    private void generateId() {
+        if (documentId == null)
+            documentId = UUID.randomUUID().toString();
+    }
 
 }

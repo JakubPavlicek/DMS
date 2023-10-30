@@ -23,6 +23,8 @@ components:
       $ref: './schema/DocumentRevisionDTO.yaml'
     UserRequest:
       $ref: './schema/UserRequest.yaml'
+    PathRequest:
+      $ref: './schema/PathRequest.yaml'
     ProblemDetail:
       $ref: './schema/ProblemDetail.yaml'
     ProblemDetailWithErrors:
@@ -139,11 +141,7 @@ paths:
                   type: string
                   format: binary
                 path:
-                  type: string
-                  description: Path in which the document will be stored.
-                  example: /home
-                  minLength: 1
-                  maxLength: 255
+                  $ref: '#/components/schemas/PathRequest'
       responses:
         201:
           description: Document uploaded successfully.
@@ -280,11 +278,7 @@ paths:
                   type: string
                   format: binary
                 path:
-                  type: string
-                  description: Path in which the document will be stored.
-                  example: /home
-                  minLength: 1
-                  maxLength: 255
+                  $ref: '#/components/schemas/PathRequest'
       responses:
         201:
           description: New document version uploaded successfully.
@@ -488,14 +482,12 @@ paths:
         content:
           multipart/form-data:
             schema:
+              required:
+                - path
               type: object
               properties:
                 path:
-                  type: string
-                  description: Path in which the document will be moved.
-                  example: /home
-                  minLength: 1
-                  maxLength: 255
+                  $ref: '#/components/schemas/PathRequest'
       responses:
         200:
           description: Document moved successfully.
@@ -503,6 +495,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocumentDTO'
+        400:
+          description: Either invalid data provided or some request parts are missing.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ProblemDetail'
+                  - $ref: '#/components/schemas/ProblemDetailWithErrors'
+              examples:
+                InvalidDataProvided:
+                  summary: Invalid Data Provided
+                  value:
+                    type: http://localhost:8080/errors/invalid-data
+                    title: Invalid Data Provided
+                    status: 400
+                    instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/move
+                    errors: [ "size must be bewteen 1 and 255" ]
+                MissingRequestPart:
+                  summary: Missing Request Part
+                  value:
+                    type: http://localhost:8080/errors/missing-request-part
+                    title: Missing Request Part
+                    status: 400
+                    detail: Required part 'user' is not present.
+                    instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/move
         409:
           description: File with path already exists.
           content:

@@ -1,0 +1,8 @@
+type: object
+description: Path in which the document will be stored.
+properties:
+  path:
+    type: string
+    example: /home
+    minLength: 1
+    maxLength: 255

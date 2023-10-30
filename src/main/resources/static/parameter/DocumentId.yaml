@@ -4,4 +4,3 @@ required: true
 description: The document ID.
 schema:
   type: string
-  format: uuid

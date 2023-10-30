@@ -4,4 +4,3 @@ required: true
 description: The revision ID.
 schema:
   type: string
-  format: uuid

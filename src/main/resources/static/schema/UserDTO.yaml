@@ -1,9 +1,5 @@
 type: object
 properties:
-  userId:
-    type: integer
-    format: int64
-    example: 1
   username:
     type: string
     example: jakub

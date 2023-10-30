@@ -40,44 +40,4 @@ public class DocumentRevisionController implements RevisionsApi {
         return ResponseEntity.ok(revisionService.getRevisions(page, limit, sort, filter));
     }
 
-    //    @GetMapping
-//    public Page<DocumentRevisionDTO> getRevisions(
-//        @Min(0)
-//        @RequestParam(name = "page", defaultValue = "0") int pageNumber,
-//
-//        @Min(1)
-//        @RequestParam(name = "limit", defaultValue = "10") int pageSize,
-//
-//        @RequestParam(name = "sort", defaultValue = "name:asc") String sort,
-//
-//        @RequestParam(name = "filter", defaultValue = "name:") String filter
-//    ) {
-//        return revisionService.getRevisions(pageNumber, pageSize, sort, filter);
-//    }
-//
-//    @GetMapping("/{revisionId}")
-//    public DocumentRevisionDTO getRevision(
-//        @NotNull(message = "Revision ID is mandatory.")
-//        @PathVariable("revisionId") UUID revisionId
-//    ) {
-//        return revisionService.getRevision(revisionId);
-//    }
-//
-//    @DeleteMapping("/{revisionId}")
-//    public ResponseEntity<Void> deleteRevision(
-//        @NotNull(message = "Revision ID is mandatory.")
-//        @PathVariable("revisionId") UUID revisionId
-//    ) {
-//        revisionService.deleteRevision(revisionId);
-//        return ResponseEntity.noContent().build();
-//    }
-//
-//    @GetMapping("/{revisionId}/download")
-//    public ResponseEntity<Resource> downloadRevision(
-//        @NotNull(message = "Revision ID is mandatory.")
-//        @PathVariable("revisionId") UUID revisionId
-//    ) {
-//        return revisionService.downloadRevision(revisionId);
-//    }
-
 }

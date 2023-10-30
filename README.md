@@ -66,7 +66,7 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
 #### /documents/{documentId}/revisions/{revisionId}
 - `PUT` : Switch document to a specific revision 
 
-#### /documents/{documentId}/versions [GET]
+#### /documents/{documentId}/versions
 - `GET` : Retrieve a list of document versions
 
 #### /documents/{documentId}/versions/{version}

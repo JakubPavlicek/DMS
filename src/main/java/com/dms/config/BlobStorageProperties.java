@@ -1,5 +1,7 @@
 package com.dms.config;
 
+import com.dms.exception.FileOperation;
+import com.dms.exception.FileOperationException;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
@@ -18,7 +20,7 @@ import java.nio.file.Paths;
 @ConfigurationProperties(prefix = "storage")
 public class BlobStorageProperties implements Validator {
 
-    @Value("${storage.path:#{systemProperties['user.home'] + systemProperties['file.separator'] + 'blob_storage'}}")
+    @Value("${storage.path}")
     private String path;
 
     @Min(value = 1, message = "Minimalni delka prefixu pro adresare je 1")
@@ -35,8 +37,13 @@ public class BlobStorageProperties implements Validator {
     public void validate(Object target, Errors errors) {
         Path storagePath = Paths.get(path);
 
-        if(Files.notExists(storagePath))
-            errors.rejectValue("path", "Blob Storage Path Not Found", "Blob storage se zadanou cestou neexistuje");
+        if(Files.notExists(storagePath)) {
+            try {
+                Files.createDirectory(storagePath);
+            } catch (Exception e) {
+                throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
+            }
+        }
     }
 
 }

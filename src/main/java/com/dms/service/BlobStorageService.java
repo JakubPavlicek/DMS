@@ -35,7 +35,7 @@ public class BlobStorageService {
 
             Files.write(filePath, file.getBytes());
         } catch (Exception exception) {
-            throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: " + filePath + " to storage");
+            throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: " + file.getOriginalFilename() + " to storage");
         }
 
         return hash;
@@ -47,7 +47,7 @@ public class BlobStorageService {
         try {
             return Files.readAllBytes(filePath);
         } catch (Exception e) {
-            throw new FileOperationException(FileOperation.READ, "An error occurred while reading the file: " + filePath);
+            throw new FileOperationException(FileOperation.READ, "An error occurred while reading the file");
         }
     }
 
@@ -57,7 +57,7 @@ public class BlobStorageService {
         try {
             Files.deleteIfExists(filePath);
         } catch (Exception e) {
-            throw new FileOperationException(FileOperation.DELETE, "An error occurred while deleting the file: " + filePath);
+            throw new FileOperationException(FileOperation.DELETE, "An error occurred while deleting the file");
         }
 
         Path directoryPath = getDirectoryPath(hash);

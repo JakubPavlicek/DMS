@@ -8,136 +8,80 @@ Jedná se o aplikaci typu SaaS (Software as a Service) pro centrální uložení
 
 Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček ze Západočeské univerzity v Plzni - Fakulta aplikovaných věd.
 
-## Endpointy
-
-### /documents [GET]
-
-- získání souborů
-
-### /documents/upload [POST]
-
-- nahrání souboru
-
-### /documents/{documentId} [GET]
-
-- získání informace o souboru
-
-### /documents/{documentId} [PUT]
-
-- nahrání změny souboru
-
-### /documents/{documentId} [DELETE]
-
-- smazání souboru
-
-### /documents/{documentId}/download [GET]
-
-- stažení souboru
-
-### /document/{documentId}/move [PUT]
-
-- přesunutí souboru
-
-### /documents/{documentId}/revisions [GET]
-
-- získání revizí souboru
-
-### /documents/{documentId}/revisions/{revisionId} [GET]
-
-- přepnutí se na revizi
-
-### /documents/{documentId}/versions [GET]
-
-- získání verzí souboru
-
-### /documents/{documentId}/versions/{version} [GET]
-
-- získání souboru dané verze
-
-### /documents/{documentId}/versions/{version} [PUT]
-
-- přepnutí se na verzi souboru
-
-### /revisions [GET]
-
-- získání informací o všech revizích
-
-### /revisions/{documentId} [GET]
-
-- získání informace o revizi
-
-### /revisions/{documentId} [DELETE]
-
-- smazání revize
-
-### /revisions/{documentId}/download [GET]
-
-- stažení revize
-
 ## Moduly
 
-### src
+```
+└── src
+    ├── main
+    │   ├── java
+    │   │   └── com.dms
+    │   │       ├── config                              // configurations and properties validation
+    │   │       ├── controller                          // REST-API controller
+    │   │       ├── entity                              // database tables
+    │   │       ├── exception                           // exceptions and exception handling
+    │   │       ├── filter                              // filtering in requests
+    │   │       ├── hash                                // hasher for blobs
+    │   │       ├── mapper                              // mapping between objects
+    │   │       ├── repository                          // DAOs
+    │   │       ├── service                             // service
+    │   │       ├── sort                                // sorting in requests
+    │   │       ├── specification                       // specification used for filtering
+    │   │       └── DocumentManagerApplication.java     // Main application class
+    │   └── resources
+    │       ├── db.changelog                            // LiquiBase changelogs
+    │       ├── static                                  // OpenAPI files
+    │       │   ├── example                             // OpenAPI examples
+    │       │   ├── parameter                           // OpenAPI parameters
+    │       │   ├── response                            // OpenAPI responses
+    │       │   ├── schema                              // OpenAPI schemas
+    │       │   └── openapi.yaml                        // main OpenAPI file 
+    │       ├── application.yaml                        // SpringBoot + application config
+    │       └── log4j2.yaml                             // Logger config
+    └── test
 
-- zdrojové kódy aplikace
+```
 
-### src/main
+## API
 
-- 2 package:
-  - **java** - Java kód
-  - **resources** - konfigurační soubory
+#### /documents
+- `GET` : Retrieve a list of the documents
 
-### src/main/java/com/dms
+#### /documents/upload
+- `POST` : Upload a document
 
-#### config
+#### /documents/{documentId}
+- `GET` : Retrieve a document
+- `PUT` : Upload new document version
+- `DELETE` : Delete a document and all revisions associated to the document
 
-- konfigurace Springu + přepravky na hodnoty v konfiguračním souboru
+#### /documents/{documentId}/download
+- `GET` : Download a document
 
-#### controller
+#### /document/{documentId}/move
+- `PUT` : Move a document
 
-- jednotlivé endpointy REST-API
+#### /documents/{documentId}/revisions
+- `GET` : Retrieve a list of document revisions
 
-#### dto
+#### /documents/{documentId}/revisions/{revisionId}
+- `PUT` : Switch document to a specific revision 
 
-- data transfer objects
+#### /documents/{documentId}/versions [GET]
+- `GET` : Retrieve a list of document versions
 
-#### entity
+#### /documents/{documentId}/versions/{version}
+- `GET` : Retrieve a document with a specific version
+- `PUT` : Switch document to a specific version 
 
-- tabulky databáze
+#### /revisions 
+- `GET` : Retrieve a list of revisions
 
-#### exception
+#### /revisions/{documentId}
+- `GET` : Retrieve a revision
+- `DELETE` : Delete a revision
 
-- odchytávání výjimek
-- výjimky
-
-#### hash
-
-- hashovací algoritmus
-
-#### repository
-
-- přístup k databázi
-
-#### service
-
-- business logic
-
-#### specification
-
-- specifikace k filtrování hodnot
-
-#### validation
-
-- validace hodnot z requestu
-
-### src/main/resources
-
-#### db.changelog
-
-- LiquiBase soubory
-
-#### static
-
-- OpenAPI
+#### /revisions/{documentId}/download
+- `GET` : Download a revision
 
 ## Spuštění aplikace
 

@@ -72,6 +72,7 @@ paths:
   /documents:
 
     get:
+      summary: List documents
       description: Retrieve a list of the documents.
       operationId: getDocuments
       tags:
@@ -118,6 +119,7 @@ paths:
   /documents/upload:
 
     post:
+      summary: Upload document
       description: Upload a document.
       operationId: uploadDocument
       tags:
@@ -228,6 +230,7 @@ paths:
   /documents/{documentId}:
 
     get:
+      summary: Get document
       description: Retrieves the details about a document.
       operationId: getDocument
       tags:
@@ -255,6 +258,7 @@ paths:
                 instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
 
     put:
+      summary: Upload new document version
       description: Upload new document version.
       operationId: uploadNewDocumentVersion
       tags:
@@ -365,6 +369,7 @@ paths:
                     instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
 
     delete:
+      summary: Delete document
       description: Deletes a document and all revisions associated with that document.
       operationId: deleteDocumentWithRevisions
       tags:
@@ -413,6 +418,7 @@ paths:
   /documents/{documentId}/move:
 
     put:
+      summary: Move document
       description: Moves a document.
       operationId: moveDocument
       tags:
@@ -457,6 +463,7 @@ paths:
   /documents/{documentId}/download:
 
     get:
+      summary: Download document
       description: Downloads a document.
       operationId: downloadDocument
       tags:
@@ -515,6 +522,7 @@ paths:
   /documents/{documentId}/revisions:
 
     get:
+      summary: List document revisions
       description: List document revisions.
       operationId: getDocumentRevisions
       tags:
@@ -562,6 +570,7 @@ paths:
   /documents/{documentId}/revisions/{revisionId}:
 
     put:
+      summary: Switch document to revision
       description: Switch document to a specific revision.
       operationId: switchToRevision
       tags:
@@ -603,6 +612,7 @@ paths:
   /documents/{documentId}/versions:
 
     get:
+      summary: List document versions
       description: List document versions.
       operationId: getDocumentVersions
       tags:
@@ -637,6 +647,7 @@ paths:
   /documents/{documentId}/versions/{version}:
 
     get:
+      summary: Get document with version
       description: Retrieves a document with a version.
       operationId: getDocumentWithVersion
       tags:
@@ -654,7 +665,8 @@ paths:
         404:
           $ref: '#/components/responses/404DocumentOrVersionNotFound'
 
-    put: 
+    put:
+      summary: Switch document to version
       description: Switch document to a specific version.
       operationId: switchToVersion
       tags:
@@ -675,6 +687,7 @@ paths:
   /revisions:
 
     get:
+      summary: List revisions
       description: List all revisions.
       operationId: getRevisions
       tags:
@@ -721,6 +734,7 @@ paths:
   /revisions/{revisionId}:
 
     get:
+      summary: Get revision
       description: Retrieves a revision.
       operationId: getRevision
       tags:
@@ -748,6 +762,7 @@ paths:
                 instance: /revisions/f79fa8e0-c42d-40f5-90b9-00a4180990d1
 
     delete:
+      summary: Delete revision
       description: Deletes a revision.
       operationId: deleteRevision
       tags:
@@ -807,6 +822,7 @@ paths:
   /revisions/{revisionId}/download:
 
     get:
+      summary: Download revision
       description: Downloads a revision.
       operationId: downloadRevision
       tags:

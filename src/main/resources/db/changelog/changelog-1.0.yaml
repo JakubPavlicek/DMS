@@ -5,6 +5,22 @@ databaseChangeLog:
       author: JakubPavlicek
       changes:
 
+        - createIndex:
+            indexName: document_id_index
+            tableName: document
+            unique: true
+            columns:
+              - column:
+                  name: document_id
+
+        - createIndex:
+            indexName: revision_id_index
+            tableName: document_revision
+            unique: true
+            columns:
+              - column:
+                  name: revision_id
+
         - createSequence:
             sequenceName: user_id_sequence
             startValue: 1

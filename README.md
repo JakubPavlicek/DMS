@@ -42,7 +42,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │   │       ├── service                           // service
     │   │       ├── sort                              // sorting in requests
     │   │       ├── specification                     // specification used for filtering
-    │   │       └── DocumentManagerApplication.java   // Main application class
+    │   │       └── DocumentManagerApplication.java   // main application class
     │   └── resources
     │       ├── db.changelog                          // LiquiBase changelogs
     │       ├── static                                // OpenAPI files

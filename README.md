@@ -5,7 +5,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 
 ## Table of Contents
 
-- [Build with](#built-with)
+- [Build With](#built-with)
 - [Modules](#modules)
 - [API](#api)
 - [Getting Started](#getting-started)
@@ -111,29 +111,32 @@ Requirments for the software and other tools to build
 
 ### Installation
 
-1. Stažení aplikace: `git clone https://github.com/JakubPavlicek/DMS.git`
-2. Přejděte do adresáře, kam jste si aplikaci stáhli a otevřete soubor **DocumentManager**
-3. V souboru **src/main/resources/application.yaml** změňte hodnoty:
-    - **storage.path** - Váš lokální adresář, kam se budou ukládat bloby souborů
-    - **storage.directory-prefix-length** - Délka prefixu pro adresáře
-    - **hash.algorithm** - Můžete nechat výchozí, či pozměnit na základě toho, jaký hashovací algoritmus chcete použít
-    - **spring.profiles.active** - hodnota, představující, jakou databázi chcete použít:
-      - **postgresql** - použije se PostgreSQL databáze
-      - **oracle** - použije se Oracle databáze
-      - **mssql** - použije se MS SQL databáze
-    - dále je nutné změnit hodnoty pro databázi, kterou jste si vybrali a kterou chcete použít:
-      - **spring.datasource.url** - url databáze
-      - **spring.datasource.username** - přihlašovací jméno do databáze
-      - **spring.datasource.password** - heslo do databáze
-4. Spuštění aplikace:
-   - Windows: `./mvnw.cmd spring-boot:run`
-   - Linux: `./mvnw spring-boot:run`
-   - macOS: `./mvnw spring-boot:run`
-   - alternativa (v případě, že již máte nastaveny správne hodnoty v konfiguračním souboru **application.yaml**):
-     - hodnota **spring-boot.run.profiles** znamená, jaký profil chcete nastavit (povolené hodnoty: **postgresql** / **mssql** / **oracle**)
-       - Windows `./mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgresql`
-       - Linux `./mvnw spring-boot:run -Dspring-boot.run.profiles=postgresql`
-       - macOS `./mvnw spring-boot:run -Dspring-boot.run.profiles=postgresql`
+1. **Download and Open**:
+    - Clone the application: `git clone https://github.com/JakubPavlicek/DMS.git`
+    - Navigate to the downloaded directory and open **DocumentManager**.
+
+2. **Configuration**:
+    - In **src/main/resources/application.yaml**, update these values:
+        - **storage.path**: Local directory for file storage.
+        - **storage.directory-prefix-length**: Directory prefix length.
+        - **hash.algorithm**: Hashing algorithm (optional).
+        - **spring.profiles.active**: Choose your database:
+            - **postgresql** for PostgreSQL.
+            - **oracle** for Oracle.
+            - **mssql** for MS SQL.
+        - Update database settings:
+            - **spring.datasource.url**: Database URL.
+            - **spring.datasource.username**: Database username.
+            - **spring.datasource.password**: Database password.
+
+3. **Start the Application**:
+    - On **Windows**: `./mvnw.cmd spring-boot:run`
+    - On **Linux** and **macOS**: `./mvnw spring-boot:run`
+
+4. **Alternative** (if configurations are set):
+    - To set a specific profile, use the following command:
+        - **Windows**: `./mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgresql`
+        - **Linux** and **macOS**: `./mvnw spring-boot:run -Dspring-boot.run.profiles=postgresql`
 
 ## Development
 

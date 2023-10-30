@@ -18,7 +18,7 @@ public class SpringDocConfig {
 
     // add application/octet-stream media type to support file uploading via swagger-ui
     public SpringDocConfig(MappingJackson2HttpMessageConverter converter) {
-        var supportedMediaTypes = new ArrayList<>(converter.getSupportedMediaTypes());
+        ArrayList<MediaType> supportedMediaTypes = new ArrayList<>(converter.getSupportedMediaTypes());
         supportedMediaTypes.add(new MediaType("application", "octet-stream"));
         converter.setSupportedMediaTypes(supportedMediaTypes);
     }

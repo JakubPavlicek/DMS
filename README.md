@@ -1,20 +1,27 @@
-# DMS
+# Document Management System
 
-## Document Management System
-
-Jedná se o aplikaci typu SaaS (Software as a Service) pro centrální uložení dokumentů vzniklých při vývoji aplikací.
-
-## Vývoj
-
-Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček ze Západočeské univerzity v Plzni - Fakulta aplikovaných věd.
+Centralized document storage for developers and teams to efficiently manage project-related files.
+Designed with simplicity and accessibility in mind, this Software as a Service (SaaS) offers centralized document storage with seamless access through a RESTful API.
 
 ## Table of Contents
 
+- [Build with](#built-with)
 - [Modules](#modules)
 - [API](#api)
-- [Getting started](#getting-started)
+- [Getting Started](#getting-started)
   - [Prerequisited](#prerequisites)
   - [Installation](#installation)
+- [Development](#development)
+
+## Built With
+
+- ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+- ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+- ![OpenAPI](https://img.shields.io/badge/OpenAPI%20Initiative-6BA539.svg?style=for-the-badge&logo=OpenAPI-Initiative&logoColor=white)
+- ![LiquiBase](https://img.shields.io/badge/Liquibase-2962FF.svg?style=for-the-badge&logo=Liquibase&logoColor=white)
+- ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1.svg?style=for-the-badge&logo=PostgreSQL&logoColor=white)
+- ![Oracle](https://img.shields.io/badge/Oracle-F80000.svg?style=for-the-badge&logo=Oracle&logoColor=white)
+- ![MSSQL](https://img.shields.io/badge/Microsoft%20SQL%20Server-CC2927.svg?style=for-the-badge&logo=Microsoft-SQL-Server&logoColor=white)
 
 ## Modules
 
@@ -91,11 +98,15 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
 #### /revisions/{documentId}/download
 - `GET` : Download a revision
 
-## Getting started
+## Getting Started
 
 ### Prerequisites
 
+Requirments for the software and other tools to build
 
+- Java 17+
+- Maven
+- PostgreSQL / Oracle / MS SQL
 
 ### Installation
 
@@ -122,3 +133,7 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
        - Windows `./mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgresql`
        - Linux `./mvnw spring-boot:run -Dspring-boot.run.profiles=postgresql`
        - macOS `./mvnw spring-boot:run -Dspring-boot.run.profiles=postgresql`
+
+## Development
+
+This application is a Bachelor's thesis (in 2023), authored by Jakub Pavlíček from the University of West Bohemia in Pilsen - Faculty of Applied Sciences.

@@ -6,6 +6,7 @@ import com.dms.dto.DocumentWithVersionDTO;
 import com.dms.dto.PageWithDocuments;
 import com.dms.dto.PageWithRevisions;
 import com.dms.dto.PageWithVersions;
+import com.dms.dto.PathRequest;
 import com.dms.dto.UserRequest;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
@@ -79,6 +80,10 @@ public class DocumentService {
         return userService.getSavedUser(user);
     }
 
+    private String getPathFromRequest(PathRequest pathRequest) {
+        return pathRequest == null ? null : pathRequest.getPath();
+    }
+
     private Document createDocument(UserRequest userRequest, MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
         User author = getUserFromUserRequest(userRequest);
@@ -108,10 +113,11 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadDocument(UserRequest userRequest, MultipartFile file, String path) {
-        Document document = createDocument(userRequest, file, path);
+    public DocumentDTO uploadDocument(UserRequest userRequest, MultipartFile file, PathRequest path) {
+        String pathFromRequest = getPathFromRequest(path);
+        Document document = createDocument(userRequest, file, pathFromRequest);
 
-        validateUniquePath(path, document);
+        validateUniquePath(pathFromRequest, document);
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
         Document savedDocument = documentRepository.saveAndFlush(document);
@@ -122,18 +128,19 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequest userRequest, MultipartFile file, String path) {
+    public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequest userRequest, MultipartFile file, PathRequest path) {
         if (!documentRepository.existsByDocumentId(documentId))
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
 
         Document databaseDocument = documentCommonService.getDocument(documentId);
+        String pathFromRequest = getPathFromRequest(path);
 
-        Document document = createDocument(userRequest, file, path);
+        Document document = createDocument(userRequest, file, pathFromRequest);
         document.setId(databaseDocument.getId());
         document.setDocumentId(documentId);
         document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);
 
-        validateUniquePath(path, document);
+        validateUniquePath(pathFromRequest, document);
 
         // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
         Document savedDocument = documentRepository.saveAndFlush(document);
@@ -231,12 +238,13 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO moveDocument(String documentId, String path) {
+    public DocumentDTO moveDocument(String documentId, PathRequest path) {
         Document document = documentCommonService.getDocument(documentId);
+        String pathFromRequest = getPathFromRequest(path);
 
-        validateUniquePath(path, document);
+        validateUniquePath(pathFromRequest, document);
 
-        document.setPath(path);
+        document.setPath(pathFromRequest);
         Document savedDocument = documentRepository.save(document);
 
         documentCommonService.saveRevisionFromDocument(savedDocument);

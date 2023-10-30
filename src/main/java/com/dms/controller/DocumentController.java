@@ -6,6 +6,7 @@ import com.dms.dto.DocumentWithVersionDTO;
 import com.dms.dto.PageWithDocuments;
 import com.dms.dto.PageWithRevisions;
 import com.dms.dto.PageWithVersions;
+import com.dms.dto.PathRequest;
 import com.dms.dto.UserRequest;
 import com.dms.service.DocumentService;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +59,7 @@ public class DocumentController implements DocumentsApi {
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> moveDocument(String documentId, String path) {
+    public ResponseEntity<DocumentDTO> moveDocument(String documentId, PathRequest path) {
         return ResponseEntity.ok(documentService.moveDocument(documentId, path));
     }
 
@@ -73,13 +74,13 @@ public class DocumentController implements DocumentsApi {
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> uploadDocument(UserRequest user, MultipartFile file, String path) {
+    public ResponseEntity<DocumentDTO> uploadDocument(UserRequest user, MultipartFile file, PathRequest path) {
         DocumentDTO documentDTO = documentService.uploadDocument(user, file, path);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(String documentId, UserRequest user, MultipartFile file, String path) {
+    public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(String documentId, UserRequest user, MultipartFile file, PathRequest path) {
         DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(documentId, user, file, path);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }

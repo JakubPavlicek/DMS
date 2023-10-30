@@ -23,7 +23,7 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
     ├── main
     │   ├── java
     │   │   └── com.dms
-    │   │       ├── config                            // configurations and properties validation
+    │   │       ├── config                            // config and properties validation
     │   │       ├── controller                        // REST-API controller
     │   │       ├── entity                            // database tables
     │   │       ├── exception                         // exceptions and exception handling

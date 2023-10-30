@@ -415,51 +415,6 @@ paths:
                     detail: "An error occurred while working with the file"
                     instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
 
-  /documents/{documentId}/move:
-
-    put:
-      summary: Move document
-      description: Moves a document.
-      operationId: moveDocument
-      tags:
-        - documents
-      parameters:
-        - $ref: '#/components/parameters/DocumentId'
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                path:
-                  type: string
-                  description: Path in which the document will be moved.
-                  example: /home
-                  minLength: 1
-                  maxLength: 255
-      responses:
-        200:
-          description: Document moved successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DocumentDTO'
-        409:
-          description: File with path already exists.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-              examples:
-                FileWithPathAlreadyExists:
-                  summary: File With Path Already Exists
-                  value:
-                    type: http://localhost:8080/errors/document-with-path-already-exists
-                    title: File With Path Already Exists
-                    status: 409
-                    detail: "Document: dog.png with path: /home already exists"
-                    instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/move
-
   /documents/{documentId}/download:
 
     get:
@@ -518,6 +473,51 @@ paths:
                     status: 500
                     detail: "An error occurred while working with the file"
                     instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/download
+
+  /documents/{documentId}/move:
+
+    put:
+      summary: Move document
+      description: Moves a document.
+      operationId: moveDocument
+      tags:
+        - documents
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: Path in which the document will be moved.
+                  example: /home
+                  minLength: 1
+                  maxLength: 255
+      responses:
+        200:
+          description: Document moved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentDTO'
+        409:
+          description: File with path already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              examples:
+                FileWithPathAlreadyExists:
+                  summary: File With Path Already Exists
+                  value:
+                    type: http://localhost:8080/errors/document-with-path-already-exists
+                    title: File With Path Already Exists
+                    status: 409
+                    detail: "Document: dog.png with path: /home already exists"
+                    instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/move
 
   /documents/{documentId}/revisions:
 

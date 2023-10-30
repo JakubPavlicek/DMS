@@ -60,44 +60,44 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 ## API
 
 #### /documents
-- `GET` : Retrieve a list of the documents
+- `GET` : List documents
 
 #### /documents/upload
-- `POST` : Upload a document
+- `POST` : Upload document
 
 #### /documents/{documentId}
-- `GET` : Retrieve a document
+- `GET` : Get document
 - `PUT` : Upload new document version
-- `DELETE` : Delete a document and all revisions associated to the document
+- `DELETE` : Delete document
 
 #### /documents/{documentId}/download
-- `GET` : Download a document
+- `GET` : Download document
 
 #### /document/{documentId}/move
-- `PUT` : Move a document
+- `PUT` : Move document
 
 #### /documents/{documentId}/revisions
-- `GET` : Retrieve a list of document revisions
+- `GET` : List document revisions
 
 #### /documents/{documentId}/revisions/{revisionId}
-- `PUT` : Switch document to a specific revision 
+- `PUT` : Switch document to revision 
 
 #### /documents/{documentId}/versions
-- `GET` : Retrieve a list of document versions
+- `GET` : List document versions
 
 #### /documents/{documentId}/versions/{version}
-- `GET` : Retrieve a document with a specific version
-- `PUT` : Switch document to a specific version 
+- `GET` : Get document with version
+- `PUT` : Switch document to version 
 
 #### /revisions 
-- `GET` : Retrieve a list of revisions
+- `GET` : List revisions
 
 #### /revisions/{documentId}
-- `GET` : Retrieve a revision
-- `DELETE` : Delete a revision
+- `GET` : Get revision
+- `DELETE` : Delete revision
 
 #### /revisions/{documentId}/download
-- `GET` : Download a revision
+- `GET` : Download revision
 
 ## Getting Started
 

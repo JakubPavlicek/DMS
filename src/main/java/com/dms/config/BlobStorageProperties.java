@@ -1,7 +1,5 @@
 package com.dms.config;
 
-import com.dms.exception.FileOperation;
-import com.dms.exception.FileOperationException;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
@@ -11,6 +9,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,9 +40,14 @@ public class BlobStorageProperties implements Validator {
             try {
                 Files.createDirectory(storagePath);
             } catch (Exception e) {
-                throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
+                errors.rejectValue("path", "Blob Storage Error Occurred", "Blob storage couldn't be created");
             }
         }
+
+        File file = new File(path);
+
+        if(!file.isDirectory())
+            errors.rejectValue("path", "Path Is Not A Directory", "Provided path: " + path + " is not a directory");
     }
 
 }

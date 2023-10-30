@@ -73,7 +73,7 @@ paths:
 
     get:
       summary: List documents
-      description: Retrieve a list of the documents.
+      description: Retrieves a list of the documents.
       operationId: getDocuments
       tags:
         - documents
@@ -120,7 +120,7 @@ paths:
 
     post:
       summary: Upload document
-      description: Upload a document.
+      description: Uploads a document.
       operationId: uploadDocument
       tags:
         - documents
@@ -231,7 +231,7 @@ paths:
 
     get:
       summary: Get document
-      description: Retrieves the details about a document.
+      description: Retrieves a document.
       operationId: getDocument
       tags:
         - documents
@@ -259,7 +259,7 @@ paths:
 
     put:
       summary: Upload new document version
-      description: Upload new document version.
+      description: Uploads a new document version.
       operationId: uploadNewDocumentVersion
       tags:
         - documents
@@ -370,7 +370,7 @@ paths:
 
     delete:
       summary: Delete document
-      description: Deletes a document and all revisions associated with that document.
+      description: Deletes a document and all revisions associated to the document.
       operationId: deleteDocumentWithRevisions
       tags:
         - documents
@@ -523,7 +523,7 @@ paths:
 
     get:
       summary: List document revisions
-      description: List document revisions.
+      description: Retrieves a list of document revisions.
       operationId: getDocumentRevisions
       tags:
         - documents
@@ -571,7 +571,7 @@ paths:
 
     put:
       summary: Switch document to revision
-      description: Switch document to a specific revision.
+      description: Switches document to a specific revision.
       operationId: switchToRevision
       tags:
         - documents
@@ -613,7 +613,7 @@ paths:
 
     get:
       summary: List document versions
-      description: List document versions.
+      description: Retrieves a list of document versions.
       operationId: getDocumentVersions
       tags:
         - documents
@@ -667,7 +667,7 @@ paths:
 
     put:
       summary: Switch document to version
-      description: Switch document to a specific version.
+      description: Switches document to a specific version.
       operationId: switchToVersion
       tags:
         - documents
@@ -688,7 +688,7 @@ paths:
 
     get:
       summary: List revisions
-      description: List all revisions.
+      description: Retrieves a list of revisions.
       operationId: getRevisions
       tags:
         - revisions

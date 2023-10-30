@@ -8,7 +8,15 @@ Jedná se o aplikaci typu SaaS (Software as a Service) pro centrální uložení
 
 Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček ze Západočeské univerzity v Plzni - Fakulta aplikovaných věd.
 
-## Moduly
+## Table of Contents
+
+- [Modules](#modules)
+- [API](#api)
+- [Getting started](#getting-started)
+  - [Prerequisited](#prerequisites)
+  - [Installation](#installation)
+
+## Modules
 
 ```
 └── src
@@ -83,12 +91,19 @@ Tato aplikace je Bakalářskou prací (v roce 2023), autorem je Jakub Pavlíček
 #### /revisions/{documentId}/download
 - `GET` : Download a revision
 
-## Spuštění aplikace
+## Getting started
+
+### Prerequisites
+
+
+
+### Installation
 
 1. Stažení aplikace: `git clone https://github.com/JakubPavlicek/DMS.git`
 2. Přejděte do adresáře, kam jste si aplikaci stáhli a otevřete soubor **DocumentManager**
 3. V souboru **src/main/resources/application.yaml** změňte hodnoty:
     - **storage.path** - Váš lokální adresář, kam se budou ukládat bloby souborů
+    - **storage.directory-prefix-length** - Délka prefixu pro adresáře
     - **hash.algorithm** - Můžete nechat výchozí, či pozměnit na základě toho, jaký hashovací algoritmus chcete použít
     - **spring.profiles.active** - hodnota, představující, jakou databázi chcete použít:
       - **postgresql** - použije se PostgreSQL databáze

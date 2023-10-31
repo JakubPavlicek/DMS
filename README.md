@@ -103,8 +103,9 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 
 ### Prerequisites
 
-Requirments for the software and other tools to build
+Requirements for the software and other tools to build
 
+- git
 - Java 17+
 - Maven
 - PostgreSQL / Oracle / MS SQL

@@ -10,6 +10,7 @@ public class DocumentSort {
 
     // valid sort fields
     private enum Field {
+        DOCUMENT_ID,
         NAME,
         TYPE,
         PATH,

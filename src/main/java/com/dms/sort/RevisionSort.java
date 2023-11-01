@@ -10,6 +10,7 @@ public class RevisionSort {
 
     // valid sort fields
     private enum Field {
+        REVISION_ID,
         NAME,
         TYPE,
         PATH,

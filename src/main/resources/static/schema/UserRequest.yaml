@@ -1,14 +1,17 @@
 type: object
+description: Author of the document.
 required:
   - username
   - email
 properties:
   username:
     type: string
-    maxLength: 40
     example: jakub
+    minLength: 1
+    maxLength: 40
   email:
     type: string
     format: email
-    maxLength: 255
     example: jakub@gmail.com
+    minLength: 1
+    maxLength: 255

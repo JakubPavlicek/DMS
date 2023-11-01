@@ -1,0 +1,33 @@
+get:
+  summary: Download revision
+  description: Downloads a revision.
+  operationId: downloadRevision
+  tags:
+    - revisions
+  parameters:
+    - $ref: '../../parameter/RevisionId.yaml'
+  responses:
+    200:
+      description: Revision downloaded successfully.
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+      headers:
+        Content-Disposition:
+          description: Specifies the filename for the downloaded revision.
+          schema:
+            type: string
+    404:
+      description: Revision not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          example:
+            type: http://localhost:8080/errors/revision-not-found
+            title: Revision Not Found
+            status: 404
+            detail: "Revision with ID: f79fa8e0-c42d-40f5-90b9-00a4180990d1 was not found"
+            instance: /revisions/f79fa8e0-c42d-40f5-90b9-00a4180990d1/download

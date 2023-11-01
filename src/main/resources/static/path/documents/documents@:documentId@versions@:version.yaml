@@ -1,0 +1,79 @@
+get:
+  summary: Get document with version
+  description: Retrieves a document with a version.
+  operationId: getDocumentWithVersion
+  tags:
+    - documents
+  parameters:
+    - $ref: '../../parameter/DocumentId.yaml'
+    - $ref: '../../parameter/DocumentVersion.yaml'
+  responses:
+    200:
+      description: Successfully retrieved document with a version.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/DocumentWithVersionDTO.yaml'
+    404:
+      description: Either document or revision with version was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          examples:
+            Document Not Found:
+              summary: Document Not Found
+              value:
+                type: http://localhost:8080/errors/document-not-found
+                title: Document Not Found
+                status: 404
+                detail: "Document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 not found"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/1
+            Version Not Found:
+              summary: Revision Not Found
+              value:
+                type: http://localhost:8080/errors/revision-not-found
+                title: Revision Not Found
+                status: 404
+                detail: "Revision with version: 5 not found for document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/5
+
+put:
+  summary: Switch document to version
+  description: Switches document to a specific version.
+  operationId: switchToVersion
+  tags:
+    - documents
+  parameters:
+    - $ref: '../../parameter/DocumentId.yaml'
+    - $ref: '../../parameter/DocumentVersion.yaml'
+  responses:
+    200:
+      description: Successfully switched document to a version.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/DocumentDTO.yaml'
+    404:
+      description: Either document or revision with version was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          examples:
+            Document Not Found:
+              summary: Document Not Found
+              value:
+                type: http://localhost:8080/errors/document-not-found
+                title: Document Not Found
+                status: 404
+                detail: "Document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 not found"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/1
+            Version Not Found:
+              summary: Revision Not Found
+              value:
+                type: http://localhost:8080/errors/revision-not-found
+                title: Revision Not Found
+                status: 404
+                detail: "Revision with version: 5 not found for document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/5

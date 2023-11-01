@@ -1,0 +1,32 @@
+get:
+  summary: List document versions
+  description: Retrieves a list of document versions.
+  operationId: getDocumentVersions
+  tags:
+    - documents
+  parameters:
+    - $ref: '../../parameter/DocumentId.yaml'
+    - $ref: '../../parameter/Page.yaml'
+    - $ref: '../../parameter/Limit.yaml'
+  responses:
+    200:
+      description: Successfully listed document versions.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/PageWithVersions.yaml'
+          examples:
+            PageableWithVersions:
+              $ref: '../../example/PageableWithVersions.yaml'
+    404:
+      description: Document not found for listing versions.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          example:
+            type: http://localhost:8080/errors/document-not-found
+            title: Document Not Found
+            status: 404
+            detail: "Document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 was not found"
+            instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions

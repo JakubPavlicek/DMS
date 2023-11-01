@@ -1,0 +1,56 @@
+get:
+  summary: Download document
+  description: Downloads a document.
+  operationId: downloadDocument
+  tags:
+    - documents
+  parameters:
+    - $ref: '../../parameter/DocumentId.yaml'
+  responses:
+    200:
+      description: "Document downloaded successfully."
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+      headers:
+        Content-Disposition:
+          description: Specifies the filename for the downloaded document.
+          schema:
+            type: string
+    404:
+      description: Document not found for download.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          example:
+            type: http://localhost:8080/errors/document-not-found
+            title: Document Not Found
+            status: 404
+            detail: "Document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 was not found"
+            instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/download
+    500:
+      description: Error occurred when working with a document.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          examples:
+            ReadError:
+              summary: File Read Error
+              value:
+                type: http://localhost:8080/errors/file-operation
+                title: File Read Error
+                status: 500
+                detail: "An error occurred while reading the file"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/download
+            DefaultError:
+              summary: File Operation Error
+              value:
+                type: http://localhost:8080/errors/file-operation
+                title: File Operation Error
+                status: 500
+                detail: "An error occurred while working with the file"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/download

@@ -1,0 +1,183 @@
+get:
+  summary: Get document
+  description: Retrieves a document.
+  operationId: getDocument
+  tags:
+    - documents
+  parameters:
+    - $ref: '../../parameter/DocumentId.yaml'
+  responses:
+    200:
+      description: Successfully retrieved details about a document.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/DocumentDTO.yaml'
+    404:
+      description: Document not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          example:
+            type: http://localhost:8080/errors/document-not-found
+            title: Document Not Found
+            status: 404
+            detail: "Document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 was not found"
+            instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
+
+put:
+  summary: Upload new document version
+  description: Uploads a new document version.
+  operationId: uploadNewDocumentVersion
+  tags:
+    - documents
+  parameters:
+    - $ref: '../../parameter/DocumentId.yaml'
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required:
+            - user
+            - file
+          properties:
+            user:
+              $ref: '../../schema/UserRequest.yaml'
+            file:
+              type: string
+              format: binary
+              description: File to be uploaded.
+              x-constraints: "@ValidFile"
+            path:
+              $ref: '../../schema/PathRequest.yaml'
+  responses:
+    201:
+      description: New document version uploaded successfully.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/DocumentDTO.yaml'
+    400:
+      description: Either invalid data provided or some request parts are missing.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '../../schema/ProblemDetail.yaml'
+              - $ref: '../../schema/ProblemDetailWithErrors.yaml'
+          examples:
+            InvalidDataProvided:
+              summary: Invalid Data Provided
+              value:
+                type: http://localhost:8080/errors/invalid-data
+                title: Invalid Data Provided"
+                status: 400
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a
+                errors: [ "Username is mandatory" ]
+            MissingRequestPart:
+              summary: Missing Request Part
+              value:
+                type: http://localhost:8080/errors/missing-request-part
+                title: Missing Request Part
+                status: 400
+                detail: Required part 'user' is not present.
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a
+    404:
+      description: The document for uploading new version not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          example:
+            type: http://localhost:8080/errors/document-not-found
+            title: Document Not Found
+            status: 404
+            detail: "Document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 was not found"
+            instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
+    409:
+      description: File with provided path already exists.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          examples:
+            FileWithPathAlreadyExists:
+              summary: File With Path Already Exists
+              value:
+                type: http://localhost:8080/errors/document-with-path-already-exists
+                title: File With Path Already Exists
+                status: 409
+                detail: "Document: dog.png with path: /home already exists"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
+    500:
+      description: Error occurred when working with a document.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          examples:
+            WriteError:
+              summary: File Write Error
+              value:
+                type: http://localhost:8080/errors/file-operation
+                title: File Write Error
+                status: 500
+                detail: "An error occurred while writing data from file: dog.png to storage"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
+            DefaultError:
+              summary: File Operation Error
+              value:
+                type: http://localhost:8080/errors/file-operation
+                title: File Operation Error
+                status: 500
+                detail: "An error occurred while working with the file"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
+
+delete:
+  summary: Delete document
+  description: Deletes a document and all revisions associated to the document.
+  operationId: deleteDocumentWithRevisions
+  tags:
+    - documents
+  parameters:
+    - $ref: '../../parameter/DocumentId.yaml'
+  responses:
+    204:
+      description: Document deleted successfully.
+    404:
+      description: Document not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          example:
+            type: http://localhost:8080/errors/document-not-found
+            title: Document Not Found
+            status: 404
+            detail: "Document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 was not found"
+            instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
+    500:
+      description: Error occurred when working with a document.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          examples:
+            DeleteError:
+              summary: File Deletion Error
+              value:
+                type: http://localhost:8080/errors/file-operation
+                title: File Deletion Error
+                status: 500
+                detail: "An error occurred while deleting the file"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
+            DefaultError:
+              summary: File Operation Error
+              value:
+                type: http://localhost:8080/errors/file-operation
+                title: File Operation Error
+                status: 500
+                detail: "An error occurred while working with the file"
+                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5

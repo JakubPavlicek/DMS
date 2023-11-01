@@ -1,0 +1,106 @@
+post:
+  summary: Upload document
+  description: Uploads a document.
+  operationId: uploadDocument
+  tags:
+    - documents
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required:
+            - user
+            - file
+          properties:
+            user:
+              $ref: '../../schema/UserRequest.yaml'
+            file:
+              type: string
+              format: binary
+              description: File to be uploaded.
+              x-constraints: "@ValidFile"
+            path:
+              $ref: '../../schema/PathRequest.yaml'
+  responses:
+    201:
+      description: Document uploaded successfully.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/DocumentDTO.yaml'
+    400:
+      description: Either invalid data provided or some request parts are missing.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '../../schema/ProblemDetail.yaml'
+              - $ref: '../../schema/ProblemDetailWithErrors.yaml'
+          examples:
+            InvalidDataProvided:
+              summary: Invalid Data Provided
+              value:
+                type: http://localhost:8080/errors/invalid-data
+                title: Invalid Data Provided
+                status: 400
+                instance: /documents/upload
+                errors: [ "Username is mandatory" ]
+            MissingRequestPart:
+              summary: Missing Request Part
+              value:
+                type: http://localhost:8080/errors/missing-request-part
+                title: Missing Request Part
+                status: 400
+                detail: Required part 'user' is not present.
+                instance: /documents/upload
+    409:
+      description: File with provided path already exists.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          examples:
+            FileWithPathAlreadyExists:
+              summary: File With Path Already Exists
+              value:
+                type: http://localhost:8080/errors/document-with-path-already-exists
+                title: File With Path Already Exists
+                status: 409
+                detail: "Document: dog.png with path: /home already exists"
+                instance: /documents/upload
+    413:
+      description: File size exceeded maximum upload size.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          example:
+            type: http://localhost:8080/errors/payload-too-large
+            title: Payload Too Large
+            status: 413
+            detail: "Maximum upload size exceeded"
+            instance: /documents/upload
+    500:
+      description: Error occurred when working with a document.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetail.yaml'
+          examples:
+            WriteError:
+              summary: File Write Error
+              value:
+                type: http://localhost:8080/errors/file-operation
+                title: File Write Error
+                status: 500
+                detail: "An error occurred while writing data from file: dog.png to storage"
+                instance: /documents/upload
+            DefaultError:
+              summary: File Operation Error
+              value:
+                type: http://localhost:8080/errors/file-operation
+                title: File Operation Error
+                status: 500
+                detail: "An error occurred while working with the file"
+                instance: /documents/upload

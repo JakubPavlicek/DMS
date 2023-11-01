@@ -135,6 +135,7 @@ paths:
                 file:
                   type: string
                   format: binary
+                  description: File to be uploaded.
                   x-constraints: "@ValidFile"
                 path:
                   $ref: '#/components/schemas/PathRequest'
@@ -273,6 +274,7 @@ paths:
                 file:
                   type: string
                   format: binary
+                  description: File to be uploaded.
                   x-constraints: "@ValidFile"
                 path:
                   $ref: '#/components/schemas/PathRequest'

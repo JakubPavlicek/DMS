@@ -116,6 +116,7 @@
                         </goals>
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/static/openapi.yaml</inputSpec>
+                            <templateDirectory>${project.basedir}/src/main/resources/static/templates</templateDirectory>
                             <generatorName>spring</generatorName>
                             <apiPackage>com.dms</apiPackage>
                             <modelPackage>com.dms.dto</modelPackage>

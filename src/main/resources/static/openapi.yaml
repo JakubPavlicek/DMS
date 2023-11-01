@@ -45,11 +45,6 @@ components:
     PageableWithVersions:
       $ref: './example/PageableWithVersions.yaml'
 
-  responses:
-
-    404DocumentOrVersionNotFound:
-      $ref: './response/404DocumentOrVersionNotFound.yaml'
-
   parameters:
 
     DocumentId:
@@ -140,6 +135,7 @@ paths:
                 file:
                   type: string
                   format: binary
+                  x-constraints: "@ValidFile"
                 path:
                   $ref: '#/components/schemas/PathRequest'
       responses:
@@ -277,6 +273,7 @@ paths:
                 file:
                   type: string
                   format: binary
+                  x-constraints: "@ValidFile"
                 path:
                   $ref: '#/components/schemas/PathRequest'
       responses:
@@ -680,7 +677,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/DocumentWithVersionDTO'
         404:
-          $ref: '#/components/responses/404DocumentOrVersionNotFound'
+          description: Either document or revision with version was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              examples:
+                Document Not Found:
+                  summary: Document Not Found
+                  value:
+                    type: http://localhost:8080/errors/document-not-found
+                    title: Document Not Found
+                    status: 404
+                    detail: "Document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 not found"
+                    instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/1
+                Version Not Found:
+                  summary: Revision Not Found
+                  value:
+                    type: http://localhost:8080/errors/revision-not-found
+                    title: Revision Not Found
+                    status: 404
+                    detail: "Revision with version: 5 not found for document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5"
+                    instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/5
 
     put:
       summary: Switch document to version
@@ -699,7 +717,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/DocumentDTO'
         404:
-          $ref: '#/components/responses/404DocumentOrVersionNotFound'
+          description: Either document or revision with version was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              examples:
+                Document Not Found:
+                  summary: Document Not Found
+                  value:
+                    type: http://localhost:8080/errors/document-not-found
+                    title: Document Not Found
+                    status: 404
+                    detail: "Document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5 not found"
+                    instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/1
+                Version Not Found:
+                  summary: Revision Not Found
+                  value:
+                    type: http://localhost:8080/errors/revision-not-found
+                    title: Revision Not Found
+                    status: 404
+                    detail: "Revision with version: 5 not found for document with ID: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5"
+                    instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5/versions/5
 
   /revisions:
 

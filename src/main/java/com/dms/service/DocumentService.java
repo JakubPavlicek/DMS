@@ -113,11 +113,11 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadDocument(UserRequest userRequest, MultipartFile file, PathRequest path) {
-        String pathFromRequest = getPathFromRequest(path);
-        Document document = createDocument(userRequest, file, pathFromRequest);
+    public DocumentDTO uploadDocument(UserRequest userRequest, MultipartFile file, PathRequest pathRequest) {
+        String path = getPathFromRequest(pathRequest);
+        Document document = createDocument(userRequest, file, path);
 
-        validateUniquePath(pathFromRequest, document);
+        validateUniquePath(path, document);
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
         Document savedDocument = documentRepository.saveAndFlush(document);
@@ -128,19 +128,19 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequest userRequest, MultipartFile file, PathRequest path) {
+    public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequest userRequest, MultipartFile file, PathRequest pathRequest) {
         if (!documentRepository.existsByDocumentId(documentId))
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
 
         Document databaseDocument = documentCommonService.getDocument(documentId);
-        String pathFromRequest = getPathFromRequest(path);
+        String path = getPathFromRequest(pathRequest);
 
-        Document document = createDocument(userRequest, file, pathFromRequest);
+        Document document = createDocument(userRequest, file, path);
         document.setId(databaseDocument.getId());
         document.setDocumentId(documentId);
         document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);
 
-        validateUniquePath(pathFromRequest, document);
+        validateUniquePath(path, document);
 
         // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
         Document savedDocument = documentRepository.saveAndFlush(document);
@@ -238,13 +238,13 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO moveDocument(String documentId, PathRequest path) {
+    public DocumentDTO moveDocument(String documentId, PathRequest pathRequest) {
         Document document = documentCommonService.getDocument(documentId);
-        String pathFromRequest = getPathFromRequest(path);
+        String path = getPathFromRequest(pathRequest);
 
-        validateUniquePath(pathFromRequest, document);
+        validateUniquePath(path, document);
 
-        document.setPath(pathFromRequest);
+        document.setPath(path);
         Document savedDocument = documentRepository.save(document);
 
         documentCommonService.saveRevisionFromDocument(savedDocument);

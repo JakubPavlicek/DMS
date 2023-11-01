@@ -83,7 +83,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errorMessages = getMethodArgumentErrorMessages(ex);
 
         problemDetail.setTitle("Invalid Data Provided");
-        problemDetail.setType(URI.create(baseUrl + "/invalid-data"));
+        problemDetail.setType(URI.create(baseUrl + "/invalid-data-provided"));
         problemDetail.setProperty("errors", errorMessages);
 
         return ResponseEntity.of(problemDetail)
@@ -96,7 +96,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         BindingResult bindingResult = ex.getBindingResult();
 
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        fieldErrors.forEach(error -> errorMessages.add(error.getDefaultMessage()));
+        fieldErrors.forEach(error -> errorMessages.add(error.getObjectName() + "." + error.getField() + ": " + error.getDefaultMessage()));
 
         return errorMessages;
     }

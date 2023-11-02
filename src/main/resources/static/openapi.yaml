@@ -27,6 +27,8 @@ components:
       $ref: './schema/PathRequest.yaml'
     ProblemDetail:
       $ref: './schema/ProblemDetail.yaml'
+    ProblemDetailWithCause:
+      $ref: './schema/ProblemDetailWithCause.yaml'
     ProblemDetailWithErrors:
       $ref: './schema/ProblemDetailWithErrors.yaml'
     PageWithDocuments:

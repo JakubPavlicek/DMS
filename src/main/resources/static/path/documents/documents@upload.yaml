@@ -81,6 +81,22 @@ post:
             status: 413
             detail: "Maximum upload size exceeded"
             instance: /documents/upload
+    415:
+      description: Request does not contain any data.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ProblemDetailWithCause.yaml'
+          examples:
+            RequestDoesNotContainData:
+              summary: Request Does Not Contain Data
+              value:
+                type: http://localhost:8080/errors/media-type-not-supported
+                title: Unsupported Media Type
+                status: 415
+                detail: "Unsupported media type: null, supported media types are: multipart/form-data"
+                instance: /documents/upload
+                cause: Request must contain data
     500:
       description: Error occurred when working with a document.
       content:

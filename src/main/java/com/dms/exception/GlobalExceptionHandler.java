@@ -80,13 +80,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        String message = "Unsupported media type: " + ex.getContentType() + ", supported media types are: " + MediaType.toString(ex.getSupportedMediaTypes());
+        String detail = "Unsupported media type: " + ex.getContentType() + ", supported media types are: " + MediaType.toString(ex.getSupportedMediaTypes());
         String cause = "Request must contain data";
 
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         problemDetail.setTitle("Unsupported Media Type");
         problemDetail.setType(URI.create(baseUrl + "/media-type-not-supported"));
-        problemDetail.setProperty("message", message);
+        problemDetail.setDetail(detail);
         problemDetail.setProperty("cause", cause);
 
         return ResponseEntity.of(problemDetail).build();

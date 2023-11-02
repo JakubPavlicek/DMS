@@ -82,8 +82,8 @@ public class DocumentRevisionService {
     }
 
     public PageWithRevisions getRevisions(int pageNumber, int pageSize, String sort, String filter) {
-        List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
-        List<FilterItem> filterItems = documentCommonService.getRevisionFilterItemsFromFilter(filter);
+        List<Sort.Order> orders = documentCommonService.getRevisionOrders(sort);
+        List<FilterItem> filterItems = documentCommonService.getRevisionFilterItems(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filterItems);

@@ -197,8 +197,8 @@ public class DocumentService {
     }
 
     public PageWithDocuments getDocuments(int pageNumber, int pageSize, String sort, String filter) {
-        List<Sort.Order> orders = documentCommonService.getOrdersFromDocumentSort(sort);
-        List<FilterItem> filterItems = documentCommonService.getDocumentFilterItemsFromFilter(filter);
+        List<Sort.Order> orders = documentCommonService.getDocumentOrders(sort);
+        List<FilterItem> filterItems = documentCommonService.getDocumentFilterItems(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
         Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
@@ -215,8 +215,8 @@ public class DocumentService {
     public PageWithRevisions getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
         Document document = documentCommonService.getDocument(documentId);
 
-        List<Sort.Order> orders = documentCommonService.getOrdersFromRevisionSort(sort);
-        List<FilterItem> filterItems = documentCommonService.getRevisionFilterItemsFromFilter(filter);
+        List<Sort.Order> orders = documentCommonService.getRevisionOrders(sort);
+        List<FilterItem> filterItems = documentCommonService.getRevisionFilterItems(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filterItems);

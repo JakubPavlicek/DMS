@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,17 +122,25 @@ public class DocumentCommonService {
         return mapPageToPageWithVersions(longs);
     }
 
-    public List<FilterItem> getDocumentFilterItemsFromFilter(String filter) {
-        if (!filter.matches("(" + DocumentFilter.FILTER_REGEX + ")+"))
+    public List<FilterItem> getDocumentFilterItems(String filter) {
+        return getFilterItems(filter, DocumentFilter.FILTER_REGEX, DocumentMapper::getMappedDocumentField);
+    }
+
+    public List<FilterItem> getRevisionFilterItems(String filter) {
+        return getFilterItems(filter, RevisionFilter.FILTER_REGEX, RevisionMapper::getMappedRevisionField);
+    }
+
+    private List<FilterItem> getFilterItems(String filter, String regex, Function<String, String> fieldMapper) {
+        if (!filter.matches("(" + regex + ")+"))
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
 
         List<FilterItem> filterItems = new ArrayList<>();
 
-        Pattern pattern = Pattern.compile(DocumentFilter.FILTER_REGEX);
+        Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(filter);
 
         while (matcher.find()) {
-            String field = DocumentMapper.getMappedDocumentField(matcher.group(1));
+            String field = fieldMapper.apply(matcher.group(1));
             String value = matcher.group(2);
 
             filterItems.add(new FilterItem(field, value));
@@ -140,58 +149,28 @@ public class DocumentCommonService {
         return filterItems;
     }
 
-    public List<FilterItem> getRevisionFilterItemsFromFilter(String filter) {
-        if (!filter.matches("(" + RevisionFilter.FILTER_REGEX + ")+"))
-            throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
-
-        List<FilterItem> filterItems = new ArrayList<>();
-
-        Pattern pattern = Pattern.compile(RevisionFilter.FILTER_REGEX);
-        Matcher matcher = pattern.matcher(filter);
-
-        while (matcher.find()) {
-            String field = RevisionMapper.getMappedRevisionField(matcher.group(1));
-            String value = matcher.group(2);
-
-            filterItems.add(new FilterItem(field, value));
-        }
-
-        return filterItems;
+    public List<Sort.Order> getDocumentOrders(String sort) {
+        return getOrders(sort, DocumentSort.DOCUMENT_SORT_REGEX, DocumentMapper::getMappedDocumentField);
     }
 
-    public List<Sort.Order> getOrdersFromDocumentSort(String sort) {
-        if (!sort.matches("(" + DocumentSort.DOCUMENT_SORT_REGEX + ")+"))
+    public List<Sort.Order> getRevisionOrders(String sort) {
+        return getOrders(sort, RevisionSort.REVISION_SORT_REGEX, RevisionMapper::getMappedRevisionField);
+    }
+
+    private List<Sort.Order> getOrders(String sort, String regex, Function<String, String> fieldMapper) {
+        if (!sort.matches("(" + regex + ")+"))
             throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
 
         List<Sort.Order> orders = new ArrayList<>();
 
-        Pattern pattern = Pattern.compile(DocumentSort.DOCUMENT_SORT_REGEX);
+        Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(sort);
 
         while (matcher.find()) {
-            String documentField = DocumentMapper.getMappedDocumentField(matcher.group(1));
+            String documentField = fieldMapper.apply(matcher.group(1));
             Sort.Direction direction = Sort.Direction.fromString(matcher.group(2));
 
             orders.add(new Sort.Order(direction, documentField));
-        }
-
-        return orders;
-    }
-
-    public List<Sort.Order> getOrdersFromRevisionSort(String sort) {
-        if (!sort.matches("(" + RevisionSort.REVISION_SORT_REGEX + ")+"))
-            throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
-
-        List<Sort.Order> orders = new ArrayList<>();
-
-        Pattern pattern = Pattern.compile(RevisionSort.REVISION_SORT_REGEX);
-        Matcher matcher = pattern.matcher(sort);
-
-        while (matcher.find()) {
-            String revisionField = RevisionMapper.getMappedRevisionField(matcher.group(1));
-            Sort.Direction direction = Sort.Direction.fromString(matcher.group(2));
-
-            orders.add(new Sort.Order(direction, revisionField));
         }
 
         return orders;

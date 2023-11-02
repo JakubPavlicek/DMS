@@ -42,14 +42,18 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │   │       ├── service                           // service
     │   │       ├── sort                              // sorting in requests
     │   │       ├── specification                     // specification used for filtering
+    │   │       ├── validation                        // validation annotations
     │   │       └── DocumentManagerApplication.java   // main application class
     │   └── resources
     │       ├── db.changelog                          // LiquiBase changelogs
     │       ├── static                                // OpenAPI files
     │       │   ├── example                           // OpenAPI examples
     │       │   ├── parameter                         // OpenAPI parameters
-    │       │   ├── response                          // OpenAPI responses
+    │       │   ├── path                              // OpenAPI paths
+    │       │   │   ├── documents                     // /documents paths
+    │       │   │   └── revisions                     // /revisions paths
     │       │   ├── schema                            // OpenAPI schemas
+    │       │   ├── templates                         // OpenAPI generator templates
     │       │   └── openapi.yaml                      // main OpenAPI file 
     │       ├── application.yaml                      // SpringBoot + application config
     │       └── log4j2.yaml                           // Logger config

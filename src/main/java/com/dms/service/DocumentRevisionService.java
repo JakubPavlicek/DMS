@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -88,12 +87,7 @@ public class DocumentRevisionService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filterItems);
 
-        Page<DocumentRevision> revisions = revisionRepository.findAll(specification, pageable);
-        List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
-                                                          .map(documentCommonService::mapRevisionToRevisionDto)
-                                                          .toList();
-
-        PageImpl<DocumentRevisionDTO> documentRevisionDTOS = new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
+        Page<DocumentRevisionDTO> documentRevisionDTOS = documentCommonService.findRevisions(specification, pageable);
         return documentCommonService.mapPageToPageWithRevisions(documentRevisionDTOS);
     }
 

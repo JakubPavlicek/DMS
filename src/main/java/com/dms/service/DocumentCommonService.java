@@ -67,10 +67,6 @@ public class DocumentCommonService {
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found for document with ID: " + document.getDocumentId()));
     }
 
-    public Page<DocumentRevision> getRevisionsBySpecification(Specification<DocumentRevision> specification, Pageable pageable) {
-        return revisionRepository.findAll(specification, pageable);
-    }
-
     public Document updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
         document.setName(documentRevision.getName());
         document.setType(documentRevision.getType());
@@ -109,6 +105,15 @@ public class DocumentCommonService {
             revisionRepository.updateVersion(revision, version);
             version++;
         }
+    }
+
+    public Page<DocumentRevisionDTO> findRevisions(Specification<DocumentRevision> specification, Pageable pageable) {
+        Page<DocumentRevision> revisions = revisionRepository.findAll(specification, pageable);
+        List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
+                                                          .map(this::mapRevisionToRevisionDto)
+                                                          .toList();
+
+        return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
     }
 
     public PageWithVersions getDocumentVersions(Document document, Pageable pageable) {

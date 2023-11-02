@@ -197,19 +197,23 @@ public class DocumentService {
     }
 
     public PageWithDocuments getDocuments(int pageNumber, int pageSize, String sort, String filter) {
-        List<Sort.Order> orders = documentCommonService.getDocumentOrders(sort);
+        List<Sort.Order> sortOrders = documentCommonService.getDocumentOrders(sort);
         List<FilterItem> filterItems = documentCommonService.getDocumentFilterItems(filter);
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
         Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
 
+        Page<DocumentDTO> documentDTOs = findDocuments(specification, pageable);
+        return documentCommonService.mapPageToPageWithDocuments(documentDTOs);
+    }
+
+    private Page<DocumentDTO> findDocuments(Specification<Document> specification, Pageable pageable) {
         Page<Document> documents = documentRepository.findAll(specification, pageable);
         List<DocumentDTO> documentDTOs = documents.stream()
                                                   .map(documentCommonService::mapDocumentToDocumentDto)
                                                   .toList();
 
-        PageImpl<DocumentDTO> documentDTOS = new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
-        return documentCommonService.mapPageToPageWithDocuments(documentDTOS);
+        return new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
     }
 
     public PageWithRevisions getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
@@ -221,13 +225,8 @@ public class DocumentService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filterItems);
 
-        Page<DocumentRevision> revisions = documentCommonService.getRevisionsBySpecification(specification, pageable);
-        List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
-                                                          .map(documentCommonService::mapRevisionToRevisionDto)
-                                                          .toList();
-
-        PageImpl<DocumentRevisionDTO> documentRevisionDTOS = new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
-        return documentCommonService.mapPageToPageWithRevisions(documentRevisionDTOS);
+        Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
+        return documentCommonService.mapPageToPageWithRevisions(documentRevisionDTOs);
     }
 
     public PageWithVersions getDocumentVersions(String documentId, int pageNumber, int pageSize) {

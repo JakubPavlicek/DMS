@@ -16,9 +16,16 @@ get:
             format: binary
       headers:
         Content-Disposition:
-          description: Specifies the filename for the downloaded revision.
+          description: The name of the file.
           schema:
             type: string
+            example: 'attachment; filename="dog.png"'
+        Content-Length:
+          description: The file size in bytes.
+          schema:
+            type: integer
+            format: int64
+            example: 17671
     404:
       description: Revision not found.
       content:

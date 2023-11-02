@@ -193,6 +193,7 @@ public class DocumentService {
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(document.getType()))
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
+                             .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(data.length))
                              .body(new ByteArrayResource(data));
     }
 

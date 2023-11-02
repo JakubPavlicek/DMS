@@ -77,6 +77,7 @@ public class DocumentRevisionService {
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(revision.getType()))
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + revision.getName() + "\"")
+                             .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(data.length))
                              .body(new ByteArrayResource(data));
     }
 

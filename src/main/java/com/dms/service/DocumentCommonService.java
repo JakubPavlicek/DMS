@@ -172,10 +172,10 @@ public class DocumentCommonService {
         Matcher matcher = pattern.matcher(sort);
 
         while (matcher.find()) {
-            String documentField = fieldMapper.apply(matcher.group(1));
+            String field = fieldMapper.apply(matcher.group(1));
             Sort.Direction direction = Sort.Direction.fromString(matcher.group(2));
 
-            orders.add(new Sort.Order(direction, documentField));
+            orders.add(new Sort.Order(direction, field));
         }
 
         return orders;

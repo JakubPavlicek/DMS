@@ -58,7 +58,6 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │       ├── application.yaml                      // SpringBoot + application config
     │       └── log4j2.yaml                           // Logger config
     └── test
-
 ```
 
 ## API

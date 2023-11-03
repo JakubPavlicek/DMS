@@ -1,4 +1,5 @@
 type: object
+title: Page Request
 description: Path in which the document will be stored.
 properties:
   path:

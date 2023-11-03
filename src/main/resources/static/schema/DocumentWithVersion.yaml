@@ -1,4 +1,5 @@
 type: object
+title: Document With Version
 properties:
   documentId:
     type: string
@@ -8,7 +9,7 @@ properties:
     format: int64
     example: 1
   author:
-    $ref: './UserDTO.yaml'
+    $ref: './User.yaml'
   name:
     type: string
     example: dog.jpeg

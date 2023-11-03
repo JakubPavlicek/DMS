@@ -1,10 +1,11 @@
 type: object
+title: Document Revision
 properties:
   revisionId:
     type: string
     example: 5b6cd216-3d3d-4121-ba69-3d6f9d8d966c
   author:
-    $ref: './UserDTO.yaml'
+    $ref: './User.yaml'
   name:
     type: string
     example: dog.jpeg

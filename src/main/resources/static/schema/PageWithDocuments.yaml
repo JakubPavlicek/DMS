@@ -1,11 +1,12 @@
 type: object
+title: Page With Documents
 properties:
   content:
     type: array
     items:
-      $ref: './DocumentDTO.yaml'
+      $ref: './Document.yaml'
   pageable:
-    $ref: './PageableDTO.yaml'
+    $ref: './Pageable.yaml'
   last:
     type: boolean
   totalElements:
@@ -20,7 +21,7 @@ properties:
   number:
     type: integer
   sort:
-    $ref: './SortDTO.yaml'
+    $ref: './Sort.yaml'
   numberOfElements:
     type: integer
   empty:

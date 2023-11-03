@@ -1,4 +1,5 @@
 type: object
+title: Page With Versions
 properties:
   content:
     type: array
@@ -6,7 +7,7 @@ properties:
       type: integer
       format: int64
   pageable:
-    $ref: './PageableDTO.yaml'
+    $ref: './Pageable.yaml'
   last:
     type: boolean
   totalElements:
@@ -21,7 +22,7 @@ properties:
   number:
     type: integer
   sort:
-    $ref: './SortDTO.yaml'
+    $ref: './Sort.yaml'
   numberOfElements:
     type: integer
   empty:

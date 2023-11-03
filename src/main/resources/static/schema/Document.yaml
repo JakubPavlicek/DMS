@@ -1,10 +1,11 @@
 type: object
+title: Document
 properties:
   documentId:
     type: string
     example: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a
   author:
-    $ref: './UserDTO.yaml'
+    $ref: './User.yaml'
   version:
     type: integer
     format: int64

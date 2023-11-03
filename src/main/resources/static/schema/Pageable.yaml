@@ -1,11 +1,12 @@
 type: object
+title: Pageable
 properties:
   pageNumber:
     type: integer
   pageSize:
     type: integer
   sort:
-    $ref: './PageableSortDTO.yaml'
+    $ref: './Sort.yaml'
   offset:
     type: integer
     format: int64

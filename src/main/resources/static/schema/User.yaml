@@ -1,4 +1,5 @@
 type: object
+title: User
 properties:
   username:
     type: string

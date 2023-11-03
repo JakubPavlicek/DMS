@@ -5,6 +5,10 @@ storage:
 hash:
   algorithm: SHA-256
 
+server:
+  error:
+    path: /errors
+
 spring:
   profiles:
     active: postgresql # set db that you want to use

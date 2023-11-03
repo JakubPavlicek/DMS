@@ -38,6 +38,8 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │   │       ├── filter                            // filtering in requests
     │   │       ├── hash                              // hasher for blobs
     │   │       ├── mapper                            // mapping between objects
+    │   │       │   ├── dto                           // dto mappers
+    │   │       │   └── entity                        // entity mappers
     │   │       ├── repository                        // DAOs
     │   │       ├── service                           // service
     │   │       ├── sort                              // sorting in requests
@@ -52,6 +54,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │       │   ├── path                              // OpenAPI paths
     │       │   │   ├── documents                     // /documents paths
     │       │   │   └── revisions                     // /revisions paths
+    │       │   ├── requestBody                       // OpenAPI requestBodies
     │       │   ├── schema                            // OpenAPI schemas
     │       │   ├── templates                         // OpenAPI generator templates
     │       │   └── openapi.yaml                      // main OpenAPI file 

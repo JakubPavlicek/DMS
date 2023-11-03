@@ -18,7 +18,7 @@ Configuration:
       target: SYSTEM_OUT
 
       PatternLayout:
-        pattern: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5level} %clr{%pid}{magenta} %clr{---}{faint} %clr{[%t]}{faint} %clr{%-40.40C{1.}}{cyan} - %msg%n"
+        pattern: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5level} %clr{%pid}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40C{1.}}{cyan} - %msg%n"
 
     RollingFile:
       - name: InfoFile

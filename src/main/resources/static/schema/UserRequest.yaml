@@ -1,5 +1,5 @@
 type: object
-title: UserRequest
+title: User Request
 description: Author of the document.
 required:
   - username

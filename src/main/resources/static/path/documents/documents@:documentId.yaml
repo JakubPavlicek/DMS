@@ -38,20 +38,7 @@ put:
     content:
       multipart/form-data:
         schema:
-          type: object
-          required:
-            - user
-            - file
-          properties:
-            user:
-              $ref: '../../schema/UserRequest.yaml'
-            file:
-              type: string
-              format: binary
-              description: File to be uploaded.
-              x-constraints: "@ValidFile"
-            path:
-              $ref: '../../schema/PathRequest.yaml'
+          $ref: '../../requestBody/FileUploadRequest.yaml'
   responses:
     201:
       description: New document version uploaded successfully.
@@ -109,7 +96,7 @@ put:
                 type: http://localhost:8080/errors/document-with-path-already-exists
                 title: File With Path Already Exists
                 status: 409
-                detail: "Document: dog.png with path: /home already exists"
+                detail: "Document: dog.jpeg with path: /home already exists"
                 instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
     415:
       description: Request does not contain any data.
@@ -140,7 +127,7 @@ put:
                 type: http://localhost:8080/errors/file-operation
                 title: File Write Error
                 status: 500
-                detail: "An error occurred while writing data from file: dog.png to storage"
+                detail: "An error occurred while writing data from file: dog.jpeg to storage"
                 instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a5
             DefaultError:
               summary: File Operation Error

@@ -8,20 +8,7 @@ post:
     content:
       multipart/form-data:
         schema:
-          type: object
-          required:
-            - user
-            - file
-          properties:
-            user:
-              $ref: '../../schema/UserRequest.yaml'
-            file:
-              type: string
-              format: binary
-              description: File to be uploaded.
-              x-constraints: "@ValidFile"
-            path:
-              $ref: '../../schema/PathRequest.yaml'
+          $ref: '../../requestBody/FileUploadRequest.yaml'
   responses:
     201:
       description: Document uploaded successfully.
@@ -67,7 +54,7 @@ post:
                 type: http://localhost:8080/errors/document-with-path-already-exists
                 title: File With Path Already Exists
                 status: 409
-                detail: "Document: dog.png with path: /home already exists"
+                detail: "Document: dog.jpeg with path: /home already exists"
                 instance: /documents/upload
     413:
       description: File size exceeded maximum upload size.
@@ -110,7 +97,7 @@ post:
                 type: http://localhost:8080/errors/file-operation
                 title: File Write Error
                 status: 500
-                detail: "An error occurred while writing data from file: dog.png to storage"
+                detail: "An error occurred while writing data from file: dog.jpeg to storage"
                 instance: /documents/upload
             DefaultError:
               summary: File Operation Error

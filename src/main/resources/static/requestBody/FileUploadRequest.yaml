@@ -1,0 +1,14 @@
+type: object
+required:
+  - user
+  - file
+properties:
+  user:
+    $ref: '../schema/UserRequest.yaml'
+  file:
+    type: string
+    format: binary
+    description: File to be uploaded.
+    x-constraints: "@ValidFile"
+  path:
+    $ref: '../schema/PathRequest.yaml'

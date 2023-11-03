@@ -1,4 +1,4 @@
-package com.dms.mapper;
+package com.dms.mapper.entity;
 
 import com.dms.entity.Document_;
 

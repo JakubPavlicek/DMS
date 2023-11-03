@@ -2,7 +2,7 @@ package com.dms.controller;
 
 import com.dms.RevisionsApi;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.PageWithRevisions;
+import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.service.DocumentRevisionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -32,7 +32,7 @@ public class DocumentRevisionController implements RevisionsApi {
     }
 
     @Override
-    public ResponseEntity<PageWithRevisions> getRevisions(Integer page, Integer limit, String sort, String filter) {
+    public ResponseEntity<PageWithRevisionsDTO> getRevisions(Integer page, Integer limit, String sort, String filter) {
         return ResponseEntity.ok(revisionService.getRevisions(page, limit, sort, filter));
     }
 

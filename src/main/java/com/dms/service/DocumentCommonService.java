@@ -1,7 +1,7 @@
 package com.dms.service;
 
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.PageWithVersions;
+import com.dms.dto.PageWithVersionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
@@ -11,10 +11,10 @@ import com.dms.exception.RevisionNotFoundException;
 import com.dms.filter.DocumentFilter;
 import com.dms.filter.FilterItem;
 import com.dms.filter.RevisionFilter;
-import com.dms.mapper.DocumentMapper;
-import com.dms.mapper.DocumentRevisionDTOMapper;
-import com.dms.mapper.PageWithVersionsMapper;
-import com.dms.mapper.RevisionMapper;
+import com.dms.mapper.entity.DocumentMapper;
+import com.dms.mapper.dto.DocumentRevisionDTOMapper;
+import com.dms.mapper.dto.PageWithVersionsDTOMapper;
+import com.dms.mapper.entity.RevisionMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import com.dms.sort.DocumentSort;
@@ -112,7 +112,7 @@ public class DocumentCommonService {
         return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
     }
 
-    public PageWithVersions getDocumentVersions(Document document, Pageable pageable) {
+    public PageWithVersionsDTO getDocumentVersions(Document document, Pageable pageable) {
         Page<DocumentRevision> revisions = revisionRepository.findAllByDocument(document, pageable);
 
         List<Long> versionList = revisions.stream()
@@ -120,7 +120,7 @@ public class DocumentCommonService {
                                        .toList();
 
         PageImpl<Long> versions = new PageImpl<>(versionList, pageable, revisions.getTotalElements());
-        return PageWithVersionsMapper.map(versions);
+        return PageWithVersionsDTOMapper.map(versions);
     }
 
     public List<FilterItem> getDocumentFilterItems(String filter) {

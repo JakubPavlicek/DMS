@@ -3,21 +3,21 @@ package com.dms.service;
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.DocumentWithVersionDTO;
-import com.dms.dto.PageWithDocuments;
-import com.dms.dto.PageWithRevisions;
-import com.dms.dto.PageWithVersions;
-import com.dms.dto.PathRequest;
-import com.dms.dto.UserRequest;
+import com.dms.dto.PageWithDocumentsDTO;
+import com.dms.dto.PageWithRevisionsDTO;
+import com.dms.dto.PageWithVersionsDTO;
+import com.dms.dto.PathRequestDTO;
+import com.dms.dto.UserRequestDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
 import com.dms.filter.FilterItem;
-import com.dms.mapper.DocumentDTOMapper;
-import com.dms.mapper.DocumentWithVersionDTOMapper;
-import com.dms.mapper.PageWithDocumentsMapper;
-import com.dms.mapper.PageWithRevisionsMapper;
+import com.dms.mapper.dto.DocumentDTOMapper;
+import com.dms.mapper.dto.DocumentWithVersionDTOMapper;
+import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
+import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -67,7 +67,7 @@ public class DocumentService {
                                  .orElseThrow(() -> new RuntimeException("Creation time not found for file with ID: " + documentId));
     }
 
-    private User getUserFromUserRequest(UserRequest userRequest) {
+    private User getUserFromUserRequest(UserRequestDTO userRequest) {
         User user = User.builder()
                         .username(userRequest.getUsername())
                         .email(userRequest.getEmail())
@@ -76,11 +76,11 @@ public class DocumentService {
         return userService.getSavedUser(user);
     }
 
-    private String getPathFromRequest(PathRequest pathRequest) {
+    private String getPathFromRequest(PathRequestDTO pathRequest) {
         return pathRequest == null ? null : pathRequest.getPath();
     }
 
-    private Document createDocument(UserRequest userRequest, MultipartFile file, String path) {
+    private Document createDocument(UserRequestDTO userRequest, MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
         User author = getUserFromUserRequest(userRequest);
 
@@ -109,7 +109,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadDocument(UserRequest userRequest, MultipartFile file, PathRequest pathRequest) {
+    public DocumentDTO uploadDocument(UserRequestDTO userRequest, MultipartFile file, PathRequestDTO pathRequest) {
         String path = getPathFromRequest(pathRequest);
         Document document = createDocument(userRequest, file, path);
 
@@ -124,7 +124,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequest userRequest, MultipartFile file, PathRequest pathRequest) {
+    public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequestDTO userRequest, MultipartFile file, PathRequestDTO pathRequest) {
         if (!documentRepository.existsByDocumentId(documentId))
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
 
@@ -193,7 +193,7 @@ public class DocumentService {
                              .body(new ByteArrayResource(data));
     }
 
-    public PageWithDocuments getDocuments(int pageNumber, int pageSize, String sort, String filter) {
+    public PageWithDocumentsDTO getDocuments(int pageNumber, int pageSize, String sort, String filter) {
         List<Sort.Order> sortOrders = documentCommonService.getDocumentOrders(sort);
         List<FilterItem> filterItems = documentCommonService.getDocumentFilterItems(filter);
 
@@ -201,7 +201,7 @@ public class DocumentService {
         Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
 
         Page<DocumentDTO> documentDTOs = findDocuments(specification, pageable);
-        return PageWithDocumentsMapper.map(documentDTOs);
+        return PageWithDocumentsDTOMapper.map(documentDTOs);
     }
 
     private Page<DocumentDTO> findDocuments(Specification<Document> specification, Pageable pageable) {
@@ -213,7 +213,7 @@ public class DocumentService {
         return new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
     }
 
-    public PageWithRevisions getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
+    public PageWithRevisionsDTO getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
         Document document = documentCommonService.getDocument(documentId);
 
         List<Sort.Order> orders = documentCommonService.getRevisionOrders(sort);
@@ -223,10 +223,10 @@ public class DocumentService {
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filterItems);
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
-        return PageWithRevisionsMapper.map(documentRevisionDTOs);
+        return PageWithRevisionsDTOMapper.map(documentRevisionDTOs);
     }
 
-    public PageWithVersions getDocumentVersions(String documentId, int pageNumber, int pageSize) {
+    public PageWithVersionsDTO getDocumentVersions(String documentId, int pageNumber, int pageSize) {
         Document document = documentCommonService.getDocument(documentId);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
@@ -234,7 +234,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO moveDocument(String documentId, PathRequest pathRequest) {
+    public DocumentDTO moveDocument(String documentId, PathRequestDTO pathRequest) {
         Document document = documentCommonService.getDocument(documentId);
         String path = getPathFromRequest(pathRequest);
 

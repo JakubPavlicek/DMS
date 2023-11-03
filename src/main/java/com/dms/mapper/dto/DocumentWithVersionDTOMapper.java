@@ -1,4 +1,4 @@
-package com.dms.mapper;
+package com.dms.mapper.dto;
 
 import com.dms.dto.DocumentWithVersionDTO;
 import com.dms.entity.Document;

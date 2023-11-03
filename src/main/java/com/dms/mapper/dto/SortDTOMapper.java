@@ -1,4 +1,4 @@
-package com.dms.mapper;
+package com.dms.mapper.dto;
 
 import com.dms.dto.SortDTO;
 import org.springframework.data.domain.Sort;

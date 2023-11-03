@@ -3,11 +3,11 @@ package com.dms.controller;
 import com.dms.DocumentsApi;
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentWithVersionDTO;
-import com.dms.dto.PageWithDocuments;
-import com.dms.dto.PageWithRevisions;
-import com.dms.dto.PageWithVersions;
-import com.dms.dto.PathRequest;
-import com.dms.dto.UserRequest;
+import com.dms.dto.PageWithDocumentsDTO;
+import com.dms.dto.PageWithRevisionsDTO;
+import com.dms.dto.PageWithVersionsDTO;
+import com.dms.dto.PathRequestDTO;
+import com.dms.dto.UserRequestDTO;
 import com.dms.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -39,12 +39,12 @@ public class DocumentController implements DocumentsApi {
     }
 
     @Override
-    public ResponseEntity<PageWithRevisions> getDocumentRevisions(String documentId, Integer page, Integer limit, String sort, String filter) {
+    public ResponseEntity<PageWithRevisionsDTO> getDocumentRevisions(String documentId, Integer page, Integer limit, String sort, String filter) {
         return ResponseEntity.ok(documentService.getDocumentRevisions(documentId, page, limit, sort, filter));
     }
 
     @Override
-    public ResponseEntity<PageWithVersions> getDocumentVersions(String documentId, Integer page, Integer limit) {
+    public ResponseEntity<PageWithVersionsDTO> getDocumentVersions(String documentId, Integer page, Integer limit) {
         return ResponseEntity.ok(documentService.getDocumentVersions(documentId, page, limit));
     }
 
@@ -54,12 +54,12 @@ public class DocumentController implements DocumentsApi {
     }
 
     @Override
-    public ResponseEntity<PageWithDocuments> getDocuments(Integer page, Integer limit, String sort, String filter) {
+    public ResponseEntity<PageWithDocumentsDTO> getDocuments(Integer page, Integer limit, String sort, String filter) {
         return ResponseEntity.ok(documentService.getDocuments(page, limit, sort, filter));
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> moveDocument(String documentId, PathRequest path) {
+    public ResponseEntity<DocumentDTO> moveDocument(String documentId, PathRequestDTO path) {
         return ResponseEntity.ok(documentService.moveDocument(documentId, path));
     }
 
@@ -74,13 +74,13 @@ public class DocumentController implements DocumentsApi {
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> uploadDocument(UserRequest user, MultipartFile file, PathRequest path) {
+    public ResponseEntity<DocumentDTO> uploadDocument(UserRequestDTO user, MultipartFile file, PathRequestDTO path) {
         DocumentDTO documentDTO = documentService.uploadDocument(user, file, path);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(String documentId, UserRequest user, MultipartFile file, PathRequest path) {
+    public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(String documentId, UserRequestDTO user, MultipartFile file, PathRequestDTO path) {
         DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(documentId, user, file, path);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }

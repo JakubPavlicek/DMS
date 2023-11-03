@@ -1,4 +1,4 @@
-package com.dms.mapper;
+package com.dms.mapper.dto;
 
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.DocumentRevision;

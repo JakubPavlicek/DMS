@@ -1,13 +1,13 @@
 package com.dms.service;
 
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.PageWithRevisions;
+import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionDeletionException;
 import com.dms.filter.FilterItem;
-import com.dms.mapper.DocumentRevisionDTOMapper;
-import com.dms.mapper.PageWithRevisionsMapper;
+import com.dms.mapper.dto.DocumentRevisionDTOMapper;
+import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
 import com.dms.repository.DocumentRevisionRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -83,7 +83,7 @@ public class DocumentRevisionService {
                              .body(new ByteArrayResource(data));
     }
 
-    public PageWithRevisions getRevisions(int pageNumber, int pageSize, String sort, String filter) {
+    public PageWithRevisionsDTO getRevisions(int pageNumber, int pageSize, String sort, String filter) {
         List<Sort.Order> orders = documentCommonService.getRevisionOrders(sort);
         List<FilterItem> filterItems = documentCommonService.getRevisionFilterItems(filter);
 
@@ -91,7 +91,7 @@ public class DocumentRevisionService {
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filterItems);
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
-        return PageWithRevisionsMapper.map(documentRevisionDTOs);
+        return PageWithRevisionsDTOMapper.map(documentRevisionDTOs);
     }
 
 }

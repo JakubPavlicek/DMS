@@ -1,7 +1,9 @@
 package com.dms.exception;
 
+import com.dms.config.ServerProperties;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,20 +26,26 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private final String baseUrl = "http://localhost:8080/errors";
+    private final ServerProperties serverProperties;
+
+    private final static String CONTEXT_INFO = "context_info";
+    private final static String MESSAGE = "message";
 
     @ExceptionHandler(FileOperationException.class)
     public ProblemDetail handleFileOperationEception(FileOperationException eception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, eception.getMessage());
         problemDetail.setTitle(eception.getFileOperation()
                                        .getTitle());
-        problemDetail.setType(URI.create(baseUrl + "/file-operation"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/file-operation"));
 
         return problemDetail;
     }
@@ -46,7 +54,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleFileWithPathAlreadyExistsException(FileWithPathAlreadyExistsException eception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, eception.getMessage());
         problemDetail.setTitle("File With Path Already Exists");
-        problemDetail.setType(URI.create(baseUrl + "/document-with-path-already-exists"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/document-with-path-already-exists"));
 
         return problemDetail;
     }
@@ -55,7 +63,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleDocumentNotFoundException(DocumentNotFoundException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
         problemDetail.setTitle("Document Not Found");
-        problemDetail.setType(URI.create(baseUrl + "/document-not-found"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/document-not-found"));
 
         return problemDetail;
     }
@@ -64,7 +72,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleRevisionNotFoundException(RevisionNotFoundException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
         problemDetail.setTitle("Revision Not Found");
-        problemDetail.setType(URI.create(baseUrl + "/revision-not-found"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/revision-not-found"));
 
         return problemDetail;
     }
@@ -73,7 +81,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleRevisionDeletionException(RevisionDeletionException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Revision Deletion Error");
-        problemDetail.setType(URI.create(baseUrl + "/revision-deletion-error"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/revision-deletion-error"));
 
         return problemDetail;
     }
@@ -81,26 +89,30 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String detail = "Unsupported media type: " + ex.getContentType() + ", supported media types are: " + MediaType.toString(ex.getSupportedMediaTypes());
-        String cause = "Request must contain data";
 
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNSUPPORTED_MEDIA_TYPE, detail);
         problemDetail.setTitle("Unsupported Media Type");
-        problemDetail.setType(URI.create(baseUrl + "/media-type-not-supported"));
-        problemDetail.setDetail(detail);
-        problemDetail.setProperty("cause", cause);
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/media-type-not-supported"));
 
-        return ResponseEntity.of(problemDetail).build();
+        Map<String, List<String>> message = new HashMap<>();
+        message.put(MESSAGE, List.of("Request must contain data"));
+
+        problemDetail.setProperty(CONTEXT_INFO, message);
+
+        return ResponseEntity.of(problemDetail)
+                             .build();
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-
-        List<String> errorMessages = getMethodArgumentErrorMessages(ex);
-
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Provided data are not valid");
         problemDetail.setTitle("Invalid Data Provided");
-        problemDetail.setType(URI.create(baseUrl + "/invalid-data-provided"));
-        problemDetail.setProperty("errors", errorMessages);
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/invalid-data-provided"));
+
+        Map<String, List<String>> message = new HashMap<>();
+        message.put(MESSAGE, getMethodArgumentErrorMessages(ex));
+
+        problemDetail.setProperty(CONTEXT_INFO, message);
 
         return ResponseEntity.of(problemDetail)
                              .build();
@@ -121,7 +133,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problemDetail.setTitle("Missing Request Part");
-        problemDetail.setType(URI.create(baseUrl + "/missing-request-part"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/missing-request-part"));
 
         return ResponseEntity.of(problemDetail)
                              .build();
@@ -131,7 +143,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problemDetail.setTitle("Missing Request Parameter");
-        problemDetail.setType(URI.create(baseUrl + "/missing-request-parameter"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/missing-request-parameter"));
 
         return ResponseEntity.of(problemDetail)
                              .build();
@@ -141,7 +153,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problemDetail.setTitle("Resource Not Found");
-        problemDetail.setType(URI.create(baseUrl + "/resource-not-found"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/resource-not-found"));
 
         return ResponseEntity.of(problemDetail)
                              .build();
@@ -149,14 +161,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail handleConstraintViolationException(ConstraintViolationException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Provided data are not valid");
         problemDetail.setTitle("Invalid Data Provided");
-        problemDetail.setType(URI.create(baseUrl + "/invalid-data-provided"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/invalid-data-provided"));
 
         Set<ConstraintViolation<?>> violations = exception.getConstraintViolations();
 
-        List<String> errors = getConstraintViolationErrorMessages(violations);
-        problemDetail.setProperty("errors", errors);
+        Map<String, List<String>> message = new HashMap<>();
+        message.put(MESSAGE, getConstraintViolationErrorMessages(violations));
+
+        problemDetail.setProperty(CONTEXT_INFO, message);
 
         return problemDetail;
     }
@@ -165,10 +179,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errorMessages = new ArrayList<>();
 
         violations.forEach(violation -> {
-            String value = String.valueOf(violation.getInvalidValue());
             String message = violation.getMessage();
+            String propertyPath = violation.getPropertyPath().toString();
+            String property = propertyPath.substring(propertyPath.lastIndexOf('.') + 1);
 
-            String errorMessage = String.format("Value '%s' was rejected for the following reason: %s", value, message);
+            String errorMessage = String.format("%s: %s", property, message);
 
             errorMessages.add(errorMessage);
         });
@@ -180,7 +195,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handlePropertyReferenceException(PropertyReferenceException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Property Doesn't Exist");
-        problemDetail.setType(URI.create(baseUrl + "/property-doesnt-exist"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/property-doesnt-exist"));
 
         return problemDetail;
     }
@@ -189,7 +204,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleInvalidRegexInputException(InvalidRegexInputException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Pattern Doesn't Match");
-        problemDetail.setType(URI.create(baseUrl + "/pattern-doesnt-match"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/pattern-doesnt-match"));
 
         return problemDetail;
     }
@@ -198,7 +213,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleMultipartException(MultipartException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, exception.getMessage());
         problemDetail.setTitle("Payload Too Large");
-        problemDetail.setType(URI.create(baseUrl + "/payload-too-large"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/payload-too-large"));
 
         return problemDetail;
     }
@@ -207,7 +222,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleGenericException(Exception exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Unexpected Error Occurred");
-        problemDetail.setType(URI.create(baseUrl + "/unexpected"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/unexpected"));
 
         return problemDetail;
     }

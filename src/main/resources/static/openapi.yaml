@@ -13,30 +13,22 @@ components:
 
   schemas:
 
-    UserDTO:
-      $ref: './schema/UserDTO.yaml'
-    DocumentDTO:
-      $ref: './schema/DocumentDTO.yaml'
-    DocumentWithVersionDTO:
-      $ref: './schema/DocumentWithVersionDTO.yaml'
-    DocumentRevisionDTO:
-      $ref: './schema/DocumentRevisionDTO.yaml'
-    UserRequest:
-      $ref: './schema/UserRequest.yaml'
-    PathRequest:
-      $ref: './schema/PathRequest.yaml'
-    ProblemDetail:
-      $ref: './schema/ProblemDetail.yaml'
-    ProblemDetailWithCause:
-      $ref: './schema/ProblemDetailWithCause.yaml'
-    ProblemDetailWithErrors:
-      $ref: './schema/ProblemDetailWithErrors.yaml'
+    User:
+      $ref: './schema/User.yaml'
+    Document:
+      $ref: './schema/Document.yaml'
+    DocumentWithVersion:
+      $ref: './schema/DocumentWithVersion.yaml'
+    DocumentRevision:
+      $ref: './schema/DocumentRevision.yaml'
     PageWithDocuments:
       $ref: './schema/PageWithDocuments.yaml'
     PageWithRevisions:
       $ref: './schema/PageWithRevisions.yaml'
     PageWithVersions:
       $ref: './schema/PageWithVersions.yaml'
+    ClientError:
+      $ref: './schema/ClientError.yaml'
 
   examples:
 

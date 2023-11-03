@@ -18,7 +18,7 @@ Configuration:
       target: SYSTEM_OUT
 
       PatternLayout:
-        pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5p} [%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable"
+        pattern: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5level} %clr{%pid}{magenta} %clr{---}{faint} %clr{[%t]}{faint} %clr{%-40.40C{1.}}{cyan} - %msg%n"
 
     RollingFile:
       - name: InfoFile
@@ -33,7 +33,7 @@ Configuration:
           onMismatch: deny
 
         PatternLayout:
-          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t] %C{1.}: %msg%n%throwable"
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%15t] %C{1.}: %msg%n%throwable"
           disableAnsi: true
 
         Policies:
@@ -55,7 +55,7 @@ Configuration:
           level: DEBUG
 
         PatternLayout:
-          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t] %C{1.}::%M line %L: %msg%n%throwable"
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%15t] %-40C{1.}::%M line %L: %msg%n%throwable"
           disableAnsi: true
 
         Policies:

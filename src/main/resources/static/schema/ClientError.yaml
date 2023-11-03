@@ -1,0 +1,37 @@
+type: object
+title: Client Error
+description: A generic error.
+properties:
+  type:
+    type: string
+    description: "A URI reference that identifies the problem type."
+    example: "http://localhost:8080/errors/document-not-found"
+  title:
+    type: string
+    description: "A short, human-readable summary of the problem type."
+    example: Document Not Found
+  status:
+    type: number
+    description: "The HTTP status code."
+    example: 404
+  detail:
+    type: string
+    description: "A human-readable explanation specific to this occurrence of the problem."
+    example: "File with ID: 11ae56ed-240e-4d4d-8d3c-f135d9394ab3 not found"
+  instance:
+    type: string
+    description: "A URI reference that identifies the specific occurrence of the problem."
+    example: "/documents/11ae56ed-240e-4d4d-8d3c-f135d9394ab3"
+  contextInfo:
+    type: object
+    description: |
+      A free-form based object that contains additional context about the error.
+      The possible fields are defined on a per-endpoint basis.
+      'message' is only one example.
+    properties:
+      message:
+        type: array
+        items:
+          type: string
+          description: "More details on the error."
+          example: "Something went wrong"

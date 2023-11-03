@@ -15,95 +15,34 @@ post:
       content:
         application/json:
           schema:
-            $ref: '../../schema/DocumentDTO.yaml'
+            $ref: '../../schema/Document.yaml'
     400:
       description: Either invalid data provided or some request parts are missing.
       content:
         application/json:
           schema:
-            oneOf:
-              - $ref: '../../schema/ProblemDetail.yaml'
-              - $ref: '../../schema/ProblemDetailWithErrors.yaml'
-          examples:
-            InvalidDataProvided:
-              summary: Invalid Data Provided
-              value:
-                type: http://localhost:8080/errors/invalid-data
-                title: Invalid Data Provided
-                status: 400
-                instance: /documents/upload
-                errors: [ "Username is mandatory" ]
-            MissingRequestPart:
-              summary: Missing Request Part
-              value:
-                type: http://localhost:8080/errors/missing-request-part
-                title: Missing Request Part
-                status: 400
-                detail: Required part 'user' is not present.
-                instance: /documents/upload
+            $ref: '../../schema/ClientError.yaml'
     409:
       description: File with provided path already exists.
       content:
         application/json:
           schema:
-            $ref: '../../schema/ProblemDetail.yaml'
-          examples:
-            FileWithPathAlreadyExists:
-              summary: File With Path Already Exists
-              value:
-                type: http://localhost:8080/errors/document-with-path-already-exists
-                title: File With Path Already Exists
-                status: 409
-                detail: "Document: dog.jpeg with path: /home already exists"
-                instance: /documents/upload
+            $ref: '../../schema/ClientError.yaml'
     413:
       description: File size exceeded maximum upload size.
       content:
         application/json:
           schema:
-            $ref: '../../schema/ProblemDetail.yaml'
-          example:
-            type: http://localhost:8080/errors/payload-too-large
-            title: Payload Too Large
-            status: 413
-            detail: "Maximum upload size exceeded"
-            instance: /documents/upload
+            $ref: '../../schema/ClientError.yaml'
     415:
       description: Request does not contain any data.
       content:
         application/json:
           schema:
-            $ref: '../../schema/ProblemDetailWithCause.yaml'
-          examples:
-            RequestDoesNotContainData:
-              summary: Request Does Not Contain Data
-              value:
-                type: http://localhost:8080/errors/media-type-not-supported
-                title: Unsupported Media Type
-                status: 415
-                detail: "Unsupported media type: null, supported media types are: multipart/form-data"
-                instance: /documents/upload
-                cause: Request must contain data
+            $ref: '../../schema/ClientError.yaml'
     500:
       description: Error occurred when working with a document.
       content:
         application/json:
           schema:
-            $ref: '../../schema/ProblemDetail.yaml'
-          examples:
-            WriteError:
-              summary: File Write Error
-              value:
-                type: http://localhost:8080/errors/file-operation
-                title: File Write Error
-                status: 500
-                detail: "An error occurred while writing data from file: dog.jpeg to storage"
-                instance: /documents/upload
-            DefaultError:
-              summary: File Operation Error
-              value:
-                type: http://localhost:8080/errors/file-operation
-                title: File Operation Error
-                status: 500
-                detail: "An error occurred while working with the file"
-                instance: /documents/upload
+            $ref: '../../schema/ClientError.yaml'

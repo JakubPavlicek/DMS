@@ -24,21 +24,4 @@ get:
       content:
         application/json:
           schema:
-            $ref: '../../schema/ProblemDetail.yaml'
-          examples:
-            SortParameterDoesNotMatch:
-              summary: Sort Parameter Does Not Match
-              value:
-                type: http://localhost:8080/errors/pattern-doesnt-match
-                title: Pattern Doesn't Match
-                status: 400
-                detail: "The 'sort' parameter does not match the expected format"
-                instance: /documents
-            FilterParameterDoesNotMatch:
-              summary: Filter Parameter Does Not Match
-              value:
-                type: http://localhost:8080/errors/pattern-doesnt-match
-                title: Pattern Doesn't Match
-                status: 400
-                detail: "The 'filter' parameter does not match the expected format"
-                instance: /documents
+            $ref: '../../schema/ClientError.yaml'

@@ -31,10 +31,4 @@ get:
       content:
         application/json:
           schema:
-            $ref: '../../schema/ProblemDetail.yaml'
-          example:
-            type: http://localhost:8080/errors/revision-not-found
-            title: Revision Not Found
-            status: 404
-            detail: "Revision with ID: f79fa8e0-c42d-40f5-90b9-00a4180990d1 was not found"
-            instance: /revisions/f79fa8e0-c42d-40f5-90b9-00a4180990d1/download
+            $ref: '../../schema/ClientError.yaml'

@@ -25,21 +25,4 @@ get:
       content:
         application/json:
           schema:
-            $ref: '../../schema/ProblemDetail.yaml'
-          examples:
-            SortParameterDoesNotMatch:
-              summary: Sort Parameter Does Not Match
-              value:
-                type: http://localhost:8080/errors/pattern-doesnt-match
-                title: Pattern Doesn't Match
-                status: 400
-                detail: "The 'sort' parameter does not match the expected format"
-                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a/revisions
-            FilterParameterDoesNotMatch:
-              summary: Filter Parameter Does Not Match
-              value:
-                type: http://localhost:8080/errors/pattern-doesnt-match
-                title: Pattern Doesn't Match
-                status: 400
-                detail: "The 'filter' parameter does not match the expected format"
-                instance: /documents/e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a/revisions
+            $ref: '../../schema/ClientError.yaml'

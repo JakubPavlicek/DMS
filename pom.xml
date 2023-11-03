@@ -115,6 +115,7 @@
                             <generatorName>spring</generatorName>
                             <apiPackage>com.dms</apiPackage>
                             <modelPackage>com.dms.dto</modelPackage>
+                            <modelNameSuffix>DTO</modelNameSuffix>
                             <configOptions>
                                 <sourceFolder>src/gen/java/main</sourceFolder>
                                 <library>spring-boot</library>

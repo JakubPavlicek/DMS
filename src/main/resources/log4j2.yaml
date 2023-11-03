@@ -11,7 +11,7 @@ Configuration:
       - name: LOG_FILENAME_PATTERN
         value: log_%i.log
       - name: LOG_PATTERN
-        value: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5level} %clr{%pid}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40C{1.}}{cyan} - %msg%n%throwable"
+        value: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5level %pid --- [%15.15t] %-40.40C{1.} - %msg%n%throwable"
 
   Appenders:
 

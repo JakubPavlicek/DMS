@@ -1,6 +1,7 @@
 package com.dms.config;
 
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.Errors;
@@ -8,11 +9,11 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-@Validated
-@Getter
 @ConfigurationProperties(prefix = "hash")
+@Validated
+@Log4j2
+@Getter
 public class HashProperties implements Validator {
 
     @Value("${hash.algorithm:SHA-256}")
@@ -27,8 +28,10 @@ public class HashProperties implements Validator {
     public void validate(Object target, Errors errors) {
         try {
             MessageDigest.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
-            errors.rejectValue("algorithm", "Hash Algorithm Not Found", "Hashovaci algoritmus neexistuje");
+        } catch (Exception e) {
+            String message = "Hash algorithm does not exist";
+            log.error(message, e);
+            errors.rejectValue("algorithm", "Hash Algorithm Not Found", message);
         }
     }
 

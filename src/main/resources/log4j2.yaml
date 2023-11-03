@@ -6,10 +6,12 @@ Configuration:
     Property:
       - name: LOG_DIR
         value: log
-      - name: LOG_FILE
+      - name: LOG_FILENAME
         value: log.log
-      - name: LOG_PATTERN
+      - name: LOG_FILENAME_PATTERN
         value: log_%i.log
+      - name: LOG_PATTERN
+        value: "%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5level} %clr{%pid}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40C{1.}}{cyan} - %msg%n%throwable"
 
   Appenders:
 
@@ -22,8 +24,8 @@ Configuration:
 
     RollingFile:
       - name: InfoFile
-        fileName: ${LOG_DIR}/${LOG_FILE}
-        filePattern: ${LOG_DIR}/${LOG_PATTERN}
+        fileName: ${LOG_DIR}/${LOG_FILENAME}
+        filePattern: ${LOG_DIR}/${LOG_FILENAME_PATTERN}
         append: false
         immediateFlush: true
 
@@ -33,7 +35,7 @@ Configuration:
           onMismatch: deny
 
         PatternLayout:
-          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%15t] %C{1.}: %msg%n%throwable"
+          pattern: ${LOG_PATTERN}
           disableAnsi: true
 
         Policies:
@@ -46,8 +48,8 @@ Configuration:
           max: 3
 
       - name: DebugFile
-        fileName: ${LOG_DIR}/${LOG_FILE}
-        filePattern: ${LOG_DIR}/${LOG_PATTERN}
+        fileName: ${LOG_DIR}/${LOG_FILENAME}
+        filePattern: ${LOG_DIR}/${LOG_FILENAME_PATTERN}
         append: false
         immediateFlush: true
 
@@ -55,7 +57,7 @@ Configuration:
           level: DEBUG
 
         PatternLayout:
-          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%15t] %-40C{1.}::%M line %L: %msg%n%throwable"
+          pattern: ${LOG_PATTERN}
           disableAnsi: true
 
         Policies:

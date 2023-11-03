@@ -1,0 +1,15 @@
+type: object
+properties:
+  pageNumber:
+    type: integer
+  pageSize:
+    type: integer
+  sort:
+    $ref: './PageableSortDTO.yaml'
+  offset:
+    type: integer
+    format: int64
+  paged:
+    type: boolean
+  unpaged:
+    type: boolean

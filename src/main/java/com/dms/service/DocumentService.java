@@ -14,6 +14,10 @@ import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
 import com.dms.filter.FilterItem;
+import com.dms.mapper.DocumentDTOMapper;
+import com.dms.mapper.DocumentWithVersionDTOMapper;
+import com.dms.mapper.PageWithDocumentsMapper;
+import com.dms.mapper.PageWithRevisionsMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -48,22 +52,14 @@ public class DocumentService {
 
     public DocumentDTO getDocument(String documentId) {
         Document document = documentCommonService.getDocument(documentId);
-        return documentCommonService.mapDocumentToDocumentDto(document);
+        return DocumentDTOMapper.map(document);
     }
 
     public DocumentWithVersionDTO getDocumentWithVersion(String documentId, Long version) {
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
 
-        return DocumentWithVersionDTO.builder()
-                                     .documentId(document.getDocumentId())
-                                     .version(revision.getVersion())
-                                     .author(documentCommonService.mapUserToUserDto(revision.getAuthor()))
-                                     .name(revision.getName())
-                                     .type(revision.getType())
-                                     .path(revision.getPath())
-                                     .createdAt(revision.getCreatedAt())
-                                     .build();
+        return DocumentWithVersionDTOMapper.map(document, revision);
     }
 
     private LocalDateTime getDocumentCreatedAt(String documentId) {
@@ -124,7 +120,7 @@ public class DocumentService {
 
         documentCommonService.saveRevisionFromDocument(savedDocument);
 
-        return documentCommonService.mapDocumentToDocumentDto(savedDocument);
+        return DocumentDTOMapper.map(savedDocument);
     }
 
     @Transactional
@@ -151,7 +147,7 @@ public class DocumentService {
 
         documentCommonService.saveRevisionFromDocument(savedDocument);
 
-        return documentCommonService.mapDocumentToDocumentDto(savedDocument);
+        return DocumentDTOMapper.map(savedDocument);
     }
 
     @Transactional
@@ -161,7 +157,7 @@ public class DocumentService {
 
         Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
 
-        return documentCommonService.mapDocumentToDocumentDto(documentFromRevision);
+        return DocumentDTOMapper.map(documentFromRevision);
     }
 
     @Transactional
@@ -171,7 +167,7 @@ public class DocumentService {
 
         Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
 
-        return documentCommonService.mapDocumentToDocumentDto(documentFromRevision);
+        return DocumentDTOMapper.map(documentFromRevision);
     }
 
     @Transactional
@@ -205,13 +201,13 @@ public class DocumentService {
         Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
 
         Page<DocumentDTO> documentDTOs = findDocuments(specification, pageable);
-        return documentCommonService.mapPageToPageWithDocuments(documentDTOs);
+        return PageWithDocumentsMapper.map(documentDTOs);
     }
 
     private Page<DocumentDTO> findDocuments(Specification<Document> specification, Pageable pageable) {
         Page<Document> documents = documentRepository.findAll(specification, pageable);
         List<DocumentDTO> documentDTOs = documents.stream()
-                                                  .map(documentCommonService::mapDocumentToDocumentDto)
+                                                  .map(DocumentDTOMapper::map)
                                                   .toList();
 
         return new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
@@ -227,7 +223,7 @@ public class DocumentService {
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filterItems);
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
-        return documentCommonService.mapPageToPageWithRevisions(documentRevisionDTOs);
+        return PageWithRevisionsMapper.map(documentRevisionDTOs);
     }
 
     public PageWithVersions getDocumentVersions(String documentId, int pageNumber, int pageSize) {
@@ -249,7 +245,7 @@ public class DocumentService {
 
         documentCommonService.saveRevisionFromDocument(savedDocument);
 
-        return documentCommonService.mapDocumentToDocumentDto(savedDocument);
+        return DocumentDTOMapper.map(savedDocument);
     }
 
 }

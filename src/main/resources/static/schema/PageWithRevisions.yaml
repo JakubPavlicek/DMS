@@ -5,31 +5,12 @@ properties:
     items:
       $ref: './DocumentRevisionDTO.yaml'
   pageable:
-    type: object
-    properties:
-      pageNumber:
-        type: integer
-      pageSize:
-        type: integer
-      sort:
-        type: object
-        properties:
-          empty:
-            type: boolean
-          sorted:
-            type: boolean
-          unsorted:
-            type: boolean
-      offset:
-        type: integer
-      paged:
-        type: boolean
-      unpaged:
-        type: boolean
+    $ref: './PageableDTO.yaml'
   last:
     type: boolean
   totalElements:
     type: integer
+    format: int64
   totalPages:
     type: integer
   first:
@@ -39,14 +20,7 @@ properties:
   number:
     type: integer
   sort:
-    type: object
-    properties:
-      empty:
-        type: boolean
-      sorted:
-        type: boolean
-      unsorted:
-        type: boolean
+    $ref: './SortDTO.yaml'
   numberOfElements:
     type: integer
   empty:

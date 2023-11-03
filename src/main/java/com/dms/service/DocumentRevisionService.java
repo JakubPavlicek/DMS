@@ -6,6 +6,8 @@ import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionDeletionException;
 import com.dms.filter.FilterItem;
+import com.dms.mapper.DocumentRevisionDTOMapper;
+import com.dms.mapper.PageWithRevisionsMapper;
 import com.dms.repository.DocumentRevisionRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -34,7 +36,7 @@ public class DocumentRevisionService {
 
     public DocumentRevisionDTO getRevision(String revisionId) {
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
-        return documentCommonService.mapRevisionToRevisionDto(revision);
+        return DocumentRevisionDTOMapper.map(revision);
     }
 
     private void replaceDocumentWithAdjacentRevision(Document document) {
@@ -88,8 +90,8 @@ public class DocumentRevisionService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
         Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filterItems);
 
-        Page<DocumentRevisionDTO> documentRevisionDTOS = documentCommonService.findRevisions(specification, pageable);
-        return documentCommonService.mapPageToPageWithRevisions(documentRevisionDTOS);
+        Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
+        return PageWithRevisionsMapper.map(documentRevisionDTOs);
     }
 
 }

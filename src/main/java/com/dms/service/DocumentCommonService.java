@@ -1,11 +1,7 @@
 package com.dms.service;
 
-import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.PageWithDocuments;
-import com.dms.dto.PageWithRevisions;
 import com.dms.dto.PageWithVersions;
-import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
@@ -16,13 +12,14 @@ import com.dms.filter.DocumentFilter;
 import com.dms.filter.FilterItem;
 import com.dms.filter.RevisionFilter;
 import com.dms.mapper.DocumentMapper;
+import com.dms.mapper.DocumentRevisionDTOMapper;
+import com.dms.mapper.PageWithVersionsMapper;
 import com.dms.mapper.RevisionMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import com.dms.sort.DocumentSort;
 import com.dms.sort.RevisionSort;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +42,6 @@ public class DocumentCommonService {
     private final DocumentRevisionRepository revisionRepository;
 
     private final BlobStorageService blobStorageService;
-    private final ModelMapper modelMapper;
 
     public Document getDocument(String documentId) {
         return documentRepository.findByDocumentId(documentId)
@@ -110,7 +106,7 @@ public class DocumentCommonService {
     public Page<DocumentRevisionDTO> findRevisions(Specification<DocumentRevision> specification, Pageable pageable) {
         Page<DocumentRevision> revisions = revisionRepository.findAll(specification, pageable);
         List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
-                                                          .map(this::mapRevisionToRevisionDto)
+                                                          .map(DocumentRevisionDTOMapper::map)
                                                           .toList();
 
         return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
@@ -119,12 +115,12 @@ public class DocumentCommonService {
     public PageWithVersions getDocumentVersions(Document document, Pageable pageable) {
         Page<DocumentRevision> revisions = revisionRepository.findAllByDocument(document, pageable);
 
-        List<Long> versions = revisions.stream()
+        List<Long> versionList = revisions.stream()
                                        .map(DocumentRevision::getVersion)
                                        .toList();
 
-        PageImpl<Long> longs = new PageImpl<>(versions, pageable, revisions.getTotalElements());
-        return mapPageToPageWithVersions(longs);
+        PageImpl<Long> versions = new PageImpl<>(versionList, pageable, revisions.getTotalElements());
+        return PageWithVersionsMapper.map(versions);
     }
 
     public List<FilterItem> getDocumentFilterItems(String filter) {
@@ -200,30 +196,6 @@ public class DocumentCommonService {
 
     public boolean pathWithFileAlreadyExists(String path, String filename, User user) {
         return documentRepository.pathWithFileAlreadyExists(path, filename, user) || revisionRepository.pathWithFileAlreadyExists(path, filename, user);
-    }
-
-    public DocumentDTO mapDocumentToDocumentDto(Document document) {
-        return modelMapper.map(document, DocumentDTO.class);
-    }
-
-    public DocumentRevisionDTO mapRevisionToRevisionDto(DocumentRevision revision) {
-        return modelMapper.map(revision, DocumentRevisionDTO.class);
-    }
-
-    public UserDTO mapUserToUserDto(User user) {
-        return modelMapper.map(user, UserDTO.class);
-    }
-
-    public PageWithDocuments mapPageToPageWithDocuments(Page<DocumentDTO> page) {
-        return modelMapper.map(page, PageWithDocuments.class);
-    }
-
-    public PageWithRevisions mapPageToPageWithRevisions(Page<DocumentRevisionDTO> page) {
-        return modelMapper.map(page, PageWithRevisions.class);
-    }
-
-    public PageWithVersions mapPageToPageWithVersions(Page<Long> pageDocumentVersions) {
-        return modelMapper.map(pageDocumentVersions, PageWithVersions.class);
     }
 
 }

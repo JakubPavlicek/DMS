@@ -26,6 +26,8 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/changelog-master.yaml
+  main:
+    log-startup-info: false
 
 springdoc:
   api-docs:

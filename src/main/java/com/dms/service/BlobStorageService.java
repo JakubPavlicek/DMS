@@ -26,12 +26,18 @@ public class BlobStorageService {
         String hash = hasher.hashFile(file);
         String filename = file.getOriginalFilename();
 
+        Path directoryPath = getDirectoryPath(hash);
         Path filePath = getFilePath(hash);
 
         try {
             if (Files.exists(filePath)) {
                 log.info("Blob of file {} already exist, retrieving existing blob", filename);
                 return hash;
+            }
+
+            if (Files.notExists(directoryPath)) {
+                Files.createDirectory(directoryPath);
+                log.info("Creating directory for blob");
             }
 
             Files.write(filePath, file.getBytes());
@@ -60,8 +66,10 @@ public class BlobStorageService {
         Path filePath = getFilePath(hash);
 
         try {
-            Files.deleteIfExists(filePath);
-            log.info("Blob deleted successfully");
+            boolean wasFileDeleted = Files.deleteIfExists(filePath);
+
+            if(wasFileDeleted)
+                log.info("Blob deleted successfully");
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.DELETE, "An error occurred while deleting the file");
         }

@@ -79,8 +79,6 @@ public class DocumentService {
     }
 
     private User getUserFromUserRequest(UserRequestDTO userRequest) {
-        log.debug("Getting user from request: userRequest={}", userRequest);
-
         User user = User.builder()
                         .username(userRequest.getUsername())
                         .email(userRequest.getEmail())
@@ -94,8 +92,6 @@ public class DocumentService {
     }
 
     private Document createDocument(UserRequestDTO userRequest, MultipartFile file, String path) {
-        log.debug("Creating document: userRequest={}, file={}, path={}", userRequest, file.getOriginalFilename(), path);
-
         String hash = documentCommonService.storeBlob(file);
         User author = getUserFromUserRequest(userRequest);
 
@@ -104,7 +100,7 @@ public class DocumentService {
         String name = StringUtils.getFilename(cleanPath);
         String type = file.getContentType();
 
-        log.info("Document successfully created (not persisted yet)");
+        log.info("Document: '{}' successfully created (not persisted yet)", name);
 
         return Document.builder()
                        .name(name)
@@ -117,7 +113,7 @@ public class DocumentService {
     }
 
     private void validateUniquePath(String path, Document document) {
-        log.debug("Validating path: path={}, document={}", path, document.getDocumentId());
+        log.debug("Validating path: path={}, document={}", path, document);
 
         String filename = document.getName();
         User author = document.getAuthor();
@@ -139,9 +135,9 @@ public class DocumentService {
         // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
         Document savedDocument = documentRepository.saveAndFlush(document);
 
-        documentCommonService.saveRevisionFromDocument(savedDocument);
+        log.info("Document: '{}' with ID: '{}' uploaded successfully", document.getName(), document.getDocumentId());
 
-        log.info("Document uploaded successfully");
+        documentCommonService.saveRevisionFromDocument(savedDocument);
 
         return DocumentDTOMapper.map(savedDocument);
     }

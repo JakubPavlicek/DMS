@@ -97,7 +97,10 @@ public class DocumentCommonService {
                                                             .author(document.getAuthor())
                                                             .hash(document.getHash())
                                                             .build();
-        revisionRepository.save(documentRevision);
+
+        DocumentRevision savedRevision = revisionRepository.save(documentRevision);
+
+        log.info("Revision: '{}' saved successfully from document: '{}'", savedRevision.getRevisionId(), document.getDocumentId());
     }
 
     public Long getLastRevisionVersion(Document document) {

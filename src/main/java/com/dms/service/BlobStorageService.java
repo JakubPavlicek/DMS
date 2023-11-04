@@ -29,15 +29,17 @@ public class BlobStorageService {
         Path filePath = getFilePath(hash);
 
         try {
-            if (Files.exists(filePath))
+            if (Files.exists(filePath)) {
+                log.info("Blob of file: '{}' already exist, retrieving existing blob", filename);
                 return hash;
+            }
 
             Files.write(filePath, file.getBytes());
         } catch (Exception exception) {
             throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: " + filename + " to storage");
         }
 
-        log.debug("Blob of file: '{}' stored successfully", filename);
+        log.info("Blob of file: '{}' stored successfully", filename);
 
         return hash;
     }
@@ -47,7 +49,7 @@ public class BlobStorageService {
 
         try {
             byte[] bytes = Files.readAllBytes(filePath);
-            log.debug("Blob retrieved succeffully");
+            log.info("Blob retrieved succeffully");
             return bytes;
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.READ, "An error occurred while reading the file");
@@ -59,7 +61,7 @@ public class BlobStorageService {
 
         try {
             Files.deleteIfExists(filePath);
-            log.debug("Blob deleted successfully");
+            log.info("Blob deleted successfully");
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.DELETE, "An error occurred while deleting the file");
         }
@@ -88,7 +90,8 @@ public class BlobStorageService {
         Path directoryPath = getDirectoryPath(hash);
 
         try {
-            String directoryName = directoryPath.getName(directoryPath.getNameCount() - 1).toString();
+            String directoryName = directoryPath.getName(directoryPath.getNameCount() - 1)
+                                                .toString();
             String fileName = hash.substring(blobStorageProperties.getDirectoryPrefixLength());
             return Paths.get(blobStorageProperties.getPath(), directoryName, fileName);
         } catch (Exception e) {
@@ -100,7 +103,8 @@ public class BlobStorageService {
         try (DirectoryStream<Path> directory = Files.newDirectoryStream(directoryPath)) {
             if (!Files.isDirectory(directoryPath))
                 return false;
-            return !directory.iterator().hasNext();
+            return !directory.iterator()
+                             .hasNext();
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
         }

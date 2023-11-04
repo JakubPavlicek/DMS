@@ -31,13 +31,13 @@ public class BlobStorageService {
 
         try {
             if (Files.exists(filePath)) {
-                log.info("Blob of file {} already exist, retrieving existing blob", filename);
+                log.info("Blob of the file {} already exist, retrieving existing blob", filename);
                 return hash;
             }
 
             if (Files.notExists(directoryPath)) {
                 Files.createDirectory(directoryPath);
-                log.info("Creating directory for blob");
+                log.info("Creating a directory for blob of the file {}", filename);
             }
 
             Files.write(filePath, file.getBytes());
@@ -45,7 +45,7 @@ public class BlobStorageService {
             throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: '" + filename + "' to storage");
         }
 
-        log.info("Blob of file {} stored successfully", filename);
+        log.info("Blob of the file {} stored successfully", filename);
 
         return hash;
     }

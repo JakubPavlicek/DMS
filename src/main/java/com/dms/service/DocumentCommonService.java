@@ -82,7 +82,11 @@ public class DocumentCommonService {
         document.setAuthor(revision.getAuthor());
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields
-        return documentRepository.saveAndFlush(document);
+        Document updatedDocument = documentRepository.saveAndFlush(document);
+
+        log.info("Successfully updated details of document {} from revision {}", document.getDocumentId(), revision.getRevisionId());
+
+        return updatedDocument;
     }
 
     public void saveRevisionFromDocument(Document document) {

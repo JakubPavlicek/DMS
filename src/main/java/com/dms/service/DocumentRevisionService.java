@@ -37,7 +37,7 @@ public class DocumentRevisionService {
     private final DocumentCommonService documentCommonService;
 
     public DocumentRevisionDTO getRevision(String revisionId) {
-        log.debug("Getting revision: revisionId={}", revisionId);
+        log.debug("Request - Getting revision: revisionId={}", revisionId);
 
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
         log.info("Revision {} retrieved successfully", revisionId);
@@ -68,7 +68,7 @@ public class DocumentRevisionService {
 
     @Transactional
     public void deleteRevision(String revisionId) {
-        log.debug("Deleting revision: revisionId={}", revisionId);
+        log.debug("Request - Deleting revision: revisionId={}", revisionId);
 
         DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
         Document document = documentRevision.getDocument();
@@ -85,7 +85,7 @@ public class DocumentRevisionService {
     }
 
     public ResponseEntity<Resource> downloadRevision(String revisionId) {
-        log.debug("Downloading revision: revisionId={}", revisionId);
+        log.debug("Request - Downloading revision: revisionId={}", revisionId);
 
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
         String hash = revision.getHash();
@@ -101,7 +101,7 @@ public class DocumentRevisionService {
     }
 
     public PageWithRevisionsDTO getRevisions(int pageNumber, int pageSize, String sort, String filter) {
-        log.debug("Listing revisisons: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
+        log.debug("Request - Listing revisisons: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
 
         List<Sort.Order> orders = documentCommonService.getRevisionOrders(sort);
         List<FilterItem> filterItems = documentCommonService.getRevisionFilterItems(filter);

@@ -20,6 +20,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -33,6 +34,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 public class Document {
 
@@ -65,6 +67,7 @@ public class Document {
         cascade = CascadeType.REMOVE,
         mappedBy = "document"
     )
+    @ToString.Exclude
     private List<DocumentRevision> revisions;
 
     @Column(

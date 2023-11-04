@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 public class DocumentRevision {
 
@@ -62,6 +64,7 @@ public class DocumentRevision {
         referencedColumnName = "id",
         foreignKey = @ForeignKey(name = "fk_revision_document")
     )
+    @ToString.Exclude
     private Document document;
 
     @Column(

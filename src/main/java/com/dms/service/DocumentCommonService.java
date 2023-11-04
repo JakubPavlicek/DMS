@@ -7,16 +7,11 @@ import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
-import com.dms.filter.DocumentFilter;
-import com.dms.filter.FilterItem;
-import com.dms.filter.RevisionFilter;
 import com.dms.mapper.dto.DocumentRevisionDTOMapper;
 import com.dms.mapper.entity.DocumentMapper;
 import com.dms.mapper.entity.RevisionMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
-import com.dms.sort.DocumentSort;
-import com.dms.sort.RevisionSort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -28,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,6 +34,11 @@ import java.util.regex.Pattern;
 @Log4j2
 @RequiredArgsConstructor
 public class DocumentCommonService {
+
+    private static final String FILTER_REGEX = "(name|type|path):\"([^,]*)\"(?:,|$)";
+
+    private static final String DOCUMENT_SORT_REGEX = "(document_id|name|type|path|version|created_at|updated_at):(asc|desc)(?:,|$)";
+    private static final String REVISION_SORT_REGEX = "(revision_id|name|type|path|version|created_at):(asc|desc)(?:,|$)";
 
     private final DocumentRepository documentRepository;
     private final DocumentRevisionRepository revisionRepository;
@@ -133,30 +135,30 @@ public class DocumentCommonService {
         return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
     }
 
-    public List<FilterItem> getDocumentFilterItems(String filter) {
-        return getFilterItems(filter, DocumentFilter.FILTER_REGEX, DocumentMapper::getMappedDocumentField);
+    public Map<String, String> getDocumentFilters(String filter) {
+        return getFilters(filter, DocumentMapper::getMappedDocumentField);
     }
 
-    public List<FilterItem> getRevisionFilterItems(String filter) {
-        return getFilterItems(filter, RevisionFilter.FILTER_REGEX, RevisionMapper::getMappedRevisionField);
+    public Map<String, String> getRevisionFilters(String filter) {
+        return getFilters(filter, RevisionMapper::getMappedRevisionField);
     }
 
-    private List<FilterItem> getFilterItems(String filter, String regex, Function<String, String> fieldMapper) {
-        if (!filter.matches("(" + regex + ")+"))
+    private Map<String, String> getFilters(String filter, Function<String, String> fieldMapper) {
+        if (!filter.matches("(" + FILTER_REGEX + ")+"))
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
 
-        log.debug("Getting filter items: filter={}, regex={}", filter, regex);
+        log.debug("Getting filter items: filter={}, regex={}", filter, FILTER_REGEX);
 
-        List<FilterItem> filterItems = new ArrayList<>();
+        Map<String, String> filterItems = new HashMap<>();
 
-        Pattern pattern = Pattern.compile(regex);
+        Pattern pattern = Pattern.compile(FILTER_REGEX);
         Matcher matcher = pattern.matcher(filter);
 
         while (matcher.find()) {
             String field = fieldMapper.apply(matcher.group(1));
             String value = matcher.group(2);
 
-            filterItems.add(new FilterItem(field, value));
+            filterItems.put(field, value);
         }
 
         log.info("Successfully retrieved filter items from {}", filter);
@@ -164,15 +166,15 @@ public class DocumentCommonService {
         return filterItems;
     }
 
-    public List<Sort.Order> getDocumentOrders(String sort) {
-        return getOrders(sort, DocumentSort.DOCUMENT_SORT_REGEX, DocumentMapper::getMappedDocumentField);
+    public List<Sort.Order> getDocumentSortOrders(String sort) {
+        return getSortOrders(sort, DOCUMENT_SORT_REGEX, DocumentMapper::getMappedDocumentField);
     }
 
-    public List<Sort.Order> getRevisionOrders(String sort) {
-        return getOrders(sort, RevisionSort.REVISION_SORT_REGEX, RevisionMapper::getMappedRevisionField);
+    public List<Sort.Order> getRevisionSortOrders(String sort) {
+        return getSortOrders(sort, REVISION_SORT_REGEX, RevisionMapper::getMappedRevisionField);
     }
 
-    private List<Sort.Order> getOrders(String sort, String regex, Function<String, String> fieldMapper) {
+    private List<Sort.Order> getSortOrders(String sort, String regex, Function<String, String> fieldMapper) {
         if (!sort.matches("(" + regex + ")+"))
             throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
 

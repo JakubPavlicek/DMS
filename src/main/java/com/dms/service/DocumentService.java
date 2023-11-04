@@ -13,7 +13,6 @@ import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
-import com.dms.filter.FilterItem;
 import com.dms.mapper.dto.DocumentDTOMapper;
 import com.dms.mapper.dto.DocumentWithVersionDTOMapper;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
@@ -41,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -235,11 +235,11 @@ public class DocumentService {
     public PageWithDocumentsDTO getDocuments(int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing documents: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
 
-        List<Sort.Order> sortOrders = documentCommonService.getDocumentOrders(sort);
-        List<FilterItem> filterItems = documentCommonService.getDocumentFilterItems(filter);
+        List<Sort.Order> sortOrders = documentCommonService.getDocumentSortOrders(sort);
+        Map<String, String> filters = documentCommonService.getDocumentFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<Document> specification = DocumentFilterSpecification.filterByItems(filterItems);
+        Specification<Document> specification = DocumentFilterSpecification.filterByItems(filters);
 
         Page<DocumentDTO> documentDTOs = findDocuments(specification, pageable);
 
@@ -262,11 +262,11 @@ public class DocumentService {
 
         Document document = documentCommonService.getDocument(documentId);
 
-        List<Sort.Order> orders = documentCommonService.getRevisionOrders(sort);
-        List<FilterItem> filterItems = documentCommonService.getRevisionFilterItems(filter);
+        List<Sort.Order> sortOrders = documentCommonService.getRevisionSortOrders(sort);
+        Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
-        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filterItems);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
+        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filters);
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
 

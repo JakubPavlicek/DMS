@@ -5,7 +5,6 @@ import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.RevisionDeletionException;
-import com.dms.filter.FilterItem;
 import com.dms.mapper.dto.DocumentRevisionDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
 import com.dms.repository.DocumentRevisionRepository;
@@ -26,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Log4j2
@@ -103,11 +103,11 @@ public class DocumentRevisionService {
     public PageWithRevisionsDTO getRevisions(int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing revisisons: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
 
-        List<Sort.Order> orders = documentCommonService.getRevisionOrders(sort);
-        List<FilterItem> filterItems = documentCommonService.getRevisionFilterItems(filter);
+        List<Sort.Order> sortOrders = documentCommonService.getRevisionSortOrders(sort);
+        Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
-        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filterItems);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
+        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filters);
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
 

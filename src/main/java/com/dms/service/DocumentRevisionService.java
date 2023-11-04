@@ -40,7 +40,7 @@ public class DocumentRevisionService {
         log.debug("Getting revision: revision={}", revisionId);
 
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
-        log.info("Revision: '{}' retrieved successfully", revisionId);
+        log.info("Revision {} retrieved successfully", revisionId);
 
         return DocumentRevisionDTOMapper.map(revision);
     }
@@ -81,7 +81,7 @@ public class DocumentRevisionService {
 
         documentCommonService.updateRevisionVersionsForDocument(document);
 
-        log.info("Revision: '{}' deleted successfully", revisionId);
+        log.info("Revision {} deleted successfully", revisionId);
     }
 
     public ResponseEntity<Resource> downloadRevision(String revisionId) {
@@ -91,7 +91,7 @@ public class DocumentRevisionService {
         String hash = revision.getHash();
         byte[] data = documentCommonService.getBlob(hash);
 
-        log.info("Revision: '{}' downloaded successfully", revisionId);
+        log.info("Revision {} downloaded successfully", revisionId);
 
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(revision.getType()))

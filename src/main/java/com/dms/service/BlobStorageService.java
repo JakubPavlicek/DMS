@@ -30,16 +30,16 @@ public class BlobStorageService {
 
         try {
             if (Files.exists(filePath)) {
-                log.info("Blob of file: '{}' already exist, retrieving existing blob", filename);
+                log.info("Blob of file {} already exist, retrieving existing blob", filename);
                 return hash;
             }
 
             Files.write(filePath, file.getBytes());
         } catch (Exception exception) {
-            throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: " + filename + " to storage");
+            throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: '" + filename + "' to storage");
         }
 
-        log.info("Blob of file: '{}' stored successfully", filename);
+        log.info("Blob of file {} stored successfully", filename);
 
         return hash;
     }

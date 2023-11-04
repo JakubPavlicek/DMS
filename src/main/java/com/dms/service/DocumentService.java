@@ -57,18 +57,18 @@ public class DocumentService {
         log.debug("Getting document: document={}", documentId);
 
         Document document = documentCommonService.getDocument(documentId);
-        log.info("Document: '{}' retrieved successfully", documentId);
+        log.info("Document {} retrieved successfully", documentId);
 
         return DocumentDTOMapper.map(document);
     }
 
     public DocumentWithVersionDTO getDocumentWithVersion(String documentId, Long version) {
-        log.debug("Getting document by ID: '{}' with version: '{}'", documentId, version);
+        log.debug("Getting document with version: document={}, version={}", documentId, version);
 
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
 
-        log.info("Document: '{}' with version: '{}' retrieved successfully", documentId, version);
+        log.info("Document {} with version {} retrieved successfully", documentId, version);
 
         return DocumentWithVersionDTOMapper.map(document, revision);
     }
@@ -100,7 +100,7 @@ public class DocumentService {
         String name = StringUtils.getFilename(cleanPath);
         String type = file.getContentType();
 
-        log.info("Document: '{}' successfully created (not persisted yet)", name);
+        log.info("Document {} successfully created (not persisted yet)", name);
 
         return Document.builder()
                        .name(name)
@@ -113,7 +113,7 @@ public class DocumentService {
     }
 
     private void validateUniquePath(String path, Document document) {
-        log.debug("Validating path: path={}, document={}", path, document);
+        log.debug("Validating unique path: path={}, document={}", path, document);
 
         String filename = document.getName();
         User author = document.getAuthor();
@@ -125,9 +125,9 @@ public class DocumentService {
 
     @Transactional
     public DocumentDTO uploadDocument(UserRequestDTO userRequest, MultipartFile file, PathRequestDTO pathRequest) {
-        String path = getPathFromRequest(pathRequest);
-        log.debug("Uploading document: userRequest={}, file={}, path={}", userRequest, file.getOriginalFilename(), path);
+        log.debug("Uploading document: userRequest={}, file={}, pathRequest={}", userRequest, file.getOriginalFilename(), pathRequest);
 
+        String path = getPathFromRequest(pathRequest);
         Document document = createDocument(userRequest, file, path);
 
         validateUniquePath(path, document);
@@ -135,7 +135,7 @@ public class DocumentService {
         // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
         Document savedDocument = documentRepository.saveAndFlush(document);
 
-        log.info("Document: '{}' with ID: '{}' uploaded successfully", document.getName(), document.getDocumentId());
+        log.info("Document {} with ID {} uploaded successfully", document.getName(), document.getDocumentId());
 
         documentCommonService.saveRevisionFromDocument(savedDocument);
 
@@ -144,13 +144,13 @@ public class DocumentService {
 
     @Transactional
     public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequestDTO userRequest, MultipartFile file, PathRequestDTO pathRequest) {
-        String path = getPathFromRequest(pathRequest);
-        log.debug("Uploading new document version: document={}, userRequest={}, file={}, path={}", documentId, userRequest, file.getOriginalFilename(), path);
+        log.debug("Uploading new document version: document={}, userRequest={}, file={}, pathRequest={}", documentId, userRequest, file.getOriginalFilename(), pathRequest);
 
         if (!documentRepository.existsByDocumentId(documentId))
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
 
         Document databaseDocument = documentCommonService.getDocument(documentId);
+        String path = getPathFromRequest(pathRequest);
 
         Document document = createDocument(userRequest, file, path);
         document.setId(databaseDocument.getId());
@@ -166,9 +166,9 @@ public class DocumentService {
         LocalDateTime createdAt = getDocumentCreatedAt(documentId);
         savedDocument.setCreatedAt(createdAt);
 
-        documentCommonService.saveRevisionFromDocument(savedDocument);
+        log.info("Successfully uploaded new document version for document {}", documentId);
 
-        log.info("Successfully uploaded new document version for document with ID: {}", documentId);
+        documentCommonService.saveRevisionFromDocument(savedDocument);
 
         return DocumentDTOMapper.map(savedDocument);
     }
@@ -182,7 +182,7 @@ public class DocumentService {
 
         Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
 
-        log.info("Successfully switched document: '{}' to version: '{}'", documentId, version);
+        log.info("Successfully switched document {} to version: {}", documentId, version);
 
         return DocumentDTOMapper.map(documentFromRevision);
     }
@@ -196,7 +196,7 @@ public class DocumentService {
 
         Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
 
-        log.info("Successfully switched document: '{}' to revision: '{}'", documentId, revisionId);
+        log.info("Successfully switched document {} to revision {}", documentId, revisionId);
 
         return DocumentDTOMapper.map(documentFromRevision);
     }
@@ -204,6 +204,7 @@ public class DocumentService {
     @Transactional
     public void deleteDocumentWithRevisions(String documentId) {
         log.debug("Deleting document with revisions: document={}", documentId);
+
         Document document = documentCommonService.getDocument(documentId);
 
         List<DocumentRevision> documentRevisions = document.getRevisions();
@@ -212,7 +213,7 @@ public class DocumentService {
         documentCommonService.deleteBlobIfDuplicateHashNotExists(document.getHash());
         documentRepository.delete(document);
 
-        log.info("Document: '{}' with revisions deleted successfully", documentId);
+        log.info("Document {} with revisions deleted successfully", documentId);
     }
 
     public ResponseEntity<Resource> downloadDocument(String documentId) {
@@ -222,7 +223,7 @@ public class DocumentService {
         String hash = document.getHash();
         byte[] data = documentCommonService.getBlob(hash);
 
-        log.info("Document: '{}' downloaded successfully", documentId);
+        log.info("Document {} downloaded successfully", documentId);
 
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(document.getType()))
@@ -300,10 +301,10 @@ public class DocumentService {
 
     @Transactional
     public DocumentDTO moveDocument(String documentId, PathRequestDTO pathRequest) {
-        String path = getPathFromRequest(pathRequest);
-        log.debug("Moving document: document={}, path={}", documentId, path);
+        log.debug("Moving document: document={}, pathRequest={}", documentId, pathRequest);
 
         Document document = documentCommonService.getDocument(documentId);
+        String path = getPathFromRequest(pathRequest);
 
         validateUniquePath(path, document);
 
@@ -312,7 +313,7 @@ public class DocumentService {
 
         documentCommonService.saveRevisionFromDocument(savedDocument);
 
-        log.info("Document: '{}' moved successfully to path: '{}'", documentId, path);
+        log.info("Document {} moved successfully to path {}", documentId, path);
 
         return DocumentDTOMapper.map(savedDocument);
     }

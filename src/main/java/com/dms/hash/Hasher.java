@@ -20,7 +20,7 @@ public class Hasher {
 
     public String hashFile(MultipartFile file) {
         String filename = file.getOriginalFilename();
-        log.info("Hashing file: '{}'", filename);
+        log.info("Hashing file {}", filename);
 
         try {
             MessageDigest digest = MessageDigest.getInstance(hashProperties.getAlgorithm());

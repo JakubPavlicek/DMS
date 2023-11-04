@@ -100,7 +100,7 @@ public class DocumentCommonService {
 
         DocumentRevision savedRevision = revisionRepository.save(documentRevision);
 
-        log.info("Revision: '{}' saved successfully from document: '{}'", savedRevision.getRevisionId(), document.getDocumentId());
+        log.info("Revision {} saved successfully from document {}", savedRevision.getRevisionId(), document.getDocumentId());
     }
 
     public Long getLastRevisionVersion(Document document) {

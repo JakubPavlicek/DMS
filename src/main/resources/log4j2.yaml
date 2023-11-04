@@ -11,7 +11,7 @@ Configuration:
       - name: LOG_FILENAME_PATTERN
         value: log_%i.log
       - name: LOG_PATTERN
-        value: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5level %pid --- [%15.15t] %-40.40C{1.} - %msg%n%wEx"
+        value: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5level --- [%15.15t] %-40.40C{1.} - %msg%n%wEx"
 
   Appenders:
 

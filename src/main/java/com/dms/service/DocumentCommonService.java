@@ -44,13 +44,13 @@ public class DocumentCommonService {
     private final BlobStorageService blobStorageService;
 
     public Document getDocument(String documentId) {
-        log.debug("Getting document: document={}", documentId);
+        log.debug("Getting document: documentId={}", documentId);
         return documentRepository.findByDocumentId(documentId)
                                  .orElseThrow(() -> new DocumentNotFoundException("File with ID: " + documentId + " not found"));
     }
 
     public DocumentRevision getRevision(String revisionId) {
-        log.debug("Getting revision: revision={}", revisionId);
+        log.debug("Getting revision: revisionId={}", revisionId);
         return revisionRepository.findByRevisionId(revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
     }
@@ -60,19 +60,19 @@ public class DocumentCommonService {
     }
 
     public DocumentRevision getRevisionByDocumentAndVersion(Document document, Long version) {
-        log.debug("Getting revision by document and version: document={}, version={}", document.getDocumentId(), version);
+        log.debug("Getting revision by document and version: documentId={}, version={}", document.getDocumentId(), version);
         return revisionRepository.findByDocumentAndVersion(document, version)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with version: " + version + " not found for document with ID: " + document.getDocumentId()));
     }
 
     public DocumentRevision getRevisionByDocumentAndId(Document document, String revisionId) {
-        log.debug("Getting revision by document and ID: document={}, revision={}", document.getDocumentId(), revisionId);
+        log.debug("Getting revision by document and ID: documentId={}, revisionId={}", document.getDocumentId(), revisionId);
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found for document with ID: " + document.getDocumentId()));
     }
 
     public Document updateDocumentToRevision(Document document, DocumentRevision revision) {
-        log.debug("Updating document to revision: document={}, revision={}", document.getDocumentId(), revision.getRevisionId());
+        log.debug("Updating document to revision: documentId={}, revisionId={}", document.getDocumentId(), revision.getRevisionId());
 
         document.setName(revision.getName());
         document.setType(revision.getType());
@@ -109,7 +109,7 @@ public class DocumentCommonService {
     }
 
     public void updateRevisionVersionsForDocument(Document document) {
-        log.debug("Updating revision versions for document: document={}", document.getDocumentId());
+        log.debug("Updating revision versions for document: documentId={}", document.getDocumentId());
 
         List<DocumentRevision> documentRevisions = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
 

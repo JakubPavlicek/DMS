@@ -54,7 +54,7 @@ public class DocumentService {
     private final UserService userService;
 
     public DocumentDTO getDocument(String documentId) {
-        log.debug("Getting document: document={}", documentId);
+        log.debug("Getting document: documentId={}", documentId);
 
         Document document = documentCommonService.getDocument(documentId);
         log.info("Document {} retrieved successfully", documentId);
@@ -63,7 +63,7 @@ public class DocumentService {
     }
 
     public DocumentWithVersionDTO getDocumentWithVersion(String documentId, Long version) {
-        log.debug("Getting document with version: document={}, version={}", documentId, version);
+        log.debug("Getting document with version: documentId={}, version={}", documentId, version);
 
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
@@ -144,7 +144,7 @@ public class DocumentService {
 
     @Transactional
     public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequestDTO userRequest, MultipartFile file, PathRequestDTO pathRequest) {
-        log.debug("Uploading new document version: document={}, userRequest={}, file={}, pathRequest={}", documentId, userRequest, file.getOriginalFilename(), pathRequest);
+        log.debug("Uploading new document version: documentId={}, userRequest={}, file={}, pathRequest={}", documentId, userRequest, file.getOriginalFilename(), pathRequest);
 
         if (!documentRepository.existsByDocumentId(documentId))
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
@@ -175,7 +175,7 @@ public class DocumentService {
 
     @Transactional
     public DocumentDTO switchToVersion(String documentId, Long version) {
-        log.debug("Switching document to version: document={}, version={}", documentId, version);
+        log.debug("Switching document to version: documentId={}, version={}", documentId, version);
 
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
@@ -189,7 +189,7 @@ public class DocumentService {
 
     @Transactional
     public DocumentDTO switchToRevision(String documentId, String revisionId) {
-        log.debug("Switching document to revision: document={}, revision={}", documentId, revisionId);
+        log.debug("Switching document to revision: documentId={}, revision={}", documentId, revisionId);
 
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndId(document, revisionId);
@@ -203,7 +203,7 @@ public class DocumentService {
 
     @Transactional
     public void deleteDocumentWithRevisions(String documentId) {
-        log.debug("Deleting document with revisions: document={}", documentId);
+        log.debug("Deleting document with revisions: documentId={}", documentId);
 
         Document document = documentCommonService.getDocument(documentId);
 
@@ -217,7 +217,7 @@ public class DocumentService {
     }
 
     public ResponseEntity<Resource> downloadDocument(String documentId) {
-        log.debug("Downloading document: document={}", documentId);
+        log.debug("Downloading document: documentId={}", documentId);
 
         Document document = documentCommonService.getDocument(documentId);
         String hash = document.getHash();
@@ -258,7 +258,7 @@ public class DocumentService {
     }
 
     public PageWithRevisionsDTO getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
-        log.debug("Listing document revisions: document={} pageNumber={}, pageSize={}, sort={}, filter={}", documentId, pageNumber, pageSize, sort, filter);
+        log.debug("Listing document revisions: documentId={} pageNumber={}, pageSize={}, sort={}, filter={}", documentId, pageNumber, pageSize, sort, filter);
 
         Document document = documentCommonService.getDocument(documentId);
 
@@ -276,7 +276,7 @@ public class DocumentService {
     }
 
     public PageWithVersionsDTO getDocumentVersions(String documentId, int pageNumber, int pageSize) {
-        log.debug("Listing document versions: document={} pageNumber={}, pageSize={}", documentId, pageNumber, pageSize);
+        log.debug("Listing document versions: documentId={} pageNumber={}, pageSize={}", documentId, pageNumber, pageSize);
 
         Document document = documentCommonService.getDocument(documentId);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -301,7 +301,7 @@ public class DocumentService {
 
     @Transactional
     public DocumentDTO moveDocument(String documentId, PathRequestDTO pathRequest) {
-        log.debug("Moving document: document={}, pathRequest={}", documentId, pathRequest);
+        log.debug("Moving document: documentId={}, pathRequest={}", documentId, pathRequest);
 
         Document document = documentCommonService.getDocument(documentId);
         String path = getPathFromRequest(pathRequest);

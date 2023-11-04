@@ -37,7 +37,7 @@ public class DocumentRevisionService {
     private final DocumentCommonService documentCommonService;
 
     public DocumentRevisionDTO getRevision(String revisionId) {
-        log.debug("Getting revision: revision={}", revisionId);
+        log.debug("Getting revision: revisionId={}", revisionId);
 
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
         log.info("Revision {} retrieved successfully", revisionId);
@@ -68,7 +68,7 @@ public class DocumentRevisionService {
 
     @Transactional
     public void deleteRevision(String revisionId) {
-        log.debug("Deleting revision: revision={}", revisionId);
+        log.debug("Deleting revision: revisionId={}", revisionId);
 
         DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
         Document document = documentRevision.getDocument();
@@ -85,7 +85,7 @@ public class DocumentRevisionService {
     }
 
     public ResponseEntity<Resource> downloadRevision(String revisionId) {
-        log.debug("Downloading revision: revision={}", revisionId);
+        log.debug("Downloading revision: revisionId={}", revisionId);
 
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
         String hash = revision.getHash();

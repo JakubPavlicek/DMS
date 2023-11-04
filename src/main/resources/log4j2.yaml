@@ -10,8 +10,6 @@ Configuration:
         value: log.log
       - name: LOG_FILENAME_PATTERN
         value: log_%i.log
-      - name: LOG_PATTERN
-        value: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5level --- [%15.15t] %-40.40C{1.} - %msg%n%wEx"
 
   Appenders:
 
@@ -35,7 +33,7 @@ Configuration:
           onMismatch: deny
 
         PatternLayout:
-          pattern: ${LOG_PATTERN}
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5level --- [%15.15t] %-40.40C{1.} - %msg%n%wEx"
           disableAnsi: true
 
         Policies:
@@ -57,7 +55,7 @@ Configuration:
           level: DEBUG
 
         PatternLayout:
-          pattern: ${LOG_PATTERN}
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5level --- [%15.15t] %-40.40C{1.}::%M line %L - %msg%n%wEx"
           disableAnsi: true
 
         Policies:

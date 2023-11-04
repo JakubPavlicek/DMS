@@ -35,14 +35,12 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │   │       ├── controller                        // REST-API controller
     │   │       ├── entity                            // database tables
     │   │       ├── exception                         // exceptions and exception handling
-    │   │       ├── filter                            // filtering in requests
     │   │       ├── hash                              // hasher for blobs
     │   │       ├── mapper                            // mapping between objects
     │   │       │   ├── dto                           // dto mappers
     │   │       │   └── entity                        // entity mappers
     │   │       ├── repository                        // DAOs
     │   │       ├── service                           // service
-    │   │       ├── sort                              // sorting in requests
     │   │       ├── specification                     // specification used for filtering
     │   │       ├── validation                        // validation annotations
     │   │       └── DocumentManagerApplication.java   // main application class

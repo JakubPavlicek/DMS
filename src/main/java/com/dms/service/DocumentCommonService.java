@@ -1,7 +1,6 @@
 package com.dms.service;
 
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.PageWithVersionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
@@ -11,15 +10,15 @@ import com.dms.exception.RevisionNotFoundException;
 import com.dms.filter.DocumentFilter;
 import com.dms.filter.FilterItem;
 import com.dms.filter.RevisionFilter;
-import com.dms.mapper.entity.DocumentMapper;
 import com.dms.mapper.dto.DocumentRevisionDTOMapper;
-import com.dms.mapper.dto.PageWithVersionsDTOMapper;
+import com.dms.mapper.entity.DocumentMapper;
 import com.dms.mapper.entity.RevisionMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import com.dms.sort.DocumentSort;
 import com.dms.sort.RevisionSort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Log4j2
 @RequiredArgsConstructor
 public class DocumentCommonService {
 
@@ -44,38 +44,50 @@ public class DocumentCommonService {
     private final BlobStorageService blobStorageService;
 
     public Document getDocument(String documentId) {
+        log.debug("Getting document: document={}", documentId);
         return documentRepository.findByDocumentId(documentId)
                                  .orElseThrow(() -> new DocumentNotFoundException("File with ID: " + documentId + " not found"));
     }
 
     public DocumentRevision getRevision(String revisionId) {
+        log.debug("Getting revision: revision={}", revisionId);
         return revisionRepository.findByRevisionId(revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
     }
 
+    public Page<DocumentRevision> getAllRevisions(Document document, Pageable pageable) {
+        return revisionRepository.findAllByDocument(document, pageable);
+    }
+
     public DocumentRevision getRevisionByDocumentAndVersion(Document document, Long version) {
+        log.debug("Getting revision by document and version: document={}, version={}", document.getDocumentId(), version);
         return revisionRepository.findByDocumentAndVersion(document, version)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with version: " + version + " not found for document with ID: " + document.getDocumentId()));
     }
 
     public DocumentRevision getRevisionByDocumentAndId(Document document, String revisionId) {
+        log.debug("Getting revision by document and ID: document={}, revision={}", document.getDocumentId(), revisionId);
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found for document with ID: " + document.getDocumentId()));
     }
 
-    public Document updateDocumentToRevision(Document document, DocumentRevision documentRevision) {
-        document.setName(documentRevision.getName());
-        document.setType(documentRevision.getType());
-        document.setPath(documentRevision.getPath());
-        document.setHash(documentRevision.getHash());
-        document.setVersion(documentRevision.getVersion());
-        document.setAuthor(documentRevision.getAuthor());
+    public Document updateDocumentToRevision(Document document, DocumentRevision revision) {
+        log.debug("Updating document to revision: document={}, revision={}", document.getDocumentId(), revision.getRevisionId());
+
+        document.setName(revision.getName());
+        document.setType(revision.getType());
+        document.setPath(revision.getPath());
+        document.setHash(revision.getHash());
+        document.setVersion(revision.getVersion());
+        document.setAuthor(revision.getAuthor());
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields
         return documentRepository.saveAndFlush(document);
     }
 
     public void saveRevisionFromDocument(Document document) {
+        log.debug("Saving revision from document: document={}", document);
+
         DocumentRevision documentRevision = DocumentRevision.builder()
                                                             .document(document)
                                                             .version(getLastRevisionVersion(document) + 1)
@@ -94,6 +106,8 @@ public class DocumentCommonService {
     }
 
     public void updateRevisionVersionsForDocument(Document document) {
+        log.debug("Updating revision versions for document: document={}", document.getDocumentId());
+
         List<DocumentRevision> documentRevisions = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
 
         Long version = 1L;
@@ -112,17 +126,6 @@ public class DocumentCommonService {
         return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
     }
 
-    public PageWithVersionsDTO getDocumentVersions(Document document, Pageable pageable) {
-        Page<DocumentRevision> revisions = revisionRepository.findAllByDocument(document, pageable);
-
-        List<Long> versionList = revisions.stream()
-                                       .map(DocumentRevision::getVersion)
-                                       .toList();
-
-        PageImpl<Long> versions = new PageImpl<>(versionList, pageable, revisions.getTotalElements());
-        return PageWithVersionsDTOMapper.map(versions);
-    }
-
     public List<FilterItem> getDocumentFilterItems(String filter) {
         return getFilterItems(filter, DocumentFilter.FILTER_REGEX, DocumentMapper::getMappedDocumentField);
     }
@@ -134,6 +137,8 @@ public class DocumentCommonService {
     private List<FilterItem> getFilterItems(String filter, String regex, Function<String, String> fieldMapper) {
         if (!filter.matches("(" + regex + ")+"))
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
+
+        log.debug("Getting filter items: filter={}, regex={}", filter, regex);
 
         List<FilterItem> filterItems = new ArrayList<>();
 
@@ -161,6 +166,8 @@ public class DocumentCommonService {
     private List<Sort.Order> getOrders(String sort, String regex, Function<String, String> fieldMapper) {
         if (!sort.matches("(" + regex + ")+"))
             throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
+
+        log.debug("Getting orders: sort={}, regex={}", sort, regex);
 
         List<Sort.Order> orders = new ArrayList<>();
 

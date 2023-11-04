@@ -5,6 +5,7 @@ import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
 import com.dms.hash.Hasher;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
+@Log4j2
 @RequiredArgsConstructor
 public class BlobStorageService {
 
@@ -22,21 +24,20 @@ public class BlobStorageService {
 
     public String storeBlob(MultipartFile file) {
         String hash = hasher.hashFile(file);
+        String filename = file.getOriginalFilename();
 
-        Path directoryPath = getDirectoryPath(hash);
         Path filePath = getFilePath(hash);
 
         try {
             if (Files.exists(filePath))
                 return hash;
 
-            if (Files.notExists(directoryPath))
-                Files.createDirectory(directoryPath);
-
             Files.write(filePath, file.getBytes());
         } catch (Exception exception) {
-            throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: " + file.getOriginalFilename() + " to storage");
+            throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: " + filename + " to storage");
         }
+
+        log.debug("Blob of file: '{}' stored successfully", filename);
 
         return hash;
     }
@@ -45,7 +46,9 @@ public class BlobStorageService {
         Path filePath = getFilePath(hash);
 
         try {
-            return Files.readAllBytes(filePath);
+            byte[] bytes = Files.readAllBytes(filePath);
+            log.debug("Blob retrieved succeffully");
+            return bytes;
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.READ, "An error occurred while reading the file");
         }
@@ -56,6 +59,7 @@ public class BlobStorageService {
 
         try {
             Files.deleteIfExists(filePath);
+            log.debug("Blob deleted successfully");
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.DELETE, "An error occurred while deleting the file");
         }

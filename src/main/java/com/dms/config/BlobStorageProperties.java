@@ -10,7 +10,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,10 +48,8 @@ public class BlobStorageProperties implements Validator {
             }
         }
 
-        File file = new File(path);
-
-        if(!file.isDirectory()) {
-            String message = "Provided path: " + path + " is not a directory";
+        if(!Files.isDirectory(storagePath)) {
+            String message = "Provided path: '" + path + "' is not a directory";
             log.error(message);
             errors.rejectValue("path", "Path Is Not A Directory", message);
         }

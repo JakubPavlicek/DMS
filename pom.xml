@@ -126,7 +126,12 @@
                                 <delegatePattern>false</delegatePattern>
                                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
                                 <generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
-                                <additionalModelTypeAnnotations>&#64;lombok.NoArgsConstructor &#64;lombok.AllArgsConstructor &#64;lombok.Builder</additionalModelTypeAnnotations>
+                                <additionalModelTypeAnnotations>
+                                    &#64;lombok.ToString
+                                    &#64;lombok.NoArgsConstructor
+                                    &#64;lombok.AllArgsConstructor
+                                    &#64;lombok.Builder
+                                </additionalModelTypeAnnotations>
                             </configOptions>
                             <typeMappings>
                                 <typeMapping>OffsetDateTime=java.time.LocalDateTime</typeMapping>

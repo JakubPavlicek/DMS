@@ -1,9 +1,11 @@
 package com.dms.exception;
 
 import com.dms.config.ServerProperties;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
@@ -32,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 @RestControllerAdvice
+@Log4j2
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -40,54 +44,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private final static String CONTEXT_INFO = "context_info";
     private final static String MESSAGE = "message";
 
-    @ExceptionHandler(FileOperationException.class)
-    public ProblemDetail handleFileOperationEception(FileOperationException eception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, eception.getMessage());
-        problemDetail.setTitle(eception.getFileOperation()
-                                       .getTitle());
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/file-operation"));
-
-        return problemDetail;
-    }
-
-    @ExceptionHandler(FileWithPathAlreadyExistsException.class)
-    public ProblemDetail handleFileWithPathAlreadyExistsException(FileWithPathAlreadyExistsException eception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, eception.getMessage());
-        problemDetail.setTitle("File With Path Already Exists");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/document-with-path-already-exists"));
-
-        return problemDetail;
-    }
-
-    @ExceptionHandler(DocumentNotFoundException.class)
-    public ProblemDetail handleDocumentNotFoundException(DocumentNotFoundException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
-        problemDetail.setTitle("Document Not Found");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/document-not-found"));
-
-        return problemDetail;
-    }
-
-    @ExceptionHandler(RevisionNotFoundException.class)
-    public ProblemDetail handleRevisionNotFoundException(RevisionNotFoundException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
-        problemDetail.setTitle("Revision Not Found");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/revision-not-found"));
-
-        return problemDetail;
-    }
-
-    @ExceptionHandler(RevisionDeletionException.class)
-    public ProblemDetail handleRevisionDeletionException(RevisionDeletionException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
-        problemDetail.setTitle("Revision Deletion Error");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/revision-deletion-error"));
-
-        return problemDetail;
+    private String getRequestURI(WebRequest request) {
+        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+        return servletWebRequest.getRequest().getRequestURI();
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.error("Request: '{}' raised:", getRequestURI(request), ex);
+
         String detail = "Unsupported media type: " + ex.getContentType() + ", supported media types are: " + MediaType.toString(ex.getSupportedMediaTypes());
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNSUPPORTED_MEDIA_TYPE, detail);
@@ -105,6 +70,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.error("Request: '{}' raised: ", getRequestURI(request), ex);
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Provided data are not valid");
         problemDetail.setTitle("Invalid Data Provided");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/invalid-data-provided"));
@@ -131,6 +98,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.error("Request: '{}' raised:", getRequestURI(request), ex);
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problemDetail.setTitle("Missing Request Part");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/missing-request-part"));
@@ -141,6 +110,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.error("Request: '{}' raised:", getRequestURI(request), ex);
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problemDetail.setTitle("Missing Request Parameter");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/missing-request-parameter"));
@@ -151,6 +122,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.error("Request: '{}' raised:", getRequestURI(request), ex);
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problemDetail.setTitle("Resource Not Found");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/resource-not-found"));
@@ -159,8 +132,66 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                              .build();
     }
 
+    @ExceptionHandler(FileOperationException.class)
+    public ProblemDetail handleFileOperationEception(FileOperationException exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        problemDetail.setTitle(exception.getFileOperation()
+                                       .getTitle());
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/file-operation"));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(FileWithPathAlreadyExistsException.class)
+    public ProblemDetail handleFileWithPathAlreadyExistsException(FileWithPathAlreadyExistsException exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+        problemDetail.setTitle("File With Path Already Exists");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/document-with-path-already-exists"));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(DocumentNotFoundException.class)
+    public ProblemDetail handleDocumentNotFoundException(DocumentNotFoundException exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+        problemDetail.setTitle("Document Not Found");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/document-not-found"));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(RevisionNotFoundException.class)
+    public ProblemDetail handleRevisionNotFoundException(RevisionNotFoundException exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+        problemDetail.setTitle("Revision Not Found");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/revision-not-found"));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(RevisionDeletionException.class)
+    public ProblemDetail handleRevisionDeletionException(RevisionDeletionException exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+        problemDetail.setTitle("Revision Deletion Error");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/revision-deletion-error"));
+
+        return problemDetail;
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
-    public ProblemDetail handleConstraintViolationException(ConstraintViolationException exception) {
+    public ProblemDetail handleConstraintViolationException(ConstraintViolationException exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Provided data are not valid");
         problemDetail.setTitle("Invalid Data Provided");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/invalid-data-provided"));
@@ -192,7 +223,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(PropertyReferenceException.class)
-    public ProblemDetail handlePropertyReferenceException(PropertyReferenceException exception) {
+    public ProblemDetail handlePropertyReferenceException(PropertyReferenceException exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Property Doesn't Exist");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/property-doesnt-exist"));
@@ -201,7 +234,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(InvalidRegexInputException.class)
-    public ProblemDetail handleInvalidRegexInputException(InvalidRegexInputException exception) {
+    public ProblemDetail handleInvalidRegexInputException(InvalidRegexInputException exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Pattern Doesn't Match");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/pattern-doesnt-match"));
@@ -210,7 +245,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(MultipartException.class)
-    public ProblemDetail handleMultipartException(MultipartException exception) {
+    public ProblemDetail handleMultipartException(MultipartException exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, exception.getMessage());
         problemDetail.setTitle("Payload Too Large");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/payload-too-large"));
@@ -219,7 +256,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGenericException(Exception exception) {
+    public ProblemDetail handleGenericException(Exception exception, HttpServletRequest request) {
+        log.error("Request: '{}' raised:", request.getRequestURI(), exception);
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle("Unexpected Error Occurred");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/unexpected"));

@@ -30,34 +30,6 @@ components:
     ClientError:
       $ref: './schema/ClientError.yaml'
 
-  examples:
-
-    PageableWithDocuments:
-      $ref: './example/PageableWithDocuments.yaml'
-    PageableWithRevisions:
-      $ref: './example/PageableWithRevisions.yaml'
-    PageableWithVersions:
-      $ref: './example/PageableWithVersions.yaml'
-
-  parameters:
-
-    DocumentId:
-      $ref: './parameter/DocumentId.yaml'
-    RevisionId:
-      $ref: './parameter/RevisionId.yaml'
-    DocumentVersion:
-      $ref: './parameter/DocumentVersion.yaml'
-    Page:
-      $ref: './parameter/Page.yaml'
-    Limit:
-      $ref: './parameter/Limit.yaml'
-    DocumentSort:
-      $ref: './parameter/DocumentSort.yaml'
-    RevisionSort:
-      $ref: './parameter/RevisionSort.yaml'
-    Filter:
-      $ref: './parameter/Filter.yaml'
-
 paths:
 
   /documents:

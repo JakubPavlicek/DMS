@@ -155,6 +155,8 @@ public class DocumentCommonService {
             filterItems.add(new FilterItem(field, value));
         }
 
+        log.info("Successfully retrieved filter items from {}", filter);
+
         return filterItems;
     }
 
@@ -183,6 +185,8 @@ public class DocumentCommonService {
 
             orders.add(new Sort.Order(direction, field));
         }
+
+        log.info("Successfully retrieved sort orders from {}", sort);
 
         return orders;
     }

@@ -1,7 +1,0 @@
-name: version
-in: path
-required: true
-description: The document version.
-schema:
-  type: integer
-  format: int64

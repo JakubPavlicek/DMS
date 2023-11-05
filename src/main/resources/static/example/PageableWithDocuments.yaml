@@ -3,20 +3,22 @@ value:
   content:
     - documentId: "2481d886-e7cb-45f1-9577-bd5c6329aac4"
       author:
-        userId: 3
-        username: "pepa"
-        email: "pepa@seznam.cz"
+        username: "james"
+        email: "james@gmail.com"
+      version: 1
       name: "document.pdf"
       type: "application/pdf"
+      path: "/docs"
       createdAt: "2023-10-15T15:40:51.340065"
       updatedAt: "2023-10-15T15:40:51.340101"
     - documentId: "58475d9f-4299-423b-b2e8-fbeae5dd51df"
       author:
-        userId: 1
-        username: "ondra"
-        email: "ondra@gmail.com"
+        username: "john"
+        email: "john@gmail.com"
+      version: 3
       name: "schema.pdf"
       type: "application/pdf"
+      path: "/home"
       createdAt: "2023-10-14T09:32:08.473799"
       updatedAt: "2023-10-14T09:32:08.473817"
   pageable:

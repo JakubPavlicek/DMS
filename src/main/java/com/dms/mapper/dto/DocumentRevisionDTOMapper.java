@@ -9,6 +9,7 @@ public class DocumentRevisionDTOMapper {
         return DocumentRevisionDTO.builder()
                                   .revisionId(revision.getRevisionId())
                                   .author(UserDTOMapper.mapToUserDTO(revision.getAuthor()))
+                                  .version(revision.getVersion())
                                   .name(revision.getName())
                                   .type(revision.getType())
                                   .path(revision.getPath())

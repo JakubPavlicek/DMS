@@ -72,7 +72,7 @@ public class DocumentService {
         return userService.getSavedUser(user);
     }
 
-    private String getPathFromRequest(DestinationDTO destination) {
+    private String getPathFromDestination(DestinationDTO destination) {
         if (destination == null)
             return null;
 
@@ -120,7 +120,7 @@ public class DocumentService {
     public DocumentDTO uploadDocument(UserDTO user, MultipartFile file, DestinationDTO destination) {
         log.debug("Request - Uploading document: user={}, file={}, destination={}", user, file.getOriginalFilename(), destination);
 
-        String path = getPathFromRequest(destination);
+        String path = getPathFromDestination(destination);
         Document document = createDocument(user, file, path);
 
         validateUniquePath(path, document);
@@ -143,7 +143,7 @@ public class DocumentService {
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
 
         Document databaseDocument = documentCommonService.getDocument(documentId);
-        String path = getPathFromRequest(destination);
+        String path = getPathFromDestination(destination);
 
         Document document = createDocument(user, file, path);
         document.setId(databaseDocument.getId());
@@ -259,7 +259,7 @@ public class DocumentService {
         log.debug("Request - Moving document: documentId={}, destination={}", documentId, destination);
 
         Document document = documentCommonService.getDocument(documentId);
-        String path = getPathFromRequest(destination);
+        String path = getPathFromDestination(destination);
 
         validateUniquePath(path, document);
 

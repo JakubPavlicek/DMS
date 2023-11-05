@@ -1,5 +1,6 @@
 type: object
 title: Document
+description: The representation of a document.
 required:
   - documentId
   - author

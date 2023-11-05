@@ -1,11 +1,11 @@
 type: object
 title: Destination
-description: "The destination to store/move the document to."
+description: The destination to store/move the document to.
 properties:
   path:
     type: string
     pattern: /$|(/[\w\-]+)+
-    description: "The path to store/move the document to. "
+    description: The path to store/move the document to.
     minLength: 1
     maxLength: 255
     example: /home

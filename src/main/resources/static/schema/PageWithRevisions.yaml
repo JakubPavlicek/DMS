@@ -1,5 +1,6 @@
 type: object
 title: Page With Revisions
+description: Represents a page of document revisions, including pagination and sorting information.
 required:
   - pageable
   - last

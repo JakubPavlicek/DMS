@@ -1,5 +1,6 @@
 type: object
 title: Pageable
+description: Represents pagination and sorting information for querying a paginated dataset.
 required:
   - pageNumber
   - pageSize

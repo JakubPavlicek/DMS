@@ -1,5 +1,6 @@
 type: object
 title: Sort
+description: Represents sorting information for ordering query results based on one or more criteria.
 required:
   - empty
   - sorted

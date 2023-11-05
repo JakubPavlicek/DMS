@@ -8,13 +8,11 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(indexes = @Index(name = "document_id_index", columnList = "documentId", unique = true))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -47,10 +44,6 @@ public class Document {
     @GeneratedValue(
         strategy = GenerationType.SEQUENCE,
         generator = "document_id_generator"
-    )
-    @Column(
-        nullable = false,
-        unique = true
     )
     private Long id;
 

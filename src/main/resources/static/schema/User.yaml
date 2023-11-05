@@ -7,12 +7,14 @@ required:
 properties:
   username:
     type: string
-    example: jakub
+    description: "The username of the user"
     minLength: 1
     maxLength: 40
+    example: jakub
   email:
     type: string
     format: email
-    example: jakub@gmail.com
+    description: "The email of the user"
     minLength: 1
     maxLength: 255
+    example: jakub@gmail.com

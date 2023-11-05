@@ -3,28 +3,35 @@ title: Document
 properties:
   documentId:
     type: string
+    description: "The document ID"
     example: e6c9f6b8-df1b-4ac0-b4a7-d1dfb535e52a
   author:
     $ref: './User.yaml'
   version:
     type: integer
     format: int64
+    description: "The version of the document"
     example: 1
   name:
     type: string
+    description: "The name of the document"
     example: dog.jpeg
   type:
     type: string
+    description: "The type of the document"
     example: image/jpeg
   path:
     type: string
     pattern: /$|(/[\w\-]+)+
+    description: "The user-defined path of the document"
     example: /home
   createdAt:
     type: string
     format: date-time
+    description: "The creation date of the document"
     example: "2023-10-14T09:32:01.485815"
   updatedAt:
     type: string
     format: date-time
+    description: "The modification date of the document"
     example: "2023-10-14T09:32:01.521845"

@@ -3,6 +3,7 @@ title: Document Revision
 properties:
   revisionId:
     type: string
+    description: "The revision ID"
     example: 5b6cd216-3d3d-4121-ba69-3d6f9d8d966c
   author:
     $ref: './User.yaml'

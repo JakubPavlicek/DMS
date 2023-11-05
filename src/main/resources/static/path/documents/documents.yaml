@@ -18,7 +18,7 @@ get:
             $ref: '../../schema/PageWithDocuments.yaml'
           examples:
             PageableWithVersions:
-              $ref: '../../example/PageableWithDocuments.yaml'
+              $ref: '../../example/PageWithDocuments.yaml'
     400:
       description: Either sort or filter pattern does not match the expected format.
       content:

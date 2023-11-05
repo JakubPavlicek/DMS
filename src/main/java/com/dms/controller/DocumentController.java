@@ -1,11 +1,11 @@
 package com.dms.controller;
 
 import com.dms.DocumentsApi;
+import com.dms.dto.DestinationDTO;
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.PageWithDocumentsDTO;
 import com.dms.dto.PageWithRevisionsDTO;
-import com.dms.dto.PathRequestDTO;
-import com.dms.dto.UserRequestDTO;
+import com.dms.dto.UserDTO;
 import com.dms.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -47,8 +47,8 @@ public class DocumentController implements DocumentsApi {
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> moveDocument(String documentId, PathRequestDTO path) {
-        return ResponseEntity.ok(documentService.moveDocument(documentId, path));
+    public ResponseEntity<DocumentDTO> moveDocument(String documentId, DestinationDTO destination) {
+        return ResponseEntity.ok(documentService.moveDocument(documentId, destination));
     }
 
     @Override
@@ -57,14 +57,14 @@ public class DocumentController implements DocumentsApi {
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> uploadDocument(UserRequestDTO user, MultipartFile file, PathRequestDTO path) {
-        DocumentDTO documentDTO = documentService.uploadDocument(user, file, path);
+    public ResponseEntity<DocumentDTO> uploadDocument(UserDTO user, MultipartFile file, DestinationDTO destination) {
+        DocumentDTO documentDTO = documentService.uploadDocument(user, file, destination);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(String documentId, UserRequestDTO user, MultipartFile file, PathRequestDTO path) {
-        DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(documentId, user, file, path);
+    public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(String documentId, UserDTO user, MultipartFile file, DestinationDTO destination) {
+        DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(documentId, user, file, destination);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 

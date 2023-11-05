@@ -4,11 +4,11 @@ required:
   - file
 properties:
   user:
-    $ref: '../schema/UserRequest.yaml'
+    $ref: '../schema/User.yaml'
   file:
     type: string
     format: binary
     description: File to be uploaded.
     x-constraints: "@ValidFile"
-  path:
-    $ref: '../schema/PathRequest.yaml'
+  destination:
+    $ref: '../schema/Destination.yaml'

@@ -18,6 +18,7 @@ properties:
     example: image/jpeg
   path:
     type: string
+    pattern: /$|(/[\w\-]+)+
     example: /home
   createdAt:
     type: string

@@ -1,19 +1,21 @@
 package com.dms.service;
 
+import com.dms.dto.DestinationDTO;
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.PageWithDocumentsDTO;
 import com.dms.dto.PageWithRevisionsDTO;
-import com.dms.dto.PathRequestDTO;
-import com.dms.dto.UserRequestDTO;
+import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
+import com.dms.exception.InvalidRegexInputException;
 import com.dms.mapper.dto.DocumentDTOMapper;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
+import com.dms.mapper.dto.UserDTOMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -44,6 +46,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DocumentService {
 
+    private static final String PATH_REGEX = "/$|(/[\\w\\-]+)+";
+
     private final DocumentRepository documentRepository;
 
     private final DocumentCommonService documentCommonService;
@@ -63,22 +67,26 @@ public class DocumentService {
                                  .orElseThrow(() -> new RuntimeException("Creation time not found for file with ID: " + documentId));
     }
 
-    private User getUserFromUserRequest(UserRequestDTO userRequest) {
-        User user = User.builder()
-                        .username(userRequest.getUsername())
-                        .email(userRequest.getEmail())
-                        .build();
-
+    private User getUserFromUserDTO(UserDTO userDTO) {
+        User user = UserDTOMapper.mapToUser(userDTO);
         return userService.getSavedUser(user);
     }
 
-    private String getPathFromRequest(PathRequestDTO pathRequest) {
-        return pathRequest == null ? null : pathRequest.getPath();
+    private String getPathFromRequest(DestinationDTO destination) {
+        if (destination == null)
+            return null;
+
+        String path = destination.getPath();
+
+        if (!path.matches(PATH_REGEX))
+            throw new InvalidRegexInputException("Request part 'path' does not match the expected format");
+
+        return path;
     }
 
-    private Document createDocument(UserRequestDTO userRequest, MultipartFile file, String path) {
+    private Document createDocument(UserDTO user, MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
-        User author = getUserFromUserRequest(userRequest);
+        User author = getUserFromUserDTO(user);
 
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
         String cleanPath = StringUtils.cleanPath(originalFileName);
@@ -109,11 +117,11 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadDocument(UserRequestDTO userRequest, MultipartFile file, PathRequestDTO pathRequest) {
-        log.debug("Request - Uploading document: userRequest={}, file={}, pathRequest={}", userRequest, file.getOriginalFilename(), pathRequest);
+    public DocumentDTO uploadDocument(UserDTO user, MultipartFile file, DestinationDTO destination) {
+        log.debug("Request - Uploading document: user={}, file={}, destination={}", user, file.getOriginalFilename(), destination);
 
-        String path = getPathFromRequest(pathRequest);
-        Document document = createDocument(userRequest, file, path);
+        String path = getPathFromRequest(destination);
+        Document document = createDocument(user, file, path);
 
         validateUniquePath(path, document);
 
@@ -128,16 +136,16 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadNewDocumentVersion(String documentId, UserRequestDTO userRequest, MultipartFile file, PathRequestDTO pathRequest) {
-        log.debug("Request - Uploading new document version: documentId={}, userRequest={}, file={}, pathRequest={}", documentId, userRequest, file.getOriginalFilename(), pathRequest);
+    public DocumentDTO uploadNewDocumentVersion(String documentId, UserDTO user, MultipartFile file, DestinationDTO destination) {
+        log.debug("Request - Uploading new document version: documentId={}, user={}, file={}, destination={}", documentId, user, file.getOriginalFilename(), destination);
 
         if (!documentRepository.existsByDocumentId(documentId))
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
 
         Document databaseDocument = documentCommonService.getDocument(documentId);
-        String path = getPathFromRequest(pathRequest);
+        String path = getPathFromRequest(destination);
 
-        Document document = createDocument(userRequest, file, path);
+        Document document = createDocument(user, file, path);
         document.setId(databaseDocument.getId());
         document.setDocumentId(documentId);
         document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);
@@ -247,11 +255,11 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO moveDocument(String documentId, PathRequestDTO pathRequest) {
-        log.debug("Request - Moving document: documentId={}, pathRequest={}", documentId, pathRequest);
+    public DocumentDTO moveDocument(String documentId, DestinationDTO destination) {
+        log.debug("Request - Moving document: documentId={}, destination={}", documentId, destination);
 
         Document document = documentCommonService.getDocument(documentId);
-        String path = getPathFromRequest(pathRequest);
+        String path = getPathFromRequest(destination);
 
         validateUniquePath(path, document);
 

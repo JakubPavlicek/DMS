@@ -8,7 +8,7 @@ public class DocumentDTOMapper {
     public static DocumentDTO map(Document document) {
         return DocumentDTO.builder()
                           .documentId(document.getDocumentId())
-                          .author(UserDTOMapper.map(document.getAuthor()))
+                          .author(UserDTOMapper.mapToUserDTO(document.getAuthor()))
                           .version(document.getVersion())
                           .name(document.getName())
                           .type(document.getType())

@@ -6,16 +6,13 @@ properties:
     example: 5b6cd216-3d3d-4121-ba69-3d6f9d8d966c
   author:
     $ref: './User.yaml'
+  version:
+    $ref: './Document.yaml#/properties/version'
   name:
-    type: string
-    example: dog.jpeg
+    $ref: './Document.yaml#/properties/name'
   type:
-    type: string
-    example: image/jpeg
+    $ref: './Document.yaml#/properties/type'
   path:
-    type: string
-    example: /home
+    $ref: './Document.yaml#/properties/path'
   createdAt:
-    type: string
-    format: date-time
-    example: "2023-10-14T09:32:01.485815"
+    $ref: './Document.yaml#/properties/createdAt'

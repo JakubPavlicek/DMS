@@ -10,12 +10,12 @@ put:
     content:
       multipart/form-data:
         schema:
-          required:
-            - path
           type: object
+          required:
+            - destination
           properties:
-            path:
-              $ref: '../../schema/PathRequest.yaml'
+            destination:
+              $ref: '../../schema/Destination.yaml'
   responses:
     200:
       description: Document moved successfully.

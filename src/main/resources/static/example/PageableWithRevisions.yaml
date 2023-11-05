@@ -13,7 +13,7 @@ value:
       author:
         username: "frank"
         email: "frank@gmail.com"
-      name: "school.pdf"
+      name: "house.pdf"
       type: "application/pdf"
       path: "/home"
       createdAt: "2023-11-04T17:16:18.889468"

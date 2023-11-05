@@ -1,5 +1,12 @@
 type: object
 title: Pageable
+required:
+  - pageNumber
+  - pageSize
+  - sort
+  - offset
+  - paged
+  - unpaged
 properties:
   pageNumber:
     type: integer

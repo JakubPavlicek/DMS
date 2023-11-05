@@ -1,5 +1,16 @@
 type: object
 title: Page With Revisions
+required:
+  - pageable
+  - last
+  - totalElements
+  - totalPages
+  - first
+  - size
+  - number
+  - sort
+  - numberOfElements
+  - empty
 properties:
   content:
     type: array

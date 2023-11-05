@@ -1,5 +1,13 @@
 type: object
 title: Document
+required:
+  - documentId
+  - author
+  - version
+  - name
+  - type
+  - createdAt
+  - updatedAt
 properties:
   documentId:
     type: string

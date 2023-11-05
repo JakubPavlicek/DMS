@@ -25,6 +25,10 @@ components:
       $ref: './schema/PageWithDocuments.yaml'
     PageWithRevisions:
       $ref: './schema/PageWithRevisions.yaml'
+    Pageable:
+      $ref: './schema/Pageable.yaml'
+    Sort:
+      $ref: './schema/Sort.yaml'
     ClientError:
       $ref: './schema/ClientError.yaml'
 

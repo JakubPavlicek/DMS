@@ -1,6 +1,12 @@
 type: object
 title: Client Error
 description: A generic error.
+required:
+  - type
+  - title
+  - status
+  - detail
+  - instance
 properties:
   type:
     type: string

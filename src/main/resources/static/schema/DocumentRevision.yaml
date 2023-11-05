@@ -1,5 +1,12 @@
 type: object
 title: Document Revision
+required:
+  - revisionId
+  - author
+  - version
+  - name
+  - type
+  - createdAt
 properties:
   revisionId:
     type: string

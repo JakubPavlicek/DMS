@@ -1,5 +1,9 @@
 type: object
 title: Sort
+required:
+  - empty
+  - sorted
+  - unsorted
 properties:
   empty:
     type: boolean

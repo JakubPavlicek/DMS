@@ -70,16 +70,21 @@ public class DocumentRevisionService {
     public void deleteRevision(String revisionId) {
         log.debug("Request - Deleting revision: revisionId={}", revisionId);
 
-        DocumentRevision documentRevision = documentCommonService.getRevision(revisionId);
-        Document document = documentRevision.getDocument();
+        DocumentRevision revision = documentCommonService.getRevision(revisionId);
+        Document document = revision.getDocument();
 
-        if (isRevisionSetAsCurrent(documentRevision, document))
+        // revision which is also a current document is being deleted -> switch document to adjacent revision
+        if (isRevisionSetAsCurrent(revision, document))
             replaceDocumentWithAdjacentRevision(document);
 
-        documentCommonService.deleteBlobIfDuplicateHashNotExists(documentRevision.getHash());
+        documentCommonService.deleteBlobIfDuplicateHashNotExists(revision.getHash());
         revisionRepository.deleteByRevisionId(revisionId);
 
         documentCommonService.updateRevisionVersionsForDocument(document);
+
+        // document's previous version was deleted -> decrement current document's version
+        if (revision.getVersion().compareTo(document.getVersion()) < 0)
+            document.setVersion(document.getVersion() - 1);
 
         log.info("Revision {} deleted successfully", revisionId);
     }

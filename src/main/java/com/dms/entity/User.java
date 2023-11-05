@@ -26,17 +26,13 @@ public class User {
 
     @Id
     @SequenceGenerator(
-        name = "user_id_generator",
-        sequenceName = "user_id_sequence",
+        name = "app_user_id_generator",
+        sequenceName = "app_user_id_sequence",
         allocationSize = 1
     )
     @GeneratedValue(
         strategy = GenerationType.SEQUENCE,
-        generator = "user_id_generator"
-    )
-    @Column(
-        nullable = false,
-        unique = true
+        generator = "app_user_id_generator"
     )
     private Long id;
 

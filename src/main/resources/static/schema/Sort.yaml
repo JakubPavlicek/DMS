@@ -8,9 +8,18 @@ properties:
   empty:
     type: boolean
     example: false
+    description: |
+      A boolean value indicating whether the sorting information is empty. 
+      If `true`, there are no sorting criteria defined for the query
   sorted:
     type: boolean
     example: true
+    description: |
+      A boolean value indicating whether the query results are sorted. 
+      If `true`, the query includes sorting criteria
   unsorted:
     type: boolean
     example: false
+    description: |
+      A boolean value indicating whether the query results are unsorted. 
+      If `true`, the query results are not sorted according to any criteria

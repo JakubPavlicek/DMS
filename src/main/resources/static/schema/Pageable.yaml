@@ -10,19 +10,28 @@ required:
 properties:
   pageNumber:
     type: integer
+    description: The page number to retrieve
     example: 0
   pageSize:
     type: integer
+    description: The maximum number of elements to be returned on each page
     example: 2
   sort:
     $ref: './Sort.yaml'
   offset:
     type: integer
     format: int64
+    description: The offset of the current page within the result set
     example: 0
   paged:
     type: boolean
+    description: |
+      A boolean value indicating whether the query results are paginated. 
+      If `true`, the query includes pagination criteria
     example: true
   unpaged:
     type: boolean
+    description: |
+      A boolean value indicating whether the query results are not paginated. 
+      If `true`, the query results are not subject to pagination
     example: false

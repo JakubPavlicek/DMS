@@ -84,14 +84,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 - `GET` : List document revisions
 
 #### /documents/{documentId}/revisions/{revisionId}
-- `PUT` : Switch document to revision 
-
-#### /documents/{documentId}/versions
-- `GET` : List document versions
-
-#### /documents/{documentId}/versions/{version}
-- `GET` : Get document with version
-- `PUT` : Switch document to version 
+- `PUT` : Switch document to revision
 
 #### /revisions 
 - `GET` : List revisions

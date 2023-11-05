@@ -6,22 +6,19 @@ databaseChangeLog:
       changes:
 
         - createSequence:
-            sequenceName: user_id_sequence
+            sequenceName: app_user_id_sequence
             startValue: 1
             incrementBy: 1
-            dataType: bigint
 
         - createSequence:
             sequenceName: document_id_sequence
             startValue: 1
             incrementBy: 1
-            dataType: bigint
 
         - createSequence:
             sequenceName: revision_id_sequence
             startValue: 1
             incrementBy: 1
-            dataType: bigint
 
         - createTable:
             tableName: app_user
@@ -29,11 +26,10 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
-                  defaultValueSequenceNext: user_id_sequence
+                  defaultValueSequenceNext: app_user_id_sequence
                   constraints:
                     primaryKey: true
                     nullable: false
-                    unique: true
               - column:
                   name: username
                   type: varchar(40)
@@ -55,7 +51,6 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
-                    unique: true
               - column:
                   name: user_id
                   type: bigint
@@ -114,7 +109,6 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
-                    unique: true
               - column:
                   name: user_id
                   type: bigint
@@ -184,19 +178,3 @@ databaseChangeLog:
             constraintName: fk_revision_document
             referencedTableName: document
             referencedColumnNames: id
-
-        - createIndex:
-            indexName: document_id_index
-            tableName: document
-            unique: true
-            columns:
-              - column:
-                  name: document_id
-
-        - createIndex:
-            indexName: revision_id_index
-            tableName: document_revision
-            unique: true
-            columns:
-              - column:
-                  name: revision_id

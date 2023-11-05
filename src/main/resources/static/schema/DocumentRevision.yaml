@@ -8,12 +8,25 @@ properties:
   author:
     $ref: './User.yaml'
   version:
-    $ref: './Document.yaml#/properties/version'
+    type: integer
+    format: int64
+    description: "The version of the revision"
+    example: 1
   name:
-    $ref: './Document.yaml#/properties/name'
+    type: string
+    description: "The name of the revision"
+    example: dog.jpeg
   type:
-    $ref: './Document.yaml#/properties/type'
+    type: string
+    description: "The type of the revision"
+    example: image/jpeg
   path:
-    $ref: './Document.yaml#/properties/path'
+    type: string
+    pattern: /$|(/[\w\-]+)+
+    description: "The user-defined path of the revision"
+    example: /home
   createdAt:
-    $ref: './Document.yaml#/properties/createdAt'
+    type: string
+    format: date-time
+    description: "The creation date of the revision"
+    example: "2023-10-14T09:32:01.485815"

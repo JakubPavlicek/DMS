@@ -17,16 +17,12 @@ components:
       $ref: './schema/User.yaml'
     Document:
       $ref: './schema/Document.yaml'
-    DocumentWithVersion:
-      $ref: './schema/DocumentWithVersion.yaml'
     DocumentRevision:
       $ref: './schema/DocumentRevision.yaml'
     PageWithDocuments:
       $ref: './schema/PageWithDocuments.yaml'
     PageWithRevisions:
       $ref: './schema/PageWithRevisions.yaml'
-    PageWithVersions:
-      $ref: './schema/PageWithVersions.yaml'
     ClientError:
       $ref: './schema/ClientError.yaml'
 
@@ -52,12 +48,6 @@ paths:
 
   /documents/{documentId}/revisions/{revisionId}:
     $ref: './path/documents/documents@:documentId@revisions@:revisionId.yaml'
-
-  /documents/{documentId}/versions:
-    $ref: './path/documents/documents@:documentId@versions.yaml'
-
-  /documents/{documentId}/versions/{version}:
-    $ref: './path/documents/documents@:documentId@versions@:version.yaml'
 
   /revisions:
     $ref: './path/revisions/revisions.yaml'

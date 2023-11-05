@@ -57,16 +57,6 @@ public class DocumentCommonService {
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
     }
 
-    public Page<DocumentRevision> getAllRevisions(Document document, Pageable pageable) {
-        return revisionRepository.findAllByDocument(document, pageable);
-    }
-
-    public DocumentRevision getRevisionByDocumentAndVersion(Document document, Long version) {
-        log.debug("Getting revision by document and version: documentId={}, version={}", document.getDocumentId(), version);
-        return revisionRepository.findByDocumentAndVersion(document, version)
-                                 .orElseThrow(() -> new RevisionNotFoundException("Revision with version: " + version + " not found for document with ID: " + document.getDocumentId()));
-    }
-
     public DocumentRevision getRevisionByDocumentAndId(Document document, String revisionId) {
         log.debug("Getting revision by document and ID: documentId={}, revisionId={}", document.getDocumentId(), revisionId);
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)

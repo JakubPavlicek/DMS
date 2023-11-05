@@ -2,10 +2,8 @@ package com.dms.service;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.DocumentWithVersionDTO;
 import com.dms.dto.PageWithDocumentsDTO;
 import com.dms.dto.PageWithRevisionsDTO;
-import com.dms.dto.PageWithVersionsDTO;
 import com.dms.dto.PathRequestDTO;
 import com.dms.dto.UserRequestDTO;
 import com.dms.entity.Document;
@@ -14,10 +12,8 @@ import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
 import com.dms.mapper.dto.DocumentDTOMapper;
-import com.dms.mapper.dto.DocumentWithVersionDTOMapper;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
-import com.dms.mapper.dto.PageWithVersionsDTOMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -60,17 +56,6 @@ public class DocumentService {
         log.info("Document {} retrieved successfully", documentId);
 
         return DocumentDTOMapper.map(document);
-    }
-
-    public DocumentWithVersionDTO getDocumentWithVersion(String documentId, Long version) {
-        log.debug("Request - Getting document with version: documentId={}, version={}", documentId, version);
-
-        Document document = documentCommonService.getDocument(documentId);
-        DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
-
-        log.info("Document {} with version {} retrieved successfully", documentId, version);
-
-        return DocumentWithVersionDTOMapper.map(document, revision);
     }
 
     private LocalDateTime getDocumentCreatedAt(String documentId) {
@@ -174,20 +159,6 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO switchToVersion(String documentId, Long version) {
-        log.debug("Request - Switching document to version: documentId={}, version={}", documentId, version);
-
-        Document document = documentCommonService.getDocument(documentId);
-        DocumentRevision revision = documentCommonService.getRevisionByDocumentAndVersion(document, version);
-
-        Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
-
-        log.info("Successfully switched document {} to version: {}", documentId, version);
-
-        return DocumentDTOMapper.map(documentFromRevision);
-    }
-
-    @Transactional
     public DocumentDTO switchToRevision(String documentId, String revisionId) {
         log.debug("Request - Switching document to revision: documentId={}, revision={}", documentId, revisionId);
 
@@ -273,30 +244,6 @@ public class DocumentService {
         log.info("Document revisions listed successfully");
 
         return PageWithRevisionsDTOMapper.map(documentRevisionDTOs);
-    }
-
-    public PageWithVersionsDTO getDocumentVersions(String documentId, int pageNumber, int pageSize) {
-        log.debug("Request - Listing document versions: documentId={} pageNumber={}, pageSize={}", documentId, pageNumber, pageSize);
-
-        Document document = documentCommonService.getDocument(documentId);
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-
-        PageWithVersionsDTO documentVersions = getPageWithVersions(document, pageable);
-
-        log.info("Document versions listed succeffully");
-
-        return documentVersions;
-    }
-
-    private PageWithVersionsDTO getPageWithVersions(Document document, Pageable pageable) {
-        Page<DocumentRevision> revisions = documentCommonService.getAllRevisions(document, pageable);
-
-        List<Long> versionList = revisions.stream()
-                                          .map(DocumentRevision::getVersion)
-                                          .toList();
-
-        PageImpl<Long> versions = new PageImpl<>(versionList, pageable, revisions.getTotalElements());
-        return PageWithVersionsDTOMapper.map(versions);
     }
 
     @Transactional

@@ -2,10 +2,8 @@ package com.dms.controller;
 
 import com.dms.DocumentsApi;
 import com.dms.dto.DocumentDTO;
-import com.dms.dto.DocumentWithVersionDTO;
 import com.dms.dto.PageWithDocumentsDTO;
 import com.dms.dto.PageWithRevisionsDTO;
-import com.dms.dto.PageWithVersionsDTO;
 import com.dms.dto.PathRequestDTO;
 import com.dms.dto.UserRequestDTO;
 import com.dms.service.DocumentService;
@@ -44,16 +42,6 @@ public class DocumentController implements DocumentsApi {
     }
 
     @Override
-    public ResponseEntity<PageWithVersionsDTO> getDocumentVersions(String documentId, Integer page, Integer limit) {
-        return ResponseEntity.ok(documentService.getDocumentVersions(documentId, page, limit));
-    }
-
-    @Override
-    public ResponseEntity<DocumentWithVersionDTO> getDocumentWithVersion(String documentId, Long version) {
-        return ResponseEntity.ok(documentService.getDocumentWithVersion(documentId, version));
-    }
-
-    @Override
     public ResponseEntity<PageWithDocumentsDTO> getDocuments(Integer page, Integer limit, String sort, String filter) {
         return ResponseEntity.ok(documentService.getDocuments(page, limit, sort, filter));
     }
@@ -66,11 +54,6 @@ public class DocumentController implements DocumentsApi {
     @Override
     public ResponseEntity<DocumentDTO> switchToRevision(String documentId, String revisionId) {
         return ResponseEntity.ok(documentService.switchToRevision(documentId, revisionId));
-    }
-
-    @Override
-    public ResponseEntity<DocumentDTO> switchToVersion(String documentId, Long version) {
-        return ResponseEntity.ok(documentService.switchToVersion(documentId, version));
     }
 
     @Override

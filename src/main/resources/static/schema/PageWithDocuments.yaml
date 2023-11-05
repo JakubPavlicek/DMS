@@ -9,20 +9,28 @@ properties:
     $ref: './Pageable.yaml'
   last:
     type: boolean
+    example: false
   totalElements:
     type: integer
     format: int64
+    example: 4
   totalPages:
     type: integer
+    example: 2
   first:
     type: boolean
+    example: true
   size:
     type: integer
+    example: 2
   number:
     type: integer
+    example: 0
   sort:
     $ref: './Sort.yaml'
   numberOfElements:
     type: integer
+    example: 2
   empty:
     type: boolean
+    example: false

@@ -3,7 +3,10 @@ title: Sort
 properties:
   empty:
     type: boolean
+    example: false
   sorted:
     type: boolean
+    example: true
   unsorted:
     type: boolean
+    example: false

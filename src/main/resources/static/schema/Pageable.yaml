@@ -3,14 +3,19 @@ title: Pageable
 properties:
   pageNumber:
     type: integer
+    example: 0
   pageSize:
     type: integer
+    example: 2
   sort:
     $ref: './Sort.yaml'
   offset:
     type: integer
     format: int64
+    example: 0
   paged:
     type: boolean
+    example: true
   unpaged:
     type: boolean
+    example: false

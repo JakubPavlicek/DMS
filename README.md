@@ -111,7 +111,7 @@ Requirements for the software and other tools to build
 
 1. **Download and Open**:
     - Clone the application: `git clone https://github.com/JakubPavlicek/DMS.git`
-    - Navigate to the downloaded directory and open **DocumentManager**.
+    - Navigate to the downloaded directory and open it.
 
 2. **Configuration**:
     - In **src/main/resources/application.yaml**, update these values:

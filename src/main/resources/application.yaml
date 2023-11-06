@@ -44,7 +44,7 @@ spring:
     activate:
       on-profile: postgresql
   datasource:
-    url: jdbc:postgresql://localhost:5433/dms
+    url: jdbc:postgresql://localhost:5432/dms
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres

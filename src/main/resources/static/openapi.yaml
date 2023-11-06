@@ -38,28 +38,28 @@ paths:
     $ref: './path/documents/documents.yaml'
 
   /documents/upload:
-    $ref: './path/documents/documents@upload.yaml'
+    $ref: './path/documents/documents_upload.yaml'
 
   /documents/{documentId}:
-    $ref: './path/documents/documents@:documentId.yaml'
+    $ref: './path/documents/documents_documentId.yaml'
 
   /documents/{documentId}/download:
-    $ref: './path/documents/documents@:documentId@download.yaml'
+    $ref: './path/documents/documents_documentId_download.yaml'
 
   /documents/{documentId}/move:
-    $ref: './path/documents/documents@:documentId@move.yaml'
+    $ref: './path/documents/documents_documentId_move.yaml'
 
   /documents/{documentId}/revisions:
-    $ref: './path/documents/documents@:documentId@revisions.yaml'
+    $ref: './path/documents/documents_documentId_revisions.yaml'
 
   /documents/{documentId}/revisions/{revisionId}:
-    $ref: './path/documents/documents@:documentId@revisions@:revisionId.yaml'
+    $ref: './path/documents/documents_documentId_revisions_revisionId.yaml'
 
   /revisions:
     $ref: './path/revisions/revisions.yaml'
 
   /revisions/{revisionId}:
-    $ref: './path/revisions/revisions@:revisionId.yaml'
+    $ref: './path/revisions/revisions_revisionId.yaml'
 
   /revisions/{revisionId}/download:
-    $ref: './path/revisions/revisions@:revisionId@download.yaml'
+    $ref: './path/revisions/revisions_revisionId_download.yaml'

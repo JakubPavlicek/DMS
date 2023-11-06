@@ -11,7 +11,6 @@ import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
-import com.dms.exception.InvalidRegexInputException;
 import com.dms.mapper.dto.DocumentDTOMapper;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
@@ -45,8 +44,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DocumentService {
 
-    private static final String PATH_REGEX = "/$|(/[\\w\\-]+)+";
-
     private final DocumentRepository documentRepository;
 
     private final DocumentCommonService documentCommonService;
@@ -69,20 +66,6 @@ public class DocumentService {
     private User getUserFromUserDTO(UserDTO userDTO) {
         User user = UserDTOMapper.mapToUser(userDTO);
         return userService.getSavedUser(user);
-    }
-
-    private String getPathFromDestination(DestinationDTO destination) {
-        if (destination == null) {
-            return null;
-        }
-
-        String path = destination.getPath();
-
-        if (!path.matches(PATH_REGEX)) {
-            throw new InvalidRegexInputException("Request part 'path' does not match the expected format");
-        }
-
-        return path;
     }
 
     private Document createDocument(UserDTO user, MultipartFile file, String path) {
@@ -122,7 +105,7 @@ public class DocumentService {
     public DocumentDTO uploadDocument(UserDTO user, MultipartFile file, DestinationDTO destination) {
         log.debug("Request - Uploading document: user={}, file={}, destination={}", user, file.getOriginalFilename(), destination);
 
-        String path = getPathFromDestination(destination);
+        String path = destination.getPath();
         Document document = createDocument(user, file, path);
 
         validateUniquePath(path, document);
@@ -146,7 +129,7 @@ public class DocumentService {
         }
 
         Document databaseDocument = documentCommonService.getDocument(documentId);
-        String path = getPathFromDestination(destination);
+        String path = destination.getPath();
 
         Document document = createDocument(user, file, path);
         document.setId(databaseDocument.getId());
@@ -262,7 +245,7 @@ public class DocumentService {
         log.debug("Request - Moving document: documentId={}, destination={}", documentId, destination);
 
         Document document = documentCommonService.getDocument(documentId);
-        String path = getPathFromDestination(destination);
+        String path = destination.getPath();
 
         validateUniquePath(path, document);
 

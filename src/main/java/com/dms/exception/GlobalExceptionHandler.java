@@ -42,7 +42,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private final ServerProperties serverProperties;
 
     private final static String CONTEXT_INFO = "context_info";
-    private final static String MESSAGE = "message";
+    private final static String MESSAGES = "messages";
 
     private String getRequestURI(WebRequest request) {
         ServletWebRequest servletWebRequest = (ServletWebRequest) request;
@@ -60,12 +60,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/media-type-not-supported"));
 
         Map<String, List<String>> message = new HashMap<>();
-        message.put(MESSAGE, List.of("Request must contain data"));
+        message.put(MESSAGES, List.of("Request must contain data"));
 
         problemDetail.setProperty(CONTEXT_INFO, message);
 
-        return ResponseEntity.of(problemDetail)
-                             .build();
+        return ResponseEntity.of(problemDetail).build();
     }
 
     @Override
@@ -77,12 +76,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/invalid-data-provided"));
 
         Map<String, List<String>> message = new HashMap<>();
-        message.put(MESSAGE, getMethodArgumentErrorMessages(ex));
+        message.put(MESSAGES, getMethodArgumentErrorMessages(ex));
 
         problemDetail.setProperty(CONTEXT_INFO, message);
 
-        return ResponseEntity.of(problemDetail)
-                             .build();
+        return ResponseEntity.of(problemDetail).build();
     }
 
     private List<String> getMethodArgumentErrorMessages(MethodArgumentNotValidException ex) {
@@ -104,8 +102,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setTitle("Missing Request Part");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/missing-request-part"));
 
-        return ResponseEntity.of(problemDetail)
-                             .build();
+        return ResponseEntity.of(problemDetail).build();
     }
 
     @Override
@@ -116,8 +113,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setTitle("Missing Request Parameter");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/missing-request-parameter"));
 
-        return ResponseEntity.of(problemDetail)
-                             .build();
+        return ResponseEntity.of(problemDetail).build();
     }
 
     @Override
@@ -128,8 +124,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setTitle("Resource Not Found");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/resource-not-found"));
 
-        return ResponseEntity.of(problemDetail)
-                             .build();
+        return ResponseEntity.of(problemDetail).build();
     }
 
     @ExceptionHandler(FileOperationException.class)
@@ -198,7 +193,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         Set<ConstraintViolation<?>> violations = exception.getConstraintViolations();
 
         Map<String, List<String>> message = new HashMap<>();
-        message.put(MESSAGE, getConstraintViolationErrorMessages(violations));
+        message.put(MESSAGES, getConstraintViolationErrorMessages(violations));
 
         problemDetail.setProperty(CONTEXT_INFO, message);
 

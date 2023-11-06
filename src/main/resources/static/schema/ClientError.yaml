@@ -30,14 +30,11 @@ properties:
     example: "/documents/11ae56ed-240e-4d4d-8d3c-f135d9394ab3"
   contextInfo:
     type: object
-    description: |
-      A free-form based object that contains additional context about the error.
-      The possible fields are defined on a per-endpoint basis.
-      'message' is only one example.
+    description: A free-form based object that contains additional context about the error.
     properties:
-      message:
+      messages:
         type: array
+        description: "More details on the error."
         items:
           type: string
-          description: "More details on the error."
-          example: "Something went wrong"
+        example: ["Something went wrong", "Something else went wrong"]

@@ -114,7 +114,7 @@ public class DocumentService {
         User author = document.getAuthor();
 
         // user can't have a duplicate path for a document with the same name
-        if (documentCommonService.pathWithFileAlreadyExists(path, filename, author)) {
+        if (documentRepository.pathWithFileAlreadyExists(path, filename, author)) {
             throw new FileWithPathAlreadyExistsException("Document: " + filename + " with path: " + path + " already exists");
         }
     }

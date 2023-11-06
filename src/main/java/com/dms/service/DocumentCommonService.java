@@ -3,7 +3,6 @@ package com.dms.service;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
-import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
@@ -203,10 +202,6 @@ public class DocumentCommonService {
 
     private boolean isDuplicateHashPresent(String hash) {
         return documentRepository.duplicateHashExists(hash) || revisionRepository.duplicateHashExists(hash);
-    }
-
-    public boolean pathWithFileAlreadyExists(String path, String filename, User user) {
-        return documentRepository.pathWithFileAlreadyExists(path, filename, user) || revisionRepository.pathWithFileAlreadyExists(path, filename, user);
     }
 
 }

@@ -6,9 +6,12 @@ import com.dms.exception.FileOperationException;
 import com.dms.hash.Hasher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,7 +43,8 @@ public class BlobStorageService {
                 log.info("Creating a directory for blob of the file {}", filename);
             }
 
-            Files.write(filePath, file.getBytes());
+            InputStream fileStream = file.getInputStream();
+            Files.copy(fileStream, filePath);
         } catch (Exception exception) {
             throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: '" + filename + "' to storage");
         }
@@ -50,13 +54,13 @@ public class BlobStorageService {
         return hash;
     }
 
-    public byte[] getBlob(String hash) {
+    public Resource getBlob(String hash) {
         Path filePath = getFilePath(hash);
 
         try {
-            byte[] bytes = Files.readAllBytes(filePath);
+            Resource resource = new UrlResource(filePath.toUri());
             log.info("Blob retrieved succeffully");
-            return bytes;
+            return resource;
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.READ, "An error occurred while reading the file");
         }

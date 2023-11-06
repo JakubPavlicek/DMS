@@ -4,6 +4,8 @@ import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.DocumentNotFoundException;
+import com.dms.exception.FileOperation;
+import com.dms.exception.FileOperationException;
 import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
 import com.dms.mapper.dto.DocumentRevisionDTOMapper;
@@ -13,6 +15,7 @@ import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -190,8 +194,16 @@ public class DocumentCommonService {
         return blobStorageService.storeBlob(file);
     }
 
-    public byte[] getBlob(String hash) {
+    public Resource getBlob(String hash) {
         return blobStorageService.getBlob(hash);
+    }
+
+    public String getContentLength(Resource resource) {
+        try {
+            return String.valueOf(resource.contentLength());
+        } catch (IOException e) {
+            throw new FileOperationException(FileOperation.READ, "Content length could not be retrieved");
+        }
     }
 
     public void deleteBlobIfDuplicateHashNotExists(String hash) {

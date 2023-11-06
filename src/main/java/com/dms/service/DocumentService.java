@@ -21,7 +21,6 @@ import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -204,15 +203,15 @@ public class DocumentService {
 
         Document document = documentCommonService.getDocument(documentId);
         String hash = document.getHash();
-        byte[] data = documentCommonService.getBlob(hash);
+        Resource file = documentCommonService.getBlob(hash);
 
         log.info("Document {} downloaded successfully", documentId);
 
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(document.getType()))
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
-                             .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(data.length))
-                             .body(new ByteArrayResource(data));
+                             .header(HttpHeaders.CONTENT_LENGTH, documentCommonService.getContentLength(file))
+                             .body(file);
     }
 
     public PageWithDocumentsDTO getDocuments(int pageNumber, int pageSize, String sort, String filter) {

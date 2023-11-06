@@ -78,6 +78,7 @@ public class Document {
     @Column(nullable = false)
     private String type;
 
+    @Column(nullable = false)
     private String path;
 
     @Column(

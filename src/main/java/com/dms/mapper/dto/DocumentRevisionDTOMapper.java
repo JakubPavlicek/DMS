@@ -12,7 +12,6 @@ public class DocumentRevisionDTOMapper {
                                   .version(revision.getVersion())
                                   .name(revision.getName())
                                   .type(revision.getType())
-                                  .path(revision.getPath())
                                   .createdAt(revision.getCreatedAt())
                                   .build();
     }

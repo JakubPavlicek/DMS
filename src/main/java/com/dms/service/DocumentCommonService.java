@@ -38,7 +38,7 @@ public class DocumentCommonService {
     private static final String FILTER_REGEX = "(name|type|path):\"([^,]*)\"(?:,|$)";
 
     private static final String DOCUMENT_SORT_REGEX = "(document_id|name|type|path|version|created_at|updated_at):(asc|desc)(?:,|$)";
-    private static final String REVISION_SORT_REGEX = "(revision_id|name|type|path|version|created_at):(asc|desc)(?:,|$)";
+    private static final String REVISION_SORT_REGEX = "(revision_id|name|type|version|created_at):(asc|desc)(?:,|$)";
 
     private final DocumentRepository documentRepository;
     private final DocumentRevisionRepository revisionRepository;
@@ -68,7 +68,6 @@ public class DocumentCommonService {
 
         document.setName(revision.getName());
         document.setType(revision.getType());
-        document.setPath(revision.getPath());
         document.setHash(revision.getHash());
         document.setVersion(revision.getVersion());
         document.setAuthor(revision.getAuthor());
@@ -89,7 +88,6 @@ public class DocumentCommonService {
                                                             .version(getLastRevisionVersion(document) + 1)
                                                             .name(document.getName())
                                                             .type(document.getType())
-                                                            .path(document.getPath())
                                                             .author(document.getAuthor())
                                                             .hash(document.getHash())
                                                             .build();

@@ -143,11 +143,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: path
-                  type: varchar(255)
-                  constraints:
-                    nullable: true
-              - column:
                   name: hash
                   type: varchar(64)
                   constraints:

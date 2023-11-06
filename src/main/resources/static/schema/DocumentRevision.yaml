@@ -28,11 +28,6 @@ properties:
     type: string
     description: "The type of the revision"
     example: image/jpeg
-  path:
-    type: string
-    pattern: /$|(/[\w\-]+)+
-    description: "The user-defined path of the revision"
-    example: /home
   createdAt:
     type: string
     format: date-time

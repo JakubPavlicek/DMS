@@ -1,6 +1,8 @@
 type: object
 title: Destination
 description: The destination to store/move the document to.
+required:
+  - path
 properties:
   path:
     type: string

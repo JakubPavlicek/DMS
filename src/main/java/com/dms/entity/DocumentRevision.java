@@ -75,8 +75,6 @@ public class DocumentRevision {
     @Column(nullable = false)
     private String type;
 
-    private String path;
-
     @Column(
         length = 64,
         nullable = false

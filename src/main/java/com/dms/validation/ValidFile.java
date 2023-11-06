@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {FileValidator.class})
 public @interface ValidFile {
 
-    String message() default "File cannot be null or empty";
+    String message() default "File cannot be null";
 
     Class<?>[] groups() default {};
 

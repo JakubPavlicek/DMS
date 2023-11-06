@@ -53,10 +53,11 @@ public class DocumentRevisionService {
 
         log.debug("Replacing document with adjacent revision: document={}, replacingRevision={}", document, replacingRevision);
 
-        if (replacingRevision == null)
+        if (replacingRevision == null) {
             throw new RevisionDeletionException(
                 "Revision cannnot be deleted because this is the only version left for the document with ID: " + document.getDocumentId()
             );
+        }
 
         documentCommonService.updateDocumentToRevision(document, replacingRevision);
     }
@@ -74,8 +75,9 @@ public class DocumentRevisionService {
         Document document = revision.getDocument();
 
         // revision which is also a current document is being deleted -> switch document to adjacent revision
-        if (isRevisionSetAsCurrent(revision, document))
+        if (isRevisionSetAsCurrent(revision, document)) {
             replaceDocumentWithAdjacentRevision(document);
+        }
 
         documentCommonService.deleteBlobIfDuplicateHashNotExists(revision.getHash());
         revisionRepository.deleteByRevisionId(revisionId);
@@ -83,8 +85,9 @@ public class DocumentRevisionService {
         documentCommonService.updateRevisionVersionsForDocument(document);
 
         // document's previous version was deleted -> decrement current document's version
-        if (revision.getVersion().compareTo(document.getVersion()) < 0)
+        if (revision.getVersion().compareTo(document.getVersion()) < 0) {
             document.setVersion(document.getVersion() - 1);
+        }
 
         log.info("Revision {} deleted successfully", revisionId);
     }

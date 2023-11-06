@@ -23,8 +23,14 @@ public class BlobStorageProperties implements Validator {
     @Value("${storage.path}")
     private String path;
 
-    @Min(value = 1, message = "Minimal directory prefix length is 1")
-    @Max(value = 10, message = "Maximum directory prefix length is 10")
+    @Min(
+        value = 1,
+        message = "Minimal directory prefix length is 1"
+    )
+    @Max(
+        value = 10,
+        message = "Maximum directory prefix length is 10"
+    )
     @Value("${storage.directory-prefix-length:2}")
     private int directoryPrefixLength;
 
@@ -37,7 +43,7 @@ public class BlobStorageProperties implements Validator {
     public void validate(Object target, Errors errors) {
         Path storagePath = Paths.get(path);
 
-        if(Files.notExists(storagePath)) {
+        if (Files.notExists(storagePath)) {
             try {
                 Files.createDirectories(storagePath);
                 log.warn("The provided blob storage path {} did not exist. A new directory has been created at that path", storagePath);
@@ -48,7 +54,7 @@ public class BlobStorageProperties implements Validator {
             }
         }
 
-        if(!Files.isDirectory(storagePath)) {
+        if (!Files.isDirectory(storagePath)) {
             String message = "Provided path: '" + path + "' is not a directory";
             log.error(message);
             errors.rejectValue("path", "Path Is Not A Directory", message);

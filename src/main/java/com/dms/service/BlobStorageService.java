@@ -68,8 +68,9 @@ public class BlobStorageService {
         try {
             boolean wasFileDeleted = Files.deleteIfExists(filePath);
 
-            if(wasFileDeleted)
+            if (wasFileDeleted) {
                 log.info("Blob deleted successfully");
+            }
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.DELETE, "An error occurred while deleting the file");
         }
@@ -98,8 +99,7 @@ public class BlobStorageService {
         Path directoryPath = getDirectoryPath(hash);
 
         try {
-            String directoryName = directoryPath.getName(directoryPath.getNameCount() - 1)
-                                                .toString();
+            String directoryName = directoryPath.getName(directoryPath.getNameCount() - 1).toString();
             String fileName = hash.substring(blobStorageProperties.getDirectoryPrefixLength());
             return Paths.get(blobStorageProperties.getPath(), directoryName, fileName);
         } catch (Exception e) {
@@ -109,10 +109,10 @@ public class BlobStorageService {
 
     private boolean isDirectoryEmpty(Path directoryPath) {
         try (DirectoryStream<Path> directory = Files.newDirectoryStream(directoryPath)) {
-            if (!Files.isDirectory(directoryPath))
+            if (!Files.isDirectory(directoryPath)) {
                 return false;
-            return !directory.iterator()
-                             .hasNext();
+            }
+            return !directory.iterator().hasNext();
         } catch (Exception e) {
             throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
         }

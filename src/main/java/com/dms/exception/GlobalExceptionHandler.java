@@ -137,8 +137,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("Request {} raised:", request.getRequestURI(), exception);
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
-        problemDetail.setTitle(exception.getFileOperation()
-                                       .getTitle());
+        problemDetail.setTitle(exception.getFileOperation().getTitle());
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/file-operation"));
 
         return problemDetail;

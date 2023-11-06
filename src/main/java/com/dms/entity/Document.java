@@ -99,8 +99,9 @@ public class Document {
 
     @PrePersist
     private void generateId() {
-        if (documentId == null)
+        if (documentId == null) {
             documentId = UUID.randomUUID().toString();
+        }
     }
 
 }

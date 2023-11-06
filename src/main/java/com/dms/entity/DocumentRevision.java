@@ -92,8 +92,9 @@ public class DocumentRevision {
 
     @PrePersist
     private void generateId() {
-        if (revisionId == null)
+        if (revisionId == null) {
             revisionId = UUID.randomUUID().toString();
+        }
     }
 
 }

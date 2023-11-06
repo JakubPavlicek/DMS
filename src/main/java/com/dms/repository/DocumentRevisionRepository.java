@@ -3,8 +3,6 @@ package com.dms.repository;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,13 +17,9 @@ public interface DocumentRevisionRepository extends JpaRepository<DocumentRevisi
 
     Optional<DocumentRevision> findByRevisionId(String revisionId);
 
-    Optional<DocumentRevision> findByDocumentAndVersion(Document document, Long version);
-
     Optional<DocumentRevision> findByDocumentAndRevisionId(Document document, String revisionId);
 
     List<DocumentRevision> findAllByDocumentOrderByCreatedAtAsc(Document document);
-
-    Page<DocumentRevision> findAllByDocument(Document document, Pageable pageable);
 
     void deleteByRevisionId(String revisionId);
 

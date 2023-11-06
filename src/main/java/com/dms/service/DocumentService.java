@@ -73,13 +73,15 @@ public class DocumentService {
     }
 
     private String getPathFromDestination(DestinationDTO destination) {
-        if (destination == null)
+        if (destination == null) {
             return null;
+        }
 
         String path = destination.getPath();
 
-        if (!path.matches(PATH_REGEX))
+        if (!path.matches(PATH_REGEX)) {
             throw new InvalidRegexInputException("Request part 'path' does not match the expected format");
+        }
 
         return path;
     }
@@ -112,8 +114,9 @@ public class DocumentService {
         User author = document.getAuthor();
 
         // user can't have a duplicate path for a document with the same name
-        if (documentCommonService.pathWithFileAlreadyExists(path, filename, author))
+        if (documentCommonService.pathWithFileAlreadyExists(path, filename, author)) {
             throw new FileWithPathAlreadyExistsException("Document: " + filename + " with path: " + path + " already exists");
+        }
     }
 
     @Transactional
@@ -139,8 +142,9 @@ public class DocumentService {
     public DocumentDTO uploadNewDocumentVersion(String documentId, UserDTO user, MultipartFile file, DestinationDTO destination) {
         log.debug("Request - Uploading new document version: documentId={}, user={}, file={}, destination={}", documentId, user, file.getOriginalFilename(), destination);
 
-        if (!documentRepository.existsByDocumentId(documentId))
+        if (!documentRepository.existsByDocumentId(documentId)) {
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
+        }
 
         Document databaseDocument = documentCommonService.getDocument(documentId);
         String path = getPathFromDestination(destination);

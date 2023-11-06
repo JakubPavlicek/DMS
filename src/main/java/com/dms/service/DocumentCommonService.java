@@ -134,8 +134,9 @@ public class DocumentCommonService {
     }
 
     private Map<String, String> getFilters(String filter, Function<String, String> fieldMapper) {
-        if (!filter.matches("(" + FILTER_REGEX + ")+"))
+        if (!filter.matches("(" + FILTER_REGEX + ")+")) {
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
+        }
 
         log.debug("Getting filter items: filter={}, regex={}", filter, FILTER_REGEX);
 
@@ -165,8 +166,9 @@ public class DocumentCommonService {
     }
 
     private List<Sort.Order> getSortOrders(String sort, String regex, Function<String, String> fieldMapper) {
-        if (!sort.matches("(" + regex + ")+"))
+        if (!sort.matches("(" + regex + ")+")) {
             throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
+        }
 
         log.debug("Getting orders: sort={}, regex={}", sort, regex);
 
@@ -196,8 +198,9 @@ public class DocumentCommonService {
     }
 
     public void deleteBlobIfDuplicateHashNotExists(String hash) {
-        if (!isDuplicateHashPresent(hash))
+        if (!isDuplicateHashPresent(hash)) {
             blobStorageService.deleteBlob(hash);
+        }
     }
 
     private boolean isDuplicateHashPresent(String hash) {

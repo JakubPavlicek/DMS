@@ -18,3 +18,8 @@ properties:
     minLength: 1
     maxLength: 255
     example: james@gmail.com
+  password:
+    type: string
+    format: password
+    minLength: 5
+    maxLength: 255

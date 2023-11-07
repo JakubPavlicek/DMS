@@ -9,6 +9,7 @@ public class UserDTOMapper {
         return UserDTO.builder()
                       .username(user.getUsername())
                       .email(user.getEmail())
+                      .password("*******")
                       .build();
     }
 
@@ -16,6 +17,7 @@ public class UserDTOMapper {
         return User.builder()
                    .username(user.getUsername())
                    .email(user.getEmail())
+                   .password(user.getPassword())
                    .build();
     }
 

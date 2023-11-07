@@ -1,0 +1,33 @@
+put:
+  summary: Update user
+  description: Updates a user.
+  operationId: updateUser
+  tags:
+    - users
+  parameters:
+    - $ref: '../../parameter/UserId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../schema/User.yaml'
+  responses:
+    200:
+      description: Successfully updated user.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/User.yaml'
+
+delete:
+  summary: Delete user
+  description: Deletes a user.
+  operationId: deleteUser
+  tags:
+    - users
+  parameters:
+    - $ref: '../../parameter/UserId.yaml'
+  responses:
+    204:
+      description: Successfully deleted user.

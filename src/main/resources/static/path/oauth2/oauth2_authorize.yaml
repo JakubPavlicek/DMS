@@ -1,0 +1,15 @@
+post:
+  summary: Authorize user
+  description: Authorize a user.
+  operationId: authorize
+  tags:
+    - oauth2
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../schema/User.yaml'
+  responses:
+    204:
+      description: Successfully authorized user.

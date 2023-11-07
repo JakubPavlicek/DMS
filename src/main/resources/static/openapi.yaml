@@ -34,6 +34,15 @@ components:
 
 paths:
 
+  /oauth2/authorize:
+    $ref: './path/oauth2/oauth2_authorize.yaml'
+
+  /oauth2/revoke:
+    $ref: './path/oauth2/oauth2_revoke.yaml'
+
+  /oauth2/token:
+    $ref: './path/oauth2/oauth2_token.yaml'
+
   /documents:
     $ref: './path/documents/documents.yaml'
 
@@ -63,3 +72,12 @@ paths:
 
   /revisions/{revisionId}/download:
     $ref: './path/revisions/revisions_revisionId_download.yaml'
+
+  /users:
+    $ref: './path/users/users.yaml'
+
+  /users/me:
+    $ref: './path/users/users_me.yaml'
+
+  /users/{userId}:
+    $ref: './path/users/users_userId.yaml'

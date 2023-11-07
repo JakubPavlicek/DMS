@@ -1,0 +1,13 @@
+get:
+  summary: Get current user
+  description: Retrieves information about the user who is currently authenticated.
+  operationId: getCurrentUser
+  tags:
+    - users
+  responses:
+    200:
+      description: Successfully retrieved information about the user who is currently authenticated.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/User.yaml'

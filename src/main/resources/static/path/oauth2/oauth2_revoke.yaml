@@ -1,0 +1,15 @@
+post:
+  summary: Revoke access token
+  description: Revoke an active Access Token, effectively logging a user out that has been previously authenticated.
+  operationId: revoke
+  tags:
+    - oauth2
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../schema/User.yaml'
+  responses:
+    204:
+      description: Successfully revoked an access token.

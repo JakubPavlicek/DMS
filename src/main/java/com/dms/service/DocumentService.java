@@ -14,7 +14,6 @@ import com.dms.exception.FileWithPathAlreadyExistsException;
 import com.dms.mapper.dto.DocumentDTOMapper;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
-import com.dms.mapper.dto.UserDTOMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -63,14 +62,9 @@ public class DocumentService {
                                  .orElseThrow(() -> new RuntimeException("Creation time not found for file with ID: " + documentId));
     }
 
-    private User getUserFromUserDTO(UserDTO userDTO) {
-        User user = UserDTOMapper.mapToUser(userDTO);
-        return userService.getSavedUser(user);
-    }
-
-    private Document createDocument(UserDTO user, MultipartFile file, String path) {
+    private Document createDocument(MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
-        User author = getUserFromUserDTO(user);
+        User author = userService.getAuthenticatedUser();
 
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
         String cleanPath = StringUtils.cleanPath(originalFileName);
@@ -106,7 +100,7 @@ public class DocumentService {
         log.debug("Request - Uploading document: user={}, file={}, destination={}", user, file.getOriginalFilename(), destination);
 
         String path = destination.getPath();
-        Document document = createDocument(user, file, path);
+        Document document = createDocument(file, path);
 
         validateUniquePath(path, document);
 
@@ -131,7 +125,7 @@ public class DocumentService {
         Document databaseDocument = documentCommonService.getDocument(documentId);
         String path = destination.getPath();
 
-        Document document = createDocument(user, file, path);
+        Document document = createDocument(file, path);
         document.setId(databaseDocument.getId());
         document.setDocumentId(documentId);
         document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);

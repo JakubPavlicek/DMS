@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @Entity
 @Table(name = "app_user")
@@ -40,11 +42,14 @@ public class User implements UserDetails {
     )
     private Long id;
 
+    @Column(nullable = false)
+    private String userId;
+
     @Column(
         length = 40,
         nullable = false
     )
-    private String username;
+    private String name;
 
     @Column(
         nullable = false,
@@ -52,7 +57,15 @@ public class User implements UserDetails {
     )
     private String email;
 
+    @Column(nullable = false)
     private String password;
+
+    @PrePersist
+    private void generateId() {
+        if (userId == null) {
+            userId = UUID.randomUUID().toString();
+        }
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

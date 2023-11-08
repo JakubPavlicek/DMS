@@ -9,7 +9,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../schema/User.yaml'
+          $ref: '../../schema/UserRegister.yaml'
   responses:
     201:
       description: Successfully created user.

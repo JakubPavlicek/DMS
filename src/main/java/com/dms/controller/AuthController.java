@@ -2,6 +2,7 @@ package com.dms.controller;
 
 import com.dms.Oauth2Api;
 import com.dms.dto.UserDTO;
+import com.dms.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,19 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController implements Oauth2Api {
 
-    @Override
-    public ResponseEntity<Void> authorize(UserDTO userDTO) {
-        return Oauth2Api.super.authorize(userDTO);
-    }
+    private final AuthService authService;
 
     @Override
-    public ResponseEntity<Void> revoke(UserDTO userDTO) {
-        return Oauth2Api.super.revoke(userDTO);
-    }
-
-    @Override
-    public ResponseEntity<String> token(UserDTO userDTO) {
-        return Oauth2Api.super.token(userDTO);
+    public ResponseEntity<String> token(UserDTO user) {
+        return ResponseEntity.ok(authService.token(user));
     }
 
 }

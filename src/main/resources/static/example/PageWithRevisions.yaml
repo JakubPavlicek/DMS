@@ -3,6 +3,7 @@ value:
   content:
     - revisionId: 5f150aa7-d749-4efd-91e0-278afef7d0f7
       author:
+        userId: "d7e0184c-49e1-4d60-b837-443d2e3fc455"
         username: "adam"
         email: "adam@gmail.com"
       name: "school.pdf"
@@ -11,6 +12,7 @@ value:
       createdAt: "2023-10-14T11:20:00.646173"
     - revisionId: aca9628d-de39-4fd9-aeb9-1cde5595dbf1
       author:
+        userId: "f0b79f12-fb69-490e-ac84-5d2dfba8e9e7"
         username: "frank"
         email: "frank@gmail.com"
       name: "house.pdf"

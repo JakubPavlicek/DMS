@@ -34,12 +34,6 @@ components:
 
 paths:
 
-  /oauth2/authorize:
-    $ref: './path/oauth2/oauth2_authorize.yaml'
-
-  /oauth2/revoke:
-    $ref: './path/oauth2/oauth2_revoke.yaml'
-
   /oauth2/token:
     $ref: './path/oauth2/oauth2_token.yaml'
 

@@ -175,7 +175,6 @@ public class DocumentService {
         List<DocumentRevision> documentRevisions = document.getRevisions();
         documentRevisions.forEach(revision -> documentCommonService.deleteBlobIfDuplicateHashNotExists(revision.getHash()));
 
-        documentCommonService.deleteBlobIfDuplicateHashNotExists(document.getHash());
         documentRepository.delete(document);
 
         log.info("Document {} with revisions deleted successfully", documentId);

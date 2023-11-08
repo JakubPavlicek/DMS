@@ -9,11 +9,11 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../schema/User.yaml'
+          $ref: '../../schema/UserLogin.yaml'
   responses:
     200:
       description: Successfully retrieved an access token.
       content:
         application/json:
           schema:
-            type: string
+            $ref: '../../schema/TokenResponse.yaml'

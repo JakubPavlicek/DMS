@@ -3,6 +3,7 @@ package com.dms.service;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
@@ -47,6 +48,27 @@ public class DocumentCommonService {
     private final DocumentRevisionRepository revisionRepository;
 
     private final BlobStorageService blobStorageService;
+    private final UserService userService;
+
+    public User getAuthenticatedUser() {
+        return userService.getAuthenticatedUser();
+    }
+
+    public String getAuthenticatedUserEmail() {
+        return userService.getAuthenticatedUserEmail();
+    }
+
+    public boolean isDocumentCreatedByAuthUser(Document document) {
+        String documentAuthorEmail = document.getAuthor().getEmail();
+        String authenticatedUserEmail = getAuthenticatedUserEmail();
+        return documentAuthorEmail.equals(authenticatedUserEmail);
+    }
+
+    public boolean isRevisionCreatedByAuthUser(DocumentRevision revision) {
+        String revisionAuthorEmail = revision.getAuthor().getEmail();
+        String authenticatedUserEmail = getAuthenticatedUserEmail();
+        return revisionAuthorEmail.equals(authenticatedUserEmail);
+    }
 
     public Document getDocument(String documentId) {
         log.debug("Getting document: documentId={}", documentId);

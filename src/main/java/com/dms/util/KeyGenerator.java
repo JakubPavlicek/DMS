@@ -1,4 +1,4 @@
-package com.dms.config;
+package com.dms.util;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -11,7 +11,7 @@ public class KeyGenerator {
             keyPairGenerator.initialize(2048);
             return keyPairGenerator.generateKeyPair();
         } catch (Exception e) {
-            throw new RuntimeException("RSA keys couldn't be created");
+            throw new RuntimeException("RSA key pair couldn't be created");
         }
     }
 

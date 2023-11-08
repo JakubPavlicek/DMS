@@ -1,6 +1,7 @@
 package com.dms.service;
 
-import com.dms.dto.UserDTO;
+import com.dms.dto.TokenResponseDTO;
+import com.dms.dto.UserLoginDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,9 +21,13 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtEncoder jwtEncoder;
 
-    public String token(UserDTO user) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
-        return generateToken(authentication);
+    public TokenResponseDTO token(UserLoginDTO userLogin) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword()));
+        String token = generateToken(authentication);
+
+        return TokenResponseDTO.builder()
+                               .token(token)
+                               .build();
     }
 
     public String generateToken(Authentication authentication) {
@@ -33,7 +38,8 @@ public class AuthService {
                                           .expiresAt(now.plus(1, ChronoUnit.HOURS))
                                           .build();
 
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims))
+                         .getTokenValue();
     }
 
 }

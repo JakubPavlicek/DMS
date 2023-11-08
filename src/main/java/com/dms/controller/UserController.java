@@ -2,6 +2,7 @@ package com.dms.controller;
 
 import com.dms.UsersApi;
 import com.dms.dto.UserDTO;
+import com.dms.dto.UserRegisterDTO;
 import com.dms.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,8 +16,8 @@ public class UserController implements UsersApi {
     private final UserService userService;
 
     @Override
-    public ResponseEntity<UserDTO> createUser(UserDTO user) {
-        UserDTO userDTO = userService.createUser(user);
+    public ResponseEntity<UserDTO> createUser(UserRegisterDTO userRegister) {
+        UserDTO userDTO = userService.createUser(userRegister);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
 

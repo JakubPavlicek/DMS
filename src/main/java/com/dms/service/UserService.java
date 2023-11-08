@@ -1,6 +1,7 @@
 package com.dms.service;
 
 import com.dms.dto.UserDTO;
+import com.dms.dto.UserRegisterDTO;
 import com.dms.entity.User;
 import com.dms.mapper.dto.UserDTOMapper;
 import com.dms.repository.UserRepository;
@@ -40,8 +41,8 @@ public class UserService implements UserDetailsService {
                              .orElseThrow(() -> new RuntimeException("User with email: " + authUserEmail + " not found"));
     }
 
-    public UserDTO createUser(UserDTO userDTO) {
-        User user = UserDTOMapper.mapToUser(userDTO);
+    public UserDTO createUser(UserRegisterDTO userRegister) {
+        User user = UserDTOMapper.mapToUser(userRegister);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
         return UserDTOMapper.mapToUserDTO(savedUser);
@@ -57,7 +58,13 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDTO updateUser(String userId, UserDTO userDTO) {
-        // TODO: update credentials - email has to be unique
+        // TODO: add user ID to table
+
+        if(userRepository.existsByEmail(userDTO.getEmail()))
+            throw new RuntimeException("Email already taken");
+
+        User user = UserDTOMapper.mapToUser(userDTO);
+
         return null;
     }
 

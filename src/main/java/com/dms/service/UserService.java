@@ -28,7 +28,7 @@ public class UserService implements UserDetailsService {
                              .orElseThrow(() -> new RuntimeException("User with email: " + username + " not found"));
     }
 
-    private String getAuthenticatedUserEmail() {
+    public String getAuthenticatedUserEmail() {
         return SecurityContextHolder.getContext()
                                     .getAuthentication()
                                     .getName();

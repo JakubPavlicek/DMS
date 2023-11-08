@@ -4,8 +4,6 @@ required:
   - file
   - destination
 properties:
-  user:
-    $ref: '../schema/User.yaml'
   file:
     type: string
     format: binary

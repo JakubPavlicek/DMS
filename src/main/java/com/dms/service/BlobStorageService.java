@@ -3,7 +3,6 @@ package com.dms.service;
 import com.dms.config.BlobStorageProperties;
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
-import com.dms.hash.Hasher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
@@ -23,10 +22,10 @@ import java.nio.file.Paths;
 public class BlobStorageService {
 
     private final BlobStorageProperties blobStorageProperties;
-    private final Hasher hasher;
+    private final HashService hashService;
 
     public String storeBlob(MultipartFile file) {
-        String hash = hasher.hashFile(file);
+        String hash = hashService.hashFile(file);
         String filename = file.getOriginalFilename();
 
         Path directoryPath = getDirectoryPath(hash);

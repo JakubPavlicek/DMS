@@ -1,4 +1,4 @@
-package com.dms.hash;
+package com.dms.service;
 
 import com.dms.config.HashProperties;
 import com.dms.exception.FileOperation;
@@ -14,7 +14,7 @@ import java.security.MessageDigest;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class Hasher {
+public class HashService {
 
     private final HashProperties hashProperties;
 

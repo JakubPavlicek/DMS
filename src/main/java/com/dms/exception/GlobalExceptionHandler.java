@@ -127,6 +127,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.of(problemDetail).build();
     }
 
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ProblemDetail handleUnauthorizedAccessException(UnauthorizedAccessException exception, HttpServletRequest request) {
+        log.error("Request {} raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception.getMessage());
+        problemDetail.setTitle("Access Denied");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/unauthorized-access"));
+
+        return problemDetail;
+    }
+
     @ExceptionHandler(FileOperationException.class)
     public ProblemDetail handleFileOperationEception(FileOperationException exception, HttpServletRequest request) {
         log.error("Request {} raised:", request.getRequestURI(), exception);

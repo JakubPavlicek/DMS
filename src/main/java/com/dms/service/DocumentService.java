@@ -5,12 +5,12 @@ import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.PageWithDocumentsDTO;
 import com.dms.dto.PageWithRevisionsDTO;
-import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
+import com.dms.exception.UnauthorizedAccessException;
 import com.dms.mapper.dto.DocumentDTOMapper;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
@@ -46,12 +46,16 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
 
     private final DocumentCommonService documentCommonService;
-    private final UserService userService;
 
     public DocumentDTO getDocument(String documentId) {
         log.debug("Request - Getting document: documentId={}", documentId);
 
         Document document = documentCommonService.getDocument(documentId);
+
+        if (!documentCommonService.isDocumentCreatedByAuthUser(document)) {
+            throw new UnauthorizedAccessException("Can't access document of someone else");
+        }
+
         log.info("Document {} retrieved successfully", documentId);
 
         return DocumentDTOMapper.map(document);
@@ -64,7 +68,7 @@ public class DocumentService {
 
     private Document createDocument(MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
-        User author = userService.getAuthenticatedUser();
+        User author = documentCommonService.getAuthenticatedUser();
 
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
         String cleanPath = StringUtils.cleanPath(originalFileName);
@@ -96,8 +100,8 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadDocument(UserDTO user, MultipartFile file, DestinationDTO destination) {
-        log.debug("Request - Uploading document: user={}, file={}, destination={}", user, file.getOriginalFilename(), destination);
+    public DocumentDTO uploadDocument(MultipartFile file, DestinationDTO destination) {
+        log.debug("Request - Uploading document: file={}, destination={}", file.getOriginalFilename(), destination);
 
         String path = destination.getPath();
         Document document = createDocument(file, path);
@@ -115,8 +119,8 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadNewDocumentVersion(String documentId, UserDTO user, MultipartFile file, DestinationDTO destination) {
-        log.debug("Request - Uploading new document version: documentId={}, user={}, file={}, destination={}", documentId, user, file.getOriginalFilename(), destination);
+    public DocumentDTO uploadNewDocumentVersion(String documentId, MultipartFile file, DestinationDTO destination) {
+        log.debug("Request - Uploading new document version: documentId={}, file={}, destination={}", documentId, file.getOriginalFilename(), destination);
 
         if (!documentRepository.existsByDocumentId(documentId)) {
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
@@ -124,6 +128,10 @@ public class DocumentService {
 
         Document databaseDocument = documentCommonService.getDocument(documentId);
         String path = destination.getPath();
+
+        if (!documentCommonService.isDocumentCreatedByAuthUser(databaseDocument)) {
+            throw new UnauthorizedAccessException("Can't access document of someone else");
+        }
 
         Document document = createDocument(file, path);
         document.setId(databaseDocument.getId());
@@ -153,6 +161,10 @@ public class DocumentService {
         Document document = documentCommonService.getDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndId(document, revisionId);
 
+        if (!documentCommonService.isDocumentCreatedByAuthUser(document)) {
+            throw new UnauthorizedAccessException("Can't access document of someone else");
+        }
+
         Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
 
         log.info("Successfully switched document {} to revision {}", documentId, revisionId);
@@ -165,6 +177,10 @@ public class DocumentService {
         log.debug("Request - Deleting document with revisions: documentId={}", documentId);
 
         Document document = documentCommonService.getDocument(documentId);
+
+        if (!documentCommonService.isDocumentCreatedByAuthUser(document)) {
+            throw new UnauthorizedAccessException("Can't access document of someone else");
+        }
 
         List<DocumentRevision> documentRevisions = document.getRevisions();
         documentRevisions.forEach(revision -> documentCommonService.deleteBlobIfDuplicateHashNotExists(revision.getHash()));
@@ -179,6 +195,11 @@ public class DocumentService {
         log.debug("Request - Downloading document: documentId={}", documentId);
 
         Document document = documentCommonService.getDocument(documentId);
+
+        if (!documentCommonService.isDocumentCreatedByAuthUser(document)) {
+            throw new UnauthorizedAccessException("Can't access document of someone else");
+        }
+
         String hash = document.getHash();
         Resource file = documentCommonService.getBlob(hash);
 
@@ -194,11 +215,13 @@ public class DocumentService {
     public PageWithDocumentsDTO getDocuments(int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing documents: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
 
+        User user = documentCommonService.getAuthenticatedUser();
+
         List<Sort.Order> sortOrders = documentCommonService.getDocumentSortOrders(sort);
         Map<String, String> filters = documentCommonService.getDocumentFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<Document> specification = DocumentFilterSpecification.filterByItems(filters);
+        Specification<Document> specification = DocumentFilterSpecification.filter(filters, user);
 
         Page<DocumentDTO> documentDTOs = findDocuments(specification, pageable);
 
@@ -221,11 +244,17 @@ public class DocumentService {
 
         Document document = documentCommonService.getDocument(documentId);
 
+        if (!documentCommonService.isDocumentCreatedByAuthUser(document)) {
+            throw new UnauthorizedAccessException("Can't access document of someone else");
+        }
+
+        User user = documentCommonService.getAuthenticatedUser();
+
         List<Sort.Order> sortOrders = documentCommonService.getRevisionSortOrders(sort);
         Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filters);
+        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocument(document, user, filters);
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
 
@@ -240,6 +269,10 @@ public class DocumentService {
 
         Document document = documentCommonService.getDocument(documentId);
         String path = destination.getPath();
+
+        if (!documentCommonService.isDocumentCreatedByAuthUser(document)) {
+            throw new UnauthorizedAccessException("Can't access document of someone else");
+        }
 
         validateUniquePath(path, document);
 

@@ -4,11 +4,13 @@ import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.User;
 import com.dms.exception.RevisionDeletionException;
+import com.dms.exception.UnauthorizedAccessException;
 import com.dms.mapper.dto.DocumentRevisionDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
 import com.dms.repository.DocumentRevisionRepository;
-import com.dms.specification.DocumentFilterSpecification;
+import com.dms.specification.RevisionFilterSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -39,6 +41,11 @@ public class DocumentRevisionService {
         log.debug("Request - Getting revision: revisionId={}", revisionId);
 
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
+
+        if (!documentCommonService.isRevisionCreatedByAuthUser(revision)) {
+            throw new UnauthorizedAccessException("Can't access revision of someone else");
+        }
+
         log.info("Revision {} retrieved successfully", revisionId);
 
         return DocumentRevisionDTOMapper.map(revision);
@@ -73,6 +80,10 @@ public class DocumentRevisionService {
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
         Document document = revision.getDocument();
 
+        if (!documentCommonService.isRevisionCreatedByAuthUser(revision)) {
+            throw new UnauthorizedAccessException("Can't access revision of someone else");
+        }
+
         // revision which is also a current document is being deleted -> switch document to adjacent revision
         if (isRevisionSetAsCurrent(revision, document)) {
             replaceDocumentWithAdjacentRevision(document);
@@ -84,7 +95,8 @@ public class DocumentRevisionService {
         documentCommonService.updateRevisionVersionsForDocument(document);
 
         // document's previous version was deleted -> decrement current document's version
-        if (revision.getVersion().compareTo(document.getVersion()) < 0) {
+        if (revision.getVersion()
+                    .compareTo(document.getVersion()) < 0) {
             document.setVersion(document.getVersion() - 1);
         }
 
@@ -95,6 +107,11 @@ public class DocumentRevisionService {
         log.debug("Request - Downloading revision: revisionId={}", revisionId);
 
         DocumentRevision revision = documentCommonService.getRevision(revisionId);
+
+        if (!documentCommonService.isRevisionCreatedByAuthUser(revision)) {
+            throw new UnauthorizedAccessException("Can't access revision of someone else");
+        }
+
         String hash = revision.getHash();
         Resource file = documentCommonService.getBlob(hash);
 
@@ -110,11 +127,13 @@ public class DocumentRevisionService {
     public PageWithRevisionsDTO getRevisions(int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing revisisons: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
 
+        User user = documentCommonService.getAuthenticatedUser();
+
         List<Sort.Order> sortOrders = documentCommonService.getRevisionSortOrders(sort);
         Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByItems(filters);
+        Specification<DocumentRevision> specification = RevisionFilterSpecification.filter(filters, user);
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
 

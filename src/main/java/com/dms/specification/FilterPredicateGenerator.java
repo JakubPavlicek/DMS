@@ -1,6 +1,5 @@
 package com.dms.specification;
 
-import com.dms.entity.User;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -10,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CommonSpecification {
+public class FilterPredicateGenerator {
 
-    public static <E> List<Predicate> getLikePredicates(Map<String, String> filters, User user, Root<E> root, CriteriaBuilder criteriaBuilder) {
+    public static <E> List<Predicate> getLikePredicates(Map<String, String> filters, Root<E> root, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         for (Map.Entry<String, String> filter : filters.entrySet()) {

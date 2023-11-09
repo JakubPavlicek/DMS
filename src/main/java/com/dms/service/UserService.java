@@ -59,11 +59,13 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDTO createUser(UserRegisterDTO userRegister) {
+        log.debug("Request - Creating user: userRegister={}", userRegister);
         validateUniqueEmail(userRegister.getEmail());
 
         User user = UserDTOMapper.mapToUser(userRegister);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
+        log.info("Successfully created user {}", savedUser.getUserId());
         return UserDTOMapper.mapToUserDTO(savedUser);
     }
 
@@ -76,17 +78,19 @@ public class UserService implements UserDetailsService {
         documents.forEach(documentCommonService::deleteDocumentWithRevisions);
 
         userRepository.delete(user);
-
         log.info("Successfully deleted user {} and all his documents", userId);
     }
 
     public UserDTO getCurrentUser() {
+        log.debug("Request - Getting current user");
         User authenticatedUser = getAuthenticatedUser();
+        log.info("Successfully retrieved current user");
         return UserDTOMapper.mapToUserDTO(authenticatedUser);
     }
 
     @Transactional
     public UserDTO updateUser(String userId, UserDTO userDTO) {
+        log.debug("Request - Updating user: userId={}, userDTO={}", userId, userDTO);
         validateUniqueEmail(userDTO.getEmail());
 
         User userById = getUserById(userId);
@@ -97,6 +101,8 @@ public class UserService implements UserDetailsService {
         userById.setPassword(passwordEncoder.encode(userFromDTO.getPassword()));
 
         User savedUser = userRepository.save(userById);
+
+        log.info("Successfully updated user {}", userId);
         return UserDTOMapper.mapToUserDTO(savedUser);
     }
 

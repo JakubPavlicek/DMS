@@ -85,9 +85,7 @@ public class DocumentService {
         String hash = documentCommonService.storeBlob(file);
         User author = userService.getAuthenticatedUser();
 
-        String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
-        String cleanPath = StringUtils.cleanPath(originalFileName);
-        String name = StringUtils.getFilename(cleanPath);
+        String name = getFilename(file);
         String type = file.getContentType();
 
         log.info("Document {} successfully created (not persisted yet)", name);
@@ -100,6 +98,12 @@ public class DocumentService {
                        .version(1L)
                        .author(author)
                        .build();
+    }
+
+    private static String getFilename(MultipartFile file) {
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
+        String cleanPath = StringUtils.cleanPath(originalFileName);
+        return StringUtils.getFilename(cleanPath);
     }
 
     private void validateUniquePath(String path, Document document) {

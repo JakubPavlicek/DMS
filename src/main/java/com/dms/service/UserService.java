@@ -52,7 +52,15 @@ public class UserService implements UserDetailsService {
                              .orElseThrow(() -> new RuntimeException("User with ID: " + userId + " not found"));
     }
 
+    private void validateUniqueEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email already taken");
+        }
+    }
+
     public UserDTO createUser(UserRegisterDTO userRegister) {
+        validateUniqueEmail(userRegister.getEmail());
+
         User user = UserDTOMapper.mapToUser(userRegister);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
@@ -79,9 +87,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserDTO updateUser(String userId, UserDTO userDTO) {
-        if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new RuntimeException("Email already taken");
-        }
+        validateUniqueEmail(userDTO.getEmail());
 
         User userById = getUserById(userId);
         User userFromDTO = UserDTOMapper.mapToUser(userDTO);

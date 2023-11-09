@@ -4,6 +4,8 @@ get:
   operationId: downloadDocument
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   responses:

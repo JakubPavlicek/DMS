@@ -4,6 +4,8 @@ get:
   operationId: getDocument
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   responses:
@@ -25,6 +27,8 @@ put:
   operationId: uploadNewDocumentVersion
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   requestBody:
@@ -76,6 +80,8 @@ delete:
   operationId: deleteDocumentWithRevisions
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   responses:

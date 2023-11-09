@@ -4,6 +4,8 @@ put:
   operationId: moveDocument
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   requestBody:

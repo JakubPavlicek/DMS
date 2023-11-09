@@ -4,6 +4,8 @@ get:
   operationId: getDocuments
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/Page.yaml'
     - $ref: '../../parameter/Limit.yaml'

@@ -4,6 +4,8 @@ get:
   operationId: getRevisions
   tags:
     - revisions
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/Page.yaml'
     - $ref: '../../parameter/Limit.yaml'

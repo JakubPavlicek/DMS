@@ -4,6 +4,8 @@ get:
   operationId: getDocumentRevisions
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
     - $ref: '../../parameter/Page.yaml'

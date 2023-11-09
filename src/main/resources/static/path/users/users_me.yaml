@@ -4,6 +4,8 @@ get:
   operationId: getCurrentUser
   tags:
     - users
+  security:
+    - bearerAuth: []
   responses:
     200:
       description: Successfully retrieved information about the user who is currently authenticated.

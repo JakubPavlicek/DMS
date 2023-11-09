@@ -4,6 +4,8 @@ post:
   operationId: uploadDocument
   tags:
     - documents
+  security:
+    - bearerAuth: []
   requestBody:
     content:
       multipart/form-data:

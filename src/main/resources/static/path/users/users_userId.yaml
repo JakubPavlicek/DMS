@@ -4,6 +4,8 @@ put:
   operationId: updateUser
   tags:
     - users
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/UserId.yaml'
   requestBody:
@@ -24,6 +26,8 @@ delete:
   summary: Delete user
   description: Deletes a user.
   operationId: deleteUser
+  security:
+    - bearerAuth: []
   tags:
     - users
   parameters:

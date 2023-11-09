@@ -4,6 +4,8 @@ get:
   operationId: getRevision
   tags:
     - revisions
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/RevisionId.yaml'
   responses:
@@ -26,6 +28,8 @@ delete:
   operationId: deleteRevision
   tags:
     - revisions
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/RevisionId.yaml'
   responses:

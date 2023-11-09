@@ -98,7 +98,7 @@ public class RetrievalService {
         Map<String, String> filters = getRevisionFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocument(document, user, filters);
+        Specification<DocumentRevision> specification = RevisionFilterSpecification.filterByDocument(document, filters, user);
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = findRevisions(specification, pageable);
 

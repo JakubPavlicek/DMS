@@ -30,9 +30,7 @@ public class UploadService {
         String hash = managementService.storeBlob(file);
         User author = managementService.getAuthenticatedUser();
 
-        String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
-        String cleanPath = StringUtils.cleanPath(originalFileName);
-        String name = StringUtils.getFilename(cleanPath);
+        String name = extractFilename(file);
         String type = file.getContentType();
 
         log.info("Document {} successfully created (not persisted yet)", name);
@@ -45,6 +43,12 @@ public class UploadService {
                        .version(1L)
                        .author(author)
                        .build();
+    }
+
+    private String extractFilename(MultipartFile file) {
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
+        String cleanPath = StringUtils.cleanPath(originalFileName);
+        return StringUtils.getFilename(cleanPath);
     }
 
     @Transactional

@@ -27,8 +27,7 @@ public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final DeletionService deletionService;
-    private final ManagementService managementService;
+    private final DocumentCommonService documentCommonService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -62,12 +61,15 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void deleteUser(String userId) {
+        log.debug("Request - Deleting user: userId={}", userId);
         User user = getUserById(userId);
 
-        List<Document> documents = managementService.getDocumentsByUser(user);
-        documents.forEach(document -> deletionService.deleteDocumentWithRevisions(document.getDocumentId()));
+        List<Document> documents = documentCommonService.getDocumentsByAuthor(user);
+        documents.forEach(documentCommonService::deleteDocumentWithRevisions);
 
         userRepository.delete(user);
+
+        log.info("Successfully deleted user {} and all his documents", userId);
     }
 
     public UserDTO getCurrentUser() {

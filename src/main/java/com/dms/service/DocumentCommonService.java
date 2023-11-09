@@ -4,12 +4,10 @@ import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
-import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
 import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
-import com.dms.exception.UnauthorizedAccessException;
 import com.dms.mapper.dto.DocumentRevisionDTOMapper;
 import com.dms.mapper.entity.DocumentMapper;
 import com.dms.mapper.entity.RevisionMapper;
@@ -49,52 +47,22 @@ public class DocumentCommonService {
     private final DocumentRevisionRepository revisionRepository;
 
     private final BlobStorageService blobStorageService;
-    private final UserService userService;
-
-    public User getAuthenticatedUser() {
-        return userService.getAuthenticatedUser();
-    }
-
-    private boolean isDocumentCreatedByAuthUser(Document document) {
-        String documentAuthorEmail = document.getAuthor().getEmail();
-        String authenticatedUserEmail = userService.getAuthenticatedUserEmail();
-        return documentAuthorEmail.equals(authenticatedUserEmail);
-    }
-
-    private boolean isRevisionCreatedByAuthUser(DocumentRevision revision) {
-        String revisionAuthorEmail = revision.getAuthor().getEmail();
-        String authenticatedUserEmail = userService.getAuthenticatedUserEmail();
-        return revisionAuthorEmail.equals(authenticatedUserEmail);
-    }
-
-    public Document getDocument(String documentId) {
-        log.debug("Getting document: documentId={}", documentId);
-        Document document = documentRepository.findByDocumentId(documentId)
-                                              .orElseThrow(() -> new DocumentNotFoundException("File with ID: " + documentId + " not found"));
-
-        if (!isDocumentCreatedByAuthUser(document)) {
-            throw new UnauthorizedAccessException("Can't access document of someone else");
-        }
-
-        return document;
-    }
-
-    public DocumentRevision getRevision(String revisionId) {
-        log.debug("Getting revision: revisionId={}", revisionId);
-        DocumentRevision revision = revisionRepository.findByRevisionId(revisionId)
-                                                      .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
-
-        if (!isRevisionCreatedByAuthUser(revision)) {
-            throw new UnauthorizedAccessException("Can't access revision of someone else");
-        }
-
-        return revision;
-    }
 
     public DocumentRevision getRevisionByDocumentAndId(Document document, String revisionId) {
         log.debug("Getting revision by document and ID: documentId={}, revisionId={}", document.getDocumentId(), revisionId);
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found for document with ID: " + document.getDocumentId()));
+    }
+
+    public void deleteDocumentWithRevisions(Document document) {
+        List<DocumentRevision> documentRevisions = document.getRevisions();
+        documentRevisions.forEach(revision -> deleteBlobIfDuplicateHashNotExists(revision.getHash()));
+
+        documentRepository.delete(document);
+    }
+
+    public List<Document> getDocumentsByAuthor(User user) {
+        return documentRepository.findAllByAuthor(user);
     }
 
     public Document updateDocumentToRevision(Document document, DocumentRevision revision) {

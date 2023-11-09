@@ -10,6 +10,7 @@ import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
+import com.dms.exception.UnauthorizedAccessException;
 import com.dms.mapper.dto.DocumentDTOMapper;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
@@ -46,11 +47,30 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
 
     private final DocumentCommonService documentCommonService;
+    private final UserService userService;
+
+    private boolean isDocumentCreatedByAuthUser(Document document) {
+        String documentAuthorEmail = document.getAuthor().getEmail();
+        String authenticatedUserEmail = userService.getAuthenticatedUserEmail();
+        return documentAuthorEmail.equals(authenticatedUserEmail);
+    }
+
+    public Document getDocumentWithAuthCheck(String documentId) {
+        log.debug("Getting document: documentId={}", documentId);
+        Document document = documentRepository.findByDocumentId(documentId)
+                                              .orElseThrow(() -> new DocumentNotFoundException("File with ID: " + documentId + " not found"));
+
+        if (!isDocumentCreatedByAuthUser(document)) {
+            throw new UnauthorizedAccessException("Can't access document of someone else");
+        }
+
+        return document;
+    }
 
     public DocumentDTO getDocument(String documentId) {
         log.debug("Request - Getting document: documentId={}", documentId);
 
-        Document document = documentCommonService.getDocument(documentId);
+        Document document = getDocumentWithAuthCheck(documentId);
         log.info("Document {} retrieved successfully", documentId);
 
         return DocumentDTOMapper.map(document);
@@ -63,7 +83,7 @@ public class DocumentService {
 
     private Document createDocument(MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
-        User author = documentCommonService.getAuthenticatedUser();
+        User author = userService.getAuthenticatedUser();
 
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
         String cleanPath = StringUtils.cleanPath(originalFileName);
@@ -121,7 +141,7 @@ public class DocumentService {
             throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
         }
 
-        Document databaseDocument = documentCommonService.getDocument(documentId);
+        Document databaseDocument = getDocumentWithAuthCheck(documentId);
         String path = destination.getPath();
 
         Document document = createDocument(file, path);
@@ -149,7 +169,7 @@ public class DocumentService {
     public DocumentDTO switchToRevision(String documentId, String revisionId) {
         log.debug("Request - Switching document to revision: documentId={}, revision={}", documentId, revisionId);
 
-        Document document = documentCommonService.getDocument(documentId);
+        Document document = getDocumentWithAuthCheck(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndId(document, revisionId);
 
         Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
@@ -163,12 +183,8 @@ public class DocumentService {
     public void deleteDocumentWithRevisions(String documentId) {
         log.debug("Request - Deleting document with revisions: documentId={}", documentId);
 
-        Document document = documentCommonService.getDocument(documentId);
-
-        List<DocumentRevision> documentRevisions = document.getRevisions();
-        documentRevisions.forEach(revision -> documentCommonService.deleteBlobIfDuplicateHashNotExists(revision.getHash()));
-
-        documentRepository.delete(document);
+        Document document = getDocumentWithAuthCheck(documentId);
+        documentCommonService.deleteDocumentWithRevisions(document);
 
         log.info("Document {} with revisions deleted successfully", documentId);
     }
@@ -176,7 +192,7 @@ public class DocumentService {
     public ResponseEntity<Resource> downloadDocument(String documentId) {
         log.debug("Request - Downloading document: documentId={}", documentId);
 
-        Document document = documentCommonService.getDocument(documentId);
+        Document document = getDocumentWithAuthCheck(documentId);
         String hash = document.getHash();
         Resource file = documentCommonService.getBlob(hash);
 
@@ -192,7 +208,7 @@ public class DocumentService {
     public PageWithDocumentsDTO getDocuments(int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing documents: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
 
-        User user = documentCommonService.getAuthenticatedUser();
+        User user = userService.getAuthenticatedUser();
 
         List<Sort.Order> sortOrders = documentCommonService.getDocumentSortOrders(sort);
         Map<String, String> filters = documentCommonService.getDocumentFilters(filter);
@@ -219,8 +235,8 @@ public class DocumentService {
     public PageWithRevisionsDTO getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing document revisions: documentId={} pageNumber={}, pageSize={}, sort={}, filter={}", documentId, pageNumber, pageSize, sort, filter);
 
-        Document document = documentCommonService.getDocument(documentId);
-        User user = documentCommonService.getAuthenticatedUser();
+        Document document = getDocumentWithAuthCheck(documentId);
+        User user = userService.getAuthenticatedUser();
 
         List<Sort.Order> sortOrders = documentCommonService.getRevisionSortOrders(sort);
         Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
@@ -239,7 +255,7 @@ public class DocumentService {
     public DocumentDTO moveDocument(String documentId, DestinationDTO destination) {
         log.debug("Request - Moving document: documentId={}, destination={}", documentId, destination);
 
-        Document document = documentCommonService.getDocument(documentId);
+        Document document = getDocumentWithAuthCheck(documentId);
         String path = destination.getPath();
 
         validateUniquePath(path, document);

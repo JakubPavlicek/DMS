@@ -58,11 +58,7 @@ put:
     415:
       $ref: '../../response/415RequestWithoutData.yaml'
     500:
-      description: Error occurred when working with a document.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/500FileError.yaml'
 
 delete:
   summary: Delete document
@@ -84,8 +80,4 @@ delete:
     404:
       $ref: '../../response/404DocumentNotFound.yaml'
     500:
-      description: Error occurred when working with a document.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/500FileError.yaml'

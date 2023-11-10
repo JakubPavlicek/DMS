@@ -35,8 +35,4 @@ get:
     404:
       $ref: '../../response/404DocumentNotFound.yaml'
     500:
-      description: Error occurred when working with a document.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/500FileError.yaml'

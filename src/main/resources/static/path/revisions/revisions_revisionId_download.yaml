@@ -34,3 +34,5 @@ get:
       $ref: '../../response/401Unathorized.yaml'
     404:
       $ref: '../../response/404RevisionNotFound.yaml'
+    500:
+      $ref: '../../response/500FileError.yaml'

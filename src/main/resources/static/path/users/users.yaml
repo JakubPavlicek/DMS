@@ -17,6 +17,8 @@ post:
         application/json:
           schema:
             $ref: '../../schema/User.yaml'
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
     409:
       $ref: '../../response/409EmailAlreadyExists.yaml'
     415:

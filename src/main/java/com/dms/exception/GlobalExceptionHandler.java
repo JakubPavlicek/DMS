@@ -89,7 +89,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         BindingResult bindingResult = ex.getBindingResult();
 
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        fieldErrors.forEach(error -> errorMessages.add(error.getObjectName() + "." + error.getField() + ": " + error.getDefaultMessage()));
+        fieldErrors.forEach(error -> errorMessages.add(error.getField() + ": " + error.getDefaultMessage()));
 
         return errorMessages;
     }

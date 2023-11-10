@@ -57,7 +57,7 @@ public class DocumentService {
     public Document getDocumentWithAuthCheck(String documentId) {
         log.debug("Getting document: documentId={}", documentId);
         Document document = documentRepository.findByDocumentId(documentId)
-                                              .orElseThrow(() -> new DocumentNotFoundException("File with ID: " + documentId + " not found"));
+                                              .orElseThrow(() -> new DocumentNotFoundException("Document with ID: " + documentId + " not found"));
 
         if (!isDocumentCreatedByAuthUser(document)) {
             throw new UnauthorizedAccessException("Can't access document of someone else");
@@ -134,10 +134,6 @@ public class DocumentService {
     @Transactional
     public DocumentDTO uploadNewDocumentVersion(String documentId, MultipartFile file, DestinationDTO destination) {
         log.debug("Request - Uploading new document version: documentId={}, file={}, destination={}", documentId, file.getOriginalFilename(), destination);
-
-        if (!documentRepository.existsByDocumentId(documentId)) {
-            throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
-        }
 
         Document databaseDocument = getDocumentWithAuthCheck(documentId);
         String path = destination.getPath();

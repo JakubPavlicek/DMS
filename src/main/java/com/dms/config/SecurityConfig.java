@@ -51,7 +51,7 @@ public class SecurityConfig {
                                                          .anyRequest()
                                                          .authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint(serverProperties, new JsonFactory())))
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new BearerAuthenticationEntryPoint(serverProperties, new JsonFactory())))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .build();
     }

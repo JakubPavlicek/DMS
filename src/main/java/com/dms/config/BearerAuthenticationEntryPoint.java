@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.net.URI;
 
 @RequiredArgsConstructor
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class BearerAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ServerProperties serverProperties;
     private final JsonFactory jsonFactory;

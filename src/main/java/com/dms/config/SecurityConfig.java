@@ -46,7 +46,7 @@ public class SecurityConfig {
                                                          .permitAll()
                                                          .requestMatchers(HttpMethod.POST, "/oauth2/token")
                                                          .permitAll()
-                                                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/openapi.yaml", "/example/**", "/parameter/**", "/path/**", "/requestBody/**", "/schema/**")
+                                                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/openapi.yaml", "/example/**", "/parameter/**", "/path/**", "/requestBody/**", "/schema/**", "/response/**")
                                                          .permitAll()
                                                          .anyRequest()
                                                          .authenticated())

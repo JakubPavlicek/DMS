@@ -9,15 +9,11 @@ put:
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   requestBody:
+    required: true
     content:
-      multipart/form-data:
+      application/json:
         schema:
-          type: object
-          required:
-            - destination
-          properties:
-            destination:
-              $ref: '../../schema/Destination.yaml'
+          $ref: '../../schema/Destination.yaml'
   responses:
     200:
       description: Document moved successfully.

@@ -11,7 +11,6 @@ public class UserDTOMapper {
                       .userId(user.getUserId())
                       .name(user.getName())
                       .email(user.getEmail())
-                      .password("*******")
                       .build();
     }
 
@@ -20,7 +19,6 @@ public class UserDTOMapper {
                    .userId(user.getUserId())
                    .name(user.getName())
                    .email(user.getEmail())
-                   .password(user.getPassword())
                    .build();
     }
 

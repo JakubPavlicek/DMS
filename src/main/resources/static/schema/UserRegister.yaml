@@ -8,6 +8,7 @@ required:
 properties:
   name:
     type: string
+    pattern: ^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,39}$
     description: "The username of the user"
     minLength: 1
     maxLength: 40

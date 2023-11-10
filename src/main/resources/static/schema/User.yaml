@@ -8,6 +8,7 @@ properties:
     example: 7689fc3f-d75f-4a9c-9cb0-bf6f7fb5dd59
   name:
     type: string
+    pattern: ^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,39}$
     description: "The username of the user"
     minLength: 1
     maxLength: 40

@@ -2,6 +2,7 @@ package com.dms.repository;
 
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,7 +15,7 @@ import java.util.Optional;
 @Repository
 public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, Long>, JpaSpecificationExecutor<DocumentRevision> {
 
-    Optional<DocumentRevision> findByRevisionId(String revisionId);
+    Optional<DocumentRevision> findByRevisionIdAndAuthor(String revisionId, User author);
 
     Optional<DocumentRevision> findByDocumentAndRevisionId(Document document, String revisionId);
 

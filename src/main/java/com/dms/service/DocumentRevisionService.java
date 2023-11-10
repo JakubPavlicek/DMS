@@ -7,7 +7,6 @@ import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.RevisionDeletionException;
 import com.dms.exception.RevisionNotFoundException;
-import com.dms.exception.UnauthorizedAccessException;
 import com.dms.mapper.dto.DocumentRevisionDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
 import com.dms.repository.DocumentRevisionRepository;
@@ -39,28 +38,17 @@ public class DocumentRevisionService {
     private final DocumentCommonService documentCommonService;
     private final UserService userService;
 
-    private boolean isRevisionCreatedByAuthUser(DocumentRevision revision) {
-        String revisionAuthorEmail = revision.getAuthor().getEmail();
-        String authenticatedUserEmail = userService.getAuthenticatedUserEmail();
-        return revisionAuthorEmail.equals(authenticatedUserEmail);
-    }
-
-    public DocumentRevision getRevisionWithAuthCheck(String revisionId) {
+    public DocumentRevision getAuthUserRevision(String revisionId) {
         log.debug("Getting revision: revisionId={}", revisionId);
-        DocumentRevision revision = revisionRepository.findByRevisionId(revisionId)
-                                                      .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
-
-        if (!isRevisionCreatedByAuthUser(revision)) {
-            throw new UnauthorizedAccessException("Can't access revision of someone else");
-        }
-
-        return revision;
+        User user = userService.getAuthenticatedUser();
+        return revisionRepository.findByRevisionIdAndAuthor(revisionId, user)
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
     }
 
     public DocumentRevisionDTO getRevision(String revisionId) {
         log.debug("Request - Getting revision: revisionId={}", revisionId);
 
-        DocumentRevision revision = getRevisionWithAuthCheck(revisionId);
+        DocumentRevision revision = getAuthUserRevision(revisionId);
         log.info("Revision {} retrieved successfully", revisionId);
 
         return DocumentRevisionDTOMapper.map(revision);
@@ -92,7 +80,7 @@ public class DocumentRevisionService {
     public void deleteRevision(String revisionId) {
         log.debug("Request - Deleting revision: revisionId={}", revisionId);
 
-        DocumentRevision revision = getRevisionWithAuthCheck(revisionId);
+        DocumentRevision revision = getAuthUserRevision(revisionId);
         Document document = revision.getDocument();
 
         // revision which is also a current document is being deleted -> switch document to adjacent revision
@@ -106,7 +94,8 @@ public class DocumentRevisionService {
         documentCommonService.updateRevisionVersionsForDocument(document);
 
         // document's previous version was deleted -> decrement current document's version
-        if (revision.getVersion().compareTo(document.getVersion()) < 0) {
+        if (revision.getVersion()
+                    .compareTo(document.getVersion()) < 0) {
             document.setVersion(document.getVersion() - 1);
         }
 
@@ -116,7 +105,7 @@ public class DocumentRevisionService {
     public ResponseEntity<Resource> downloadRevision(String revisionId) {
         log.debug("Request - Downloading revision: revisionId={}", revisionId);
 
-        DocumentRevision revision = getRevisionWithAuthCheck(revisionId);
+        DocumentRevision revision = getAuthUserRevision(revisionId);
         String hash = revision.getHash();
         Resource file = documentCommonService.getBlob(hash);
 

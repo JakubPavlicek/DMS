@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSpecificationExecutor<Document> {
 
-    Optional<Document> findByDocumentId(String documentId);
+    Optional<Document> findByDocumentIdAndAuthor(String documentId, User author);
 
     List<Document> findAllByAuthor(User author);
 

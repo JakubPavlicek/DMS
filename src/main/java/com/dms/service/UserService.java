@@ -37,14 +37,10 @@ public class UserService implements UserDetailsService {
                              .orElseThrow(() -> new UserNotFoundException("User with email: " + username + " not found"));
     }
 
-    public String getAuthenticatedUserEmail() {
-        return SecurityContextHolder.getContext()
-                                    .getAuthentication()
-                                    .getName();
-    }
-
     public User getAuthenticatedUser() {
-        String authUserEmail = getAuthenticatedUserEmail();
+        String authUserEmail = SecurityContextHolder.getContext()
+                                                    .getAuthentication()
+                                                    .getName();
         return userRepository.findByEmail(authUserEmail)
                              .orElseThrow(() -> new UserNotFoundException("User with email: " + authUserEmail + " not found"));
     }

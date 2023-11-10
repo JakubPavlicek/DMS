@@ -8,7 +8,6 @@ import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
-import com.dms.exception.CreationTimeNotFoundException;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
 import com.dms.exception.UnauthorizedAccessException;
@@ -35,7 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -75,11 +73,6 @@ public class DocumentService {
         log.info("Document {} retrieved successfully", documentId);
 
         return DocumentDTOMapper.map(document);
-    }
-
-    private LocalDateTime getDocumentCreatedAt(String documentId) {
-        return documentRepository.getCreatedAtByDocumentId(documentId)
-                                 .orElseThrow(() -> new CreationTimeNotFoundException("Creation time not found for file with ID: " + documentId));
     }
 
     private Document createDocument(MultipartFile file, String path) {
@@ -153,15 +146,12 @@ public class DocumentService {
         document.setId(databaseDocument.getId());
         document.setDocumentId(documentId);
         document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);
+        document.setCreatedAt(databaseDocument.getCreatedAt());
 
         validateUniquePath(path, document);
 
         // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
         Document savedDocument = documentRepository.saveAndFlush(document);
-
-        // createdAt column is not initialized because of "updatable = false" -> set it manually
-        LocalDateTime createdAt = getDocumentCreatedAt(documentId);
-        savedDocument.setCreatedAt(createdAt);
 
         log.info("Successfully uploaded new document version for document {}", documentId);
 

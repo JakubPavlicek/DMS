@@ -215,17 +215,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(CreationTimeNotFoundException.class)
-    public ProblemDetail handleCreationTimeNotFoundException(CreationTimeNotFoundException exception, HttpServletRequest request) {
-        log.error("Request {} raised:", request.getRequestURI(), exception);
-
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
-        problemDetail.setTitle("Creation Time Not Found");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/creation-time-not-found"));
-
-        return problemDetail;
-    }
-
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail handleConstraintViolationException(ConstraintViolationException exception, HttpServletRequest request) {
         log.error("Request {} raised:", request.getRequestURI(), exception);

@@ -13,7 +13,7 @@ put:
     content:
       application/json:
         schema:
-          $ref: '../../schema/User.yaml'
+          $ref: '../../schema/User.yaml' # TODO: replace with DTO without userId
   responses:
     200:
       description: Successfully updated user.
@@ -27,6 +27,8 @@ put:
       $ref: '../../response/401Unathorized.yaml'
     404:
       $ref: '../../response/404UserNotFound.yaml'
+    409:
+      $ref: '../../response/409EmailAlreadyExists.yaml'
     415:
       $ref: '../../response/415RequestWithoutData.yaml'
 
@@ -49,3 +51,9 @@ delete:
       $ref: '../../response/401Unathorized.yaml'
     404:
       $ref: '../../response/404UserNotFound.yaml'
+    500:
+      description: Error occurred when removing user documents.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/ClientError.yaml'

@@ -20,11 +20,7 @@ get:
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:
-      description: Document not found.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404DocumentNotFound.yaml'
 put:
   summary: Upload new document version
   description: Uploads a new document version.
@@ -52,11 +48,7 @@ put:
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:
-      description: The document for uploading new version not found.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404DocumentNotFound.yaml'
     409:
       description: File with provided path already exists.
       content:
@@ -90,11 +82,7 @@ delete:
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:
-      description: Document not found.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404DocumentNotFound.yaml'
     500:
       description: Error occurred when working with a document.
       content:

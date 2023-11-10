@@ -20,11 +20,7 @@ get:
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:
-      description: Revision not found.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404RevisionNotFound.yaml'
 
 delete:
   summary: Delete revision
@@ -44,11 +40,7 @@ delete:
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:
-      description: Revision not found.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404RevisionNotFound.yaml'
     500:
       description: Error occurred when working with a document.
       content:

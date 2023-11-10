@@ -33,11 +33,7 @@ get:
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:
-      description: Document not found for download.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404DocumentNotFound.yaml'
     500:
       description: Error occurred when working with a document.
       content:

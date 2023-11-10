@@ -26,3 +26,5 @@ get:
       $ref: '../../response/400InvalidOrMissingParams.yaml'
     401:
       $ref: '../../response/401Unathorized.yaml'
+    404:
+      $ref: '../../response/404DocumentNotFound.yaml'

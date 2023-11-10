@@ -33,8 +33,4 @@ get:
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:
-      description: Revision not found.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404RevisionNotFound.yaml'

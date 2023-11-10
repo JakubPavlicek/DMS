@@ -1,0 +1,5 @@
+description: Revision not found.
+content:
+  application/json:
+    schema:
+      $ref: '../schema/ClientError.yaml'

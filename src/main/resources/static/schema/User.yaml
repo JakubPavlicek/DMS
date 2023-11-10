@@ -1,11 +1,6 @@
 type: object
 title: User
 description: The author of the document.
-required:
-  - userId
-  - username
-  - email
-  - password
 properties:
   userId:
     type: string

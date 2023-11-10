@@ -1,6 +1,5 @@
-package com.dms.exception;
+package com.dms.config;
 
-import com.dms.config.ServerProperties;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import jakarta.servlet.ServletException;
@@ -18,9 +17,10 @@ import java.io.IOException;
 import java.net.URI;
 
 @RequiredArgsConstructor
-public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ServerProperties serverProperties;
+    private final JsonFactory jsonFactory;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
@@ -28,22 +28,27 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         String bearer = OAuth2AccessToken.TokenType.BEARER.getValue() + " ";
 
         if (authorizationHeader == null || !authorizationHeader.startsWith(bearer)) {
-            handleMissingAccessToken(request, response);
-            return;
+            handleMissingBearerToken(request, response);
         }
     }
 
-    private void handleMissingAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void handleMissingBearerToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         response.setContentType("application/problem+json");
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Access Token is not provided");
+        ProblemDetail problemDetail = createProblemDetail(request);
+        writeProblemDetailToResponse(problemDetail, response);
+    }
+
+    private ProblemDetail createProblemDetail(HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Bearer token not found in request headers");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/missing-access-token"));
         problemDetail.setTitle("Missing Access Token");
         problemDetail.setInstance(URI.create(request.getRequestURI()));
+        return problemDetail;
+    }
 
-        JsonFactory jsonFactory = new JsonFactory();
-
+    private void writeProblemDetailToResponse(ProblemDetail problemDetail, HttpServletResponse response) throws IOException {
         try (JsonGenerator jsonGenerator = jsonFactory.createGenerator(response.getWriter())) {
             jsonGenerator.writeStartObject();
             jsonGenerator.writeStringField("type", String.valueOf(problemDetail.getType()));

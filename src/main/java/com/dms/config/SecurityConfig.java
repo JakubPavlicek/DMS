@@ -1,7 +1,7 @@
 package com.dms.config;
 
-import com.dms.exception.CustomAuthenticationEntryPoint;
 import com.dms.service.UserService;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -33,6 +33,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final RsaKeyProperties rsaKeyProperties;
+    private final ServerProperties serverProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -47,8 +48,8 @@ public class SecurityConfig {
                                                          .anyRequest()
                                                          .authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint(serverProperties, new JsonFactory())))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(new CustomAuthenticationEntryPoint(new ServerProperties())))
             .build();
     }
 

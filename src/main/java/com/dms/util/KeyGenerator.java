@@ -30,7 +30,9 @@ public class KeyGenerator {
             log.info("Successfully generated key pair");
             return keyPair;
         } catch (Exception e) {
-            throw new RuntimeException("RSA key pair couldn't be created");
+            String message = "RSA key pair couldn't be created";
+            log.error(message);
+            throw new RuntimeException(message);
         }
     }
 

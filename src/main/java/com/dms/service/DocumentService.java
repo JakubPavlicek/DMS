@@ -8,6 +8,7 @@ import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
+import com.dms.exception.CreationTimeNotFoundException;
 import com.dms.exception.DocumentNotFoundException;
 import com.dms.exception.FileWithPathAlreadyExistsException;
 import com.dms.exception.UnauthorizedAccessException;
@@ -78,7 +79,7 @@ public class DocumentService {
 
     private LocalDateTime getDocumentCreatedAt(String documentId) {
         return documentRepository.getCreatedAtByDocumentId(documentId)
-                                 .orElseThrow(() -> new RuntimeException("Creation time not found for file with ID: " + documentId));
+                                 .orElseThrow(() -> new CreationTimeNotFoundException("Creation time not found for file with ID: " + documentId));
     }
 
     private Document createDocument(MultipartFile file, String path) {

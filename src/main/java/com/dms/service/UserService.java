@@ -4,6 +4,8 @@ import com.dms.dto.UserDTO;
 import com.dms.dto.UserRegisterDTO;
 import com.dms.entity.Document;
 import com.dms.entity.User;
+import com.dms.exception.EmailAlreadyExistsException;
+import com.dms.exception.UserNotFoundException;
 import com.dms.mapper.dto.UserDTOMapper;
 import com.dms.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -32,7 +34,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
-                             .orElseThrow(() -> new RuntimeException("User with email: " + username + " not found"));
+                             .orElseThrow(() -> new UserNotFoundException("User with email: " + username + " not found"));
     }
 
     public String getAuthenticatedUserEmail() {
@@ -44,17 +46,17 @@ public class UserService implements UserDetailsService {
     public User getAuthenticatedUser() {
         String authUserEmail = getAuthenticatedUserEmail();
         return userRepository.findByEmail(authUserEmail)
-                             .orElseThrow(() -> new RuntimeException("User with email: " + authUserEmail + " not found"));
+                             .orElseThrow(() -> new UserNotFoundException("User with email: " + authUserEmail + " not found"));
     }
 
     private User getUserById(String userId) {
         return userRepository.findByUserId(userId)
-                             .orElseThrow(() -> new RuntimeException("User with ID: " + userId + " not found"));
+                             .orElseThrow(() -> new UserNotFoundException("User with ID: " + userId + " not found"));
     }
 
     private void validateUniqueEmail(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email already taken");
+            throw new EmailAlreadyExistsException("Email: " + email + " is already taken");
         }
     }
 

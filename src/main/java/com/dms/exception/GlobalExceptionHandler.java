@@ -160,6 +160,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ProblemDetail handleUserNotFoundException(UserNotFoundException exception, HttpServletRequest request) {
+        log.error("Request {} raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+        problemDetail.setTitle("User Not Found");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/user-not-found"));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ProblemDetail handleEmailAlreadyExistsException(EmailAlreadyExistsException exception, HttpServletRequest request) {
+        log.error("Request {} raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+        problemDetail.setTitle("Email Already Exists");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/email-already-exists"));
+
+        return problemDetail;
+    }
+
     @ExceptionHandler(DocumentNotFoundException.class)
     public ProblemDetail handleDocumentNotFoundException(DocumentNotFoundException exception, HttpServletRequest request) {
         log.error("Request {} raised:", request.getRequestURI(), exception);
@@ -189,6 +211,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Revision Deletion Error");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/revision-deletion-error"));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(CreationTimeNotFoundException.class)
+    public ProblemDetail handleCreationTimeNotFoundException(CreationTimeNotFoundException exception, HttpServletRequest request) {
+        log.error("Request {} raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+        problemDetail.setTitle("Creation Time Not Found");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/creation-time-not-found"));
 
         return problemDetail;
     }

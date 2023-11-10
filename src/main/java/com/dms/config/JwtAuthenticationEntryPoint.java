@@ -56,7 +56,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             jsonGenerator.writeNumberField("status", problemDetail.getStatus());
             jsonGenerator.writeStringField("detail", problemDetail.getDetail());
             jsonGenerator.writeStringField("instance", String.valueOf(problemDetail.getInstance()));
-            // Add more fields as needed
             jsonGenerator.writeEndObject();
         }
     }

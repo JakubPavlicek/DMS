@@ -28,6 +28,8 @@ get:
             type: integer
             format: int64
             example: 17671
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
     404:
       description: Document not found for download.
       content:

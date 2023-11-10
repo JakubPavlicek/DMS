@@ -16,6 +16,8 @@ put:
         application/json:
           schema:
             $ref: '../../schema/Document.yaml'
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
     404:
       description: Either document or revision was not found.
       content:

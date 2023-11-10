@@ -1,0 +1,5 @@
+description: Some of the parameters are missing or not valid.
+content:
+  application/json:
+    schema:
+      $ref: '../schema/ClientError.yaml'

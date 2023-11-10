@@ -13,3 +13,5 @@ get:
         application/json:
           schema:
             $ref: '../../schema/User.yaml'
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'

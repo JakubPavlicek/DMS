@@ -21,6 +21,8 @@ put:
         application/json:
           schema:
             $ref: '../../schema/User.yaml'
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
 
 delete:
   summary: Delete user
@@ -35,3 +37,5 @@ delete:
   responses:
     204:
       description: Successfully deleted user.
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'

@@ -15,6 +15,8 @@ get:
         application/json:
           schema:
             $ref: '../../schema/Document.yaml'
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
     404:
       description: Document not found.
       content:
@@ -44,11 +46,7 @@ put:
           schema:
             $ref: '../../schema/Document.yaml'
     400:
-      description: Either invalid data provided or some request parts are missing.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
     404:
       description: The document for uploading new version not found.
       content:
@@ -87,6 +85,8 @@ delete:
   responses:
     204:
       description: Document deleted successfully.
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
     404:
       description: Document not found.
       content:

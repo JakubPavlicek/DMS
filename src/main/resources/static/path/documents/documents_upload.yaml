@@ -19,11 +19,7 @@ post:
           schema:
             $ref: '../../schema/Document.yaml'
     400:
-      description: Either invalid data provided or some request parts are missing.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
     409:
       description: File with provided path already exists.
       content:

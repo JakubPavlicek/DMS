@@ -1,5 +1,6 @@
 package com.dms.config;
 
+import com.dms.exception.CustomAuthenticationEntryPoint;
 import com.dms.service.UserService;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -47,6 +48,7 @@ public class SecurityConfig {
                                                          .authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new CustomAuthenticationEntryPoint(new ServerProperties())))
             .build();
     }
 

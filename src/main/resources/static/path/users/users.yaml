@@ -17,3 +17,5 @@ post:
         application/json:
           schema:
             $ref: '../../schema/User.yaml'
+    415:
+      $ref: '../../response/415RequestWithoutData.yaml'

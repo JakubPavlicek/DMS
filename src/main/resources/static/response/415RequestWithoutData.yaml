@@ -1,0 +1,5 @@
+description: Request does not contain any data.
+content:
+  application/json:
+    schema:
+      $ref: '../schema/ClientError.yaml'

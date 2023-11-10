@@ -34,8 +34,4 @@ put:
           schema:
             $ref: '../../schema/ClientError.yaml'
     415:
-      description: Request does not contain any data.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/415RequestWithoutData.yaml'

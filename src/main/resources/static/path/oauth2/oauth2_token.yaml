@@ -19,3 +19,5 @@ post:
             $ref: '../../schema/TokenResponse.yaml'
     400:
       $ref: '../../response/400InvalidOrMissingParams.yaml'
+    415:
+      $ref: '../../response/415RequestWithoutData.yaml'

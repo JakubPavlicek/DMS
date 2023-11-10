@@ -30,6 +30,8 @@ get:
             example: 17671
     400:
       $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'
     404:
       description: Revision not found.
       content:

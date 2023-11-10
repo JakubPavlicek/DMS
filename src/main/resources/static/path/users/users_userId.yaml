@@ -23,6 +23,8 @@ put:
             $ref: '../../schema/User.yaml'
     400:
       $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'
     415:
       $ref: '../../response/415RequestWithoutData.yaml'
 
@@ -41,3 +43,5 @@ delete:
       description: Successfully deleted user.
     400:
       $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'

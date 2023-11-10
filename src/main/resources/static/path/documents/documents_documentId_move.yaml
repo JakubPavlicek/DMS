@@ -23,6 +23,8 @@ put:
             $ref: '../../schema/Document.yaml'
     400:
       $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'
     409:
       description: File with path already exists.
       content:

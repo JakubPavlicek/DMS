@@ -24,3 +24,5 @@ get:
               $ref: '../../example/PageWithRevisions.yaml'
     400:
       $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'

@@ -15,3 +15,5 @@ get:
             $ref: '../../schema/User.yaml'
     400:
       $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'

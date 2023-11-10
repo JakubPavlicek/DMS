@@ -10,11 +10,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
 import java.net.URI;
+
+import static org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER;
 
 @RequiredArgsConstructor
 public class BearerAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -25,7 +26,7 @@ public class BearerAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String bearer = OAuth2AccessToken.TokenType.BEARER.getValue() + " ";
+        String bearer = BEARER.getValue() + " ";
 
         if (authorizationHeader == null || !authorizationHeader.startsWith(bearer)) {
             handleMissingBearerToken(request, response);

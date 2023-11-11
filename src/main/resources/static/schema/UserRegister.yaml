@@ -8,21 +8,22 @@ required:
 properties:
   name:
     type: string
-    pattern: ^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,39}$
+    pattern: ^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){2,39}$
     description: "The username of the user"
-    minLength: 1
+    minLength: 3
     maxLength: 40
     example: james
   email:
     type: string
     format: email
     description: "The email of the user"
-    minLength: 1
+    minLength: 3
     maxLength: 255
     example: james@gmail.com
   password:
     type: string
     format: password
+    pattern: ^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$
     description: "The password of the user"
-    minLength: 5
+    minLength: 8
     maxLength: 255

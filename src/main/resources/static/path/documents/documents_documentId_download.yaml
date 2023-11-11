@@ -4,6 +4,8 @@ get:
   operationId: downloadDocument
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   responses:
@@ -26,15 +28,11 @@ get:
             type: integer
             format: int64
             example: 17671
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'
     404:
-      description: Document not found for download.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404DocumentNotFound.yaml'
     500:
-      description: Error occurred when working with a document.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/500FileError.yaml'

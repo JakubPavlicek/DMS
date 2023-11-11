@@ -5,7 +5,6 @@ import com.dms.dto.DestinationDTO;
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.PageWithDocumentsDTO;
 import com.dms.dto.PageWithRevisionsDTO;
-import com.dms.dto.UserDTO;
 import com.dms.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -57,14 +56,14 @@ public class DocumentController implements DocumentsApi {
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> uploadDocument(UserDTO user, MultipartFile file, DestinationDTO destination) {
-        DocumentDTO documentDTO = documentService.uploadDocument(user, file, destination);
+    public ResponseEntity<DocumentDTO> uploadDocument(MultipartFile file, DestinationDTO destination) {
+        DocumentDTO documentDTO = documentService.uploadDocument(file, destination);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 
     @Override
-    public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(String documentId, UserDTO user, MultipartFile file, DestinationDTO destination) {
-        DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(documentId, user, file, destination);
+    public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(String documentId, MultipartFile file, DestinationDTO destination) {
+        DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(documentId, file, destination);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentDTO);
     }
 

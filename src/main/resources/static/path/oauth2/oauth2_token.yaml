@@ -1,0 +1,23 @@
+post:
+  summary: Request access token
+  description: Requests an access token.
+  operationId: token
+  tags:
+    - oauth2
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../schema/UserLogin.yaml'
+  responses:
+    200:
+      description: Successfully retrieved an access token.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/TokenResponse.yaml'
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
+    415:
+      $ref: '../../response/415RequestWithoutData.yaml'

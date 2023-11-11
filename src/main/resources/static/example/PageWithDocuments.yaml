@@ -3,6 +3,7 @@ value:
   content:
     - documentId: "2481d886-e7cb-45f1-9577-bd5c6329aac4"
       author:
+        userId: "750ee2a0-6b5a-49ce-b4a1-bed44b6ec57f"
         username: "james"
         email: "james@gmail.com"
       version: 1
@@ -13,6 +14,7 @@ value:
       updatedAt: "2023-10-15T15:40:51.340101"
     - documentId: "58475d9f-4299-423b-b2e8-fbeae5dd51df"
       author:
+        userId: "2323dfcb-0f4b-424e-b63d-47c287a1f8fa"
         username: "john"
         email: "john@gmail.com"
       version: 3

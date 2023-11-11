@@ -11,6 +11,12 @@ servers:
 
 components:
 
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
 
     User:
@@ -33,6 +39,9 @@ components:
       $ref: './schema/ClientError.yaml'
 
 paths:
+
+  /oauth2/token:
+    $ref: './path/oauth2/oauth2_token.yaml'
 
   /documents:
     $ref: './path/documents/documents.yaml'
@@ -63,3 +72,12 @@ paths:
 
   /revisions/{revisionId}/download:
     $ref: './path/revisions/revisions_revisionId_download.yaml'
+
+  /users:
+    $ref: './path/users/users.yaml'
+
+  /users/me:
+    $ref: './path/users/users_me.yaml'
+
+  /users/{userId}:
+    $ref: './path/users/users_userId.yaml'

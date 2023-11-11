@@ -1,13 +1,6 @@
 type: object
 title: Document Revision
 description: The representation of a document revision.
-required:
-  - revisionId
-  - author
-  - version
-  - name
-  - type
-  - createdAt
 properties:
   revisionId:
     type: string

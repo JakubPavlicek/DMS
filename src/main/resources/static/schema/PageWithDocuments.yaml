@@ -1,17 +1,6 @@
 type: object
 title: Page With Documents
 description: Represents a page of documents, including pagination and sorting information.
-required:
-  - pageable
-  - last
-  - totalElements
-  - totalPages
-  - first
-  - size
-  - number
-  - sort
-  - numberOfElements
-  - empty
 properties:
   content:
     type: array

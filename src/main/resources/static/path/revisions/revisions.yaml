@@ -4,6 +4,8 @@ get:
   operationId: getRevisions
   tags:
     - revisions
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/Page.yaml'
     - $ref: '../../parameter/Limit.yaml'
@@ -20,8 +22,6 @@ get:
             PageableWithVersions:
               $ref: '../../example/PageWithRevisions.yaml'
     400:
-      description: Either sort or filter pattern does not match the expected format.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'

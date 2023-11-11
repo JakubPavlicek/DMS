@@ -5,7 +5,6 @@ import com.dms.dto.DocumentDTO;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.PageWithDocumentsDTO;
 import com.dms.dto.PageWithRevisionsDTO;
-import com.dms.dto.UserDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
@@ -14,9 +13,9 @@ import com.dms.exception.FileWithPathAlreadyExistsException;
 import com.dms.mapper.dto.DocumentDTOMapper;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
-import com.dms.mapper.dto.UserDTOMapper;
 import com.dms.repository.DocumentRepository;
 import com.dms.specification.DocumentFilterSpecification;
+import com.dms.specification.RevisionFilterSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -34,7 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,32 +47,27 @@ public class DocumentService {
     private final DocumentCommonService documentCommonService;
     private final UserService userService;
 
+    public Document getAuthUserDocument(String documentId) {
+        log.debug("Getting document: documentId={}", documentId);
+        User user = userService.getAuthenticatedUser();
+        return documentRepository.findByDocumentIdAndAuthor(documentId, user)
+                                 .orElseThrow(() -> new DocumentNotFoundException("Document with ID: " + documentId + " not found"));
+    }
+
     public DocumentDTO getDocument(String documentId) {
         log.debug("Request - Getting document: documentId={}", documentId);
 
-        Document document = documentCommonService.getDocument(documentId);
+        Document document = getAuthUserDocument(documentId);
         log.info("Document {} retrieved successfully", documentId);
 
         return DocumentDTOMapper.map(document);
     }
 
-    private LocalDateTime getDocumentCreatedAt(String documentId) {
-        return documentRepository.getCreatedAtByDocumentId(documentId)
-                                 .orElseThrow(() -> new RuntimeException("Creation time not found for file with ID: " + documentId));
-    }
-
-    private User getUserFromUserDTO(UserDTO userDTO) {
-        User user = UserDTOMapper.mapToUser(userDTO);
-        return userService.getSavedUser(user);
-    }
-
-    private Document createDocument(UserDTO user, MultipartFile file, String path) {
+    private Document createDocument(MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
-        User author = getUserFromUserDTO(user);
+        User author = userService.getAuthenticatedUser();
 
-        String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
-        String cleanPath = StringUtils.cleanPath(originalFileName);
-        String name = StringUtils.getFilename(cleanPath);
+        String name = getFilename(file);
         String type = file.getContentType();
 
         log.info("Document {} successfully created (not persisted yet)", name);
@@ -87,6 +80,12 @@ public class DocumentService {
                        .version(1L)
                        .author(author)
                        .build();
+    }
+
+    private static String getFilename(MultipartFile file) {
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
+        String cleanPath = StringUtils.cleanPath(originalFileName);
+        return StringUtils.getFilename(cleanPath);
     }
 
     private void validateUniquePath(String path, Document document) {
@@ -102,11 +101,11 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadDocument(UserDTO user, MultipartFile file, DestinationDTO destination) {
-        log.debug("Request - Uploading document: user={}, file={}, destination={}", user, file.getOriginalFilename(), destination);
+    public DocumentDTO uploadDocument(MultipartFile file, DestinationDTO destination) {
+        log.debug("Request - Uploading document: file={}, destination={}", file.getOriginalFilename(), destination);
 
         String path = destination.getPath();
-        Document document = createDocument(user, file, path);
+        Document document = createDocument(file, path);
 
         validateUniquePath(path, document);
 
@@ -121,29 +120,22 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentDTO uploadNewDocumentVersion(String documentId, UserDTO user, MultipartFile file, DestinationDTO destination) {
-        log.debug("Request - Uploading new document version: documentId={}, user={}, file={}, destination={}", documentId, user, file.getOriginalFilename(), destination);
+    public DocumentDTO uploadNewDocumentVersion(String documentId, MultipartFile file, DestinationDTO destination) {
+        log.debug("Request - Uploading new document version: documentId={}, file={}, destination={}", documentId, file.getOriginalFilename(), destination);
 
-        if (!documentRepository.existsByDocumentId(documentId)) {
-            throw new DocumentNotFoundException("File with ID: " + documentId + " not found for replacement");
-        }
-
-        Document databaseDocument = documentCommonService.getDocument(documentId);
+        Document databaseDocument = getAuthUserDocument(documentId);
         String path = destination.getPath();
 
-        Document document = createDocument(user, file, path);
+        Document document = createDocument(file, path);
         document.setId(databaseDocument.getId());
         document.setDocumentId(documentId);
         document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);
+        document.setCreatedAt(databaseDocument.getCreatedAt());
 
         validateUniquePath(path, document);
 
         // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
         Document savedDocument = documentRepository.saveAndFlush(document);
-
-        // createdAt column is not initialized because of "updatable = false" -> set it manually
-        LocalDateTime createdAt = getDocumentCreatedAt(documentId);
-        savedDocument.setCreatedAt(createdAt);
 
         log.info("Successfully uploaded new document version for document {}", documentId);
 
@@ -156,7 +148,7 @@ public class DocumentService {
     public DocumentDTO switchToRevision(String documentId, String revisionId) {
         log.debug("Request - Switching document to revision: documentId={}, revision={}", documentId, revisionId);
 
-        Document document = documentCommonService.getDocument(documentId);
+        Document document = getAuthUserDocument(documentId);
         DocumentRevision revision = documentCommonService.getRevisionByDocumentAndId(document, revisionId);
 
         Document documentFromRevision = documentCommonService.updateDocumentToRevision(document, revision);
@@ -170,12 +162,8 @@ public class DocumentService {
     public void deleteDocumentWithRevisions(String documentId) {
         log.debug("Request - Deleting document with revisions: documentId={}", documentId);
 
-        Document document = documentCommonService.getDocument(documentId);
-
-        List<DocumentRevision> documentRevisions = document.getRevisions();
-        documentRevisions.forEach(revision -> documentCommonService.deleteBlobIfDuplicateHashNotExists(revision.getHash()));
-
-        documentRepository.delete(document);
+        Document document = getAuthUserDocument(documentId);
+        documentCommonService.deleteDocumentWithRevisions(document);
 
         log.info("Document {} with revisions deleted successfully", documentId);
     }
@@ -183,7 +171,7 @@ public class DocumentService {
     public ResponseEntity<Resource> downloadDocument(String documentId) {
         log.debug("Request - Downloading document: documentId={}", documentId);
 
-        Document document = documentCommonService.getDocument(documentId);
+        Document document = getAuthUserDocument(documentId);
         String hash = document.getHash();
         Resource file = documentCommonService.getBlob(hash);
 
@@ -199,11 +187,13 @@ public class DocumentService {
     public PageWithDocumentsDTO getDocuments(int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing documents: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
 
+        User user = userService.getAuthenticatedUser();
+
         List<Sort.Order> sortOrders = documentCommonService.getDocumentSortOrders(sort);
         Map<String, String> filters = documentCommonService.getDocumentFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<Document> specification = DocumentFilterSpecification.filterByItems(filters);
+        Specification<Document> specification = DocumentFilterSpecification.filter(filters, user);
 
         Page<DocumentDTO> documentDTOs = findDocuments(specification, pageable);
 
@@ -224,13 +214,14 @@ public class DocumentService {
     public PageWithRevisionsDTO getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing document revisions: documentId={} pageNumber={}, pageSize={}, sort={}, filter={}", documentId, pageNumber, pageSize, sort, filter);
 
-        Document document = documentCommonService.getDocument(documentId);
+        Document document = getAuthUserDocument(documentId);
+        User user = userService.getAuthenticatedUser();
 
         List<Sort.Order> sortOrders = documentCommonService.getRevisionSortOrders(sort);
         Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<DocumentRevision> specification = DocumentFilterSpecification.filterByDocumentAndFilterItems(document, filters);
+        Specification<DocumentRevision> specification = RevisionFilterSpecification.filterByDocument(document, filters, user);
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
 
@@ -243,7 +234,7 @@ public class DocumentService {
     public DocumentDTO moveDocument(String documentId, DestinationDTO destination) {
         log.debug("Request - Moving document: documentId={}, destination={}", documentId, destination);
 
-        Document document = documentCommonService.getDocument(documentId);
+        Document document = getAuthUserDocument(documentId);
         String path = destination.getPath();
 
         validateUniquePath(path, document);

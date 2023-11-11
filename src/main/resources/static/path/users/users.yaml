@@ -1,0 +1,25 @@
+post:
+  summary: Create user
+  description: Creates a new user.
+  operationId: createUser
+  tags:
+    - users
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../schema/UserRegister.yaml'
+  responses:
+    201:
+      description: Successfully created user.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/User.yaml'
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
+    409:
+      $ref: '../../response/409EmailAlreadyExists.yaml'
+    415:
+      $ref: '../../response/415RequestWithoutData.yaml'

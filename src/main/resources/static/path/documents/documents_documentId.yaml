@@ -4,6 +4,8 @@ get:
   operationId: getDocument
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   responses:
@@ -13,18 +15,20 @@ get:
         application/json:
           schema:
             $ref: '../../schema/Document.yaml'
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'
     404:
-      description: Document not found.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404DocumentNotFound.yaml'
 put:
   summary: Upload new document version
   description: Uploads a new document version.
   operationId: uploadNewDocumentVersion
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   requestBody:
@@ -40,17 +44,11 @@ put:
           schema:
             $ref: '../../schema/Document.yaml'
     400:
-      description: Either invalid data provided or some request parts are missing.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'
     404:
-      description: The document for uploading new version not found.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404DocumentNotFound.yaml'
     409:
       description: File with provided path already exists.
       content:
@@ -58,17 +56,9 @@ put:
           schema:
             $ref: '../../schema/ClientError.yaml'
     415:
-      description: Request does not contain any data.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/415RequestWithoutData.yaml'
     500:
-      description: Error occurred when working with a document.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/500FileError.yaml'
 
 delete:
   summary: Delete document
@@ -76,20 +66,18 @@ delete:
   operationId: deleteDocumentWithRevisions
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   responses:
     204:
       description: Document deleted successfully.
+    400:
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'
     404:
-      description: Document not found.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/404DocumentNotFound.yaml'
     500:
-      description: Error occurred when working with a document.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/500FileError.yaml'

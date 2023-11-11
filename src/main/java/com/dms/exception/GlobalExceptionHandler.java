@@ -89,7 +89,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         BindingResult bindingResult = ex.getBindingResult();
 
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        fieldErrors.forEach(error -> errorMessages.add(error.getObjectName() + "." + error.getField() + ": " + error.getDefaultMessage()));
+        fieldErrors.forEach(error -> errorMessages.add(error.getField() + ": " + error.getDefaultMessage()));
 
         return errorMessages;
     }
@@ -127,6 +127,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.of(problemDetail).build();
     }
 
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ProblemDetail handleUnauthorizedAccessException(UnauthorizedAccessException exception, HttpServletRequest request) {
+        log.error("Request {} raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception.getMessage());
+        problemDetail.setTitle("Access Denied");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/unauthorized-access"));
+
+        return problemDetail;
+    }
+
     @ExceptionHandler(FileOperationException.class)
     public ProblemDetail handleFileOperationEception(FileOperationException exception, HttpServletRequest request) {
         log.error("Request {} raised:", request.getRequestURI(), exception);
@@ -145,6 +156,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
         problemDetail.setTitle("File With Path Already Exists");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/document-with-path-already-exists"));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ProblemDetail handleUserNotFoundException(UserNotFoundException exception, HttpServletRequest request) {
+        log.error("Request {} raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+        problemDetail.setTitle("User Not Found");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/user-not-found"));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ProblemDetail handleEmailAlreadyExistsException(EmailAlreadyExistsException exception, HttpServletRequest request) {
+        log.error("Request {} raised:", request.getRequestURI(), exception);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+        problemDetail.setTitle("Email Already Exists");
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/email-already-exists"));
 
         return problemDetail;
     }

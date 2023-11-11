@@ -1,0 +1,5 @@
+description: Error occurred while working with a file.
+content:
+  application/json:
+    schema:
+      $ref: '../schema/ClientError.yaml'

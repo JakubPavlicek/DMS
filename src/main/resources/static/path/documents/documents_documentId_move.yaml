@@ -4,18 +4,16 @@ put:
   operationId: moveDocument
   tags:
     - documents
+  security:
+    - bearerAuth: []
   parameters:
     - $ref: '../../parameter/DocumentId.yaml'
   requestBody:
+    required: true
     content:
-      multipart/form-data:
+      application/json:
         schema:
-          type: object
-          required:
-            - destination
-          properties:
-            destination:
-              $ref: '../../schema/Destination.yaml'
+          $ref: '../../schema/Destination.yaml'
   responses:
     200:
       description: Document moved successfully.
@@ -24,11 +22,11 @@ put:
           schema:
             $ref: '../../schema/Document.yaml'
     400:
-      description: Either invalid data provided or some request parts are missing.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/400InvalidOrMissingParams.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'
+    404:
+      $ref: '../../response/404DocumentNotFound.yaml'
     409:
       description: File with path already exists.
       content:
@@ -36,8 +34,4 @@ put:
           schema:
             $ref: '../../schema/ClientError.yaml'
     415:
-      description: Request does not contain any data.
-      content:
-        application/json:
-          schema:
-            $ref: '../../schema/ClientError.yaml'
+      $ref: '../../response/415RequestWithoutData.yaml'

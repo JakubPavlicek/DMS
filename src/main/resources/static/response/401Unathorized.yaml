@@ -1,0 +1,5 @@
+description: Either no access token was provided or the provided access token is invalid or expired.
+content:
+  application/json:
+    schema:
+      $ref: '../schema/ClientError.yaml'

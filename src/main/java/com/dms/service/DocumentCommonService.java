@@ -3,7 +3,7 @@ package com.dms.service;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
-import com.dms.exception.DocumentNotFoundException;
+import com.dms.entity.User;
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
 import com.dms.exception.InvalidRegexInputException;
@@ -48,22 +48,21 @@ public class DocumentCommonService {
 
     private final BlobStorageService blobStorageService;
 
-    public Document getDocument(String documentId) {
-        log.debug("Getting document: documentId={}", documentId);
-        return documentRepository.findByDocumentId(documentId)
-                                 .orElseThrow(() -> new DocumentNotFoundException("File with ID: " + documentId + " not found"));
-    }
-
-    public DocumentRevision getRevision(String revisionId) {
-        log.debug("Getting revision: revisionId={}", revisionId);
-        return revisionRepository.findByRevisionId(revisionId)
-                                 .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
-    }
-
     public DocumentRevision getRevisionByDocumentAndId(Document document, String revisionId) {
         log.debug("Getting revision by document and ID: documentId={}, revisionId={}", document.getDocumentId(), revisionId);
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found for document with ID: " + document.getDocumentId()));
+    }
+
+    public void deleteDocumentWithRevisions(Document document) {
+        List<DocumentRevision> documentRevisions = document.getRevisions();
+        documentRevisions.forEach(revision -> deleteBlobIfDuplicateHashNotExists(revision.getHash()));
+
+        documentRepository.delete(document);
+    }
+
+    public List<Document> getDocumentsByAuthor(User user) {
+        return documentRepository.findAllByAuthor(user);
     }
 
     public Document updateDocumentToRevision(Document document, DocumentRevision revision) {

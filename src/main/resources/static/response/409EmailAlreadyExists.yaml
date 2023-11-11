@@ -1,0 +1,5 @@
+description: Email is already taken.
+content:
+  application/json:
+    schema:
+      $ref: '../schema/ClientError.yaml'

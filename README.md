@@ -35,13 +35,13 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │   │       ├── controller                        // REST-API controller
     │   │       ├── entity                            // database tables
     │   │       ├── exception                         // exceptions and exception handling
-    │   │       ├── hash                              // hasher for blobs
     │   │       ├── mapper                            // mapping between objects
     │   │       │   ├── dto                           // dto mappers
     │   │       │   └── entity                        // entity mappers
     │   │       ├── repository                        // DAOs
     │   │       ├── service                           // service
-    │   │       ├── specification                     // specification used for filtering
+    │   │       ├── specification                     // specifications used for filtering
+    │   │       ├── util                              // utility classes
     │   │       ├── validation                        // validation annotations
     │   │       └── DocumentManagerApplication.java   // main application class
     │   └── resources
@@ -51,8 +51,11 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │       │   ├── parameter                         // OpenAPI parameters
     │       │   ├── path                              // OpenAPI paths
     │       │   │   ├── documents                     // /documents paths
-    │       │   │   └── revisions                     // /revisions paths
+    │       │   │   ├── oauth2                        // /oauth2 paths
+    │       │   │   ├── revisions                     // /revisions paths
+    │       │   │   └── users                         // /users paths
     │       │   ├── requestBody                       // OpenAPI requestBodies
+    │       │   ├── response                          // OpenAPI responses
     │       │   ├── schema                            // OpenAPI schemas
     │       │   ├── templates                         // OpenAPI generator templates
     │       │   └── openapi.yaml                      // main OpenAPI file 
@@ -62,6 +65,9 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 ```
 
 ## API
+
+#### /oauth2/token
+- `POST` : Request access token
 
 #### /documents
 - `GET` : List documents
@@ -95,6 +101,16 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 
 #### /revisions/{documentId}/download
 - `GET` : Download revision
+
+#### /users
+- `POST` : Create user
+
+#### /users/me
+- `GET` : Get current user
+
+#### /users/{userId}
+- `PUT` : Update user
+- `DELETE` : Delete user
 
 ## Getting Started
 

@@ -2,7 +2,6 @@ package com.dms.config;
 
 import com.dms.service.UserService;
 import com.dms.util.KeyGenerator;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -11,6 +10,8 @@ import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -33,8 +34,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final ServerProperties serverProperties;
     private final KeyGenerator keyGenerator;
+    private final SecurityUserProperties securityUserProperties;
 
     private RSAKey rsaKey;
 
@@ -51,8 +52,21 @@ public class SecurityConfig {
                                                          .anyRequest()
                                                          .authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(new BearerAuthenticationEntryPoint(serverProperties, new JsonFactory())))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .build();
+    }
+
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .securityMatcher("/actuator/**")
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(authorize -> authorize.anyRequest()
+                                                         .hasAuthority("ADMIN"))
+            .authenticationProvider(new ActuatorAuthenticationProvider(securityUserProperties))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .httpBasic(Customizer.withDefaults())
             .build();
     }
 
@@ -70,7 +84,8 @@ public class SecurityConfig {
 
     @Bean
     JwtDecoder jwtDecoder() throws JOSEException {
-        return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+        return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey())
+                               .build();
     }
 
     @Bean

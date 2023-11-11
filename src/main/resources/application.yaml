@@ -9,6 +9,12 @@ server:
   error:
     path: /errors
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 spring:
   profiles:
     active: postgresql # set db that you want to use
@@ -28,6 +34,11 @@ spring:
     change-log: classpath:db/changelog/changelog-master.yaml
   main:
     log-startup-info: false
+  security:
+    user:
+      name: admin
+      password: admin123
+      roles: ADMIN
 
 springdoc:
   api-docs:

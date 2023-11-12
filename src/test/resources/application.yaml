@@ -1,0 +1,50 @@
+storage:
+  path: /Users/kuba/Downloads/blob_storage
+  directory-prefix-length: 2
+
+hash:
+  algorithm: SHA-256
+
+server:
+  error:
+    path: /errors
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+spring:
+  datasource:
+    url: jdbc:h2://mem:dms:DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: sa
+  jpa:
+    open-in-view: false
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1GB
+      max-request-size: 1GB
+  mvc:
+    problemdetails:
+      enabled: true
+    throw-exception-if-no-handler-found: true
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/changelog-master.yaml
+  main:
+    log-startup-info: false
+  security:
+    user:
+      name: admin
+      password: admin123
+      roles: ADMIN
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    url: /openapi.yaml

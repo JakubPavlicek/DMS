@@ -35,18 +35,18 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void shouldFindDocumentByDocumentIdAndAuthor() {
+    void whenValidDocumentIdAndAuthor_thenDocumentShouldBeFound() {
         assertThat(documentRepository.findByDocumentIdAndAuthor(document.getDocumentId(), document.getAuthor())).isPresent();
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenDocumentNotFoundByAuthorAndInvalidDocumentId() {
+    void whenInvalidDocumentIdAndValidAuthor_thenNoDocumentShouldBeFound() {
         String documentId = UUID.randomUUID().toString();
         assertThat(documentRepository.findByDocumentIdAndAuthor(documentId, document.getAuthor())).isEmpty();
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenDocumentNotFoundByDocumentIdAndInvalidAuthor() {
+    void whenInvalidAuthorAndValidDocumentId_thenNoDocumentShouldBeFound() {
         User author = createUser();
         author.setEmail("john@gmail.com");
         author = userRepository.save(author);
@@ -55,7 +55,7 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void shouldFindAllDocumentsByAuthor() {
+    void whenTwoDocumentsWithSameAuthorExists_thenTwoDocumentsShouldBeFound() {
         Document anotherDocument = createDocument(document.getAuthor());
         documentRepository.save(anotherDocument);
 
@@ -63,7 +63,7 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void shouldReturnEmptyListWhenNoDocumentsFoundForAuthor() {
+    void whenInvalidAuthor_thenNoDocumentsShouldBeFound() {
         User author = createUser();
         author.setEmail("john@gmail.com");
         author = userRepository.save(author);
@@ -72,7 +72,7 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void shouldReturnTrueWhenDuplicateHashExists() {
+    void whenTwoEqualHashesExist_thenShouldReturnTrue() {
         Document anotherDocument = createDocument(document.getAuthor());
         documentRepository.save(anotherDocument);
 
@@ -80,7 +80,7 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void shouldReturnFalseWhenDuplicateHashDoesNotExist() {
+    void whenNoDuplicateHashesExist_thenShouldReturnFalse() {
         Document anotherDocument = createDocument(document.getAuthor());
         anotherDocument.setHash("04cda4ddf5773cbc4f80452696112091f60380015b17973aae8a11f3d92e7c7d");
         documentRepository.save(anotherDocument);
@@ -89,22 +89,22 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void shouldReturnTrueWhenDocumentWithPathAlreadyExists() {
+    void whenDocumentExistsAtPathForGivenAuthor_thenShouldReturnTrue() {
         assertThat(documentRepository.documentWithPathAlreadyExists(document.getName(), document.getPath(), document.getAuthor())).isTrue();
     }
 
     @Test
-    void shouldReturnFalseWhenDocumentWithDifferentNameAndSamePathDoesNotExist() {
+    void whenTwoDistinctDocumentNamesWithSamePathAndAuthorExist_thenShouldReturnFalse() {
         assertThat(documentRepository.documentWithPathAlreadyExists("cat.jpeg", document.getPath(), document.getAuthor())).isFalse();
     }
 
     @Test
-    void shouldReturnFalseWhenDocumentWithDifferentPathAndSameNameDoesNotExist() {
+    void whenTwoDistinctPathsWithSameDocumentNameAndAuthorExist_thenShouldReturnFalse() {
         assertThat(documentRepository.documentWithPathAlreadyExists(document.getName(), "/home", document.getAuthor())).isFalse();
     }
 
     @Test
-    void shouldReturnFalseWhenDocumentWithDifferentAuthorDoesNotExist() {
+    void whenTwoDistinctAuthorsOfTheSameDocumentExist_thenShouldReturnFalse() {
         User author = createUser();
         author.setEmail("john@gmail.com");
         author = userRepository.save(author);

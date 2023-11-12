@@ -44,19 +44,18 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldFindRevisionByRevisionIdAndAuthor() {
+    void whenValidRevisionIdAndAuthor_thenRevisionShouldBeFound() {
         assertThat(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), revision.getAuthor())).isPresent();
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenRevisionNotFoundByAuthorAndInvalidRevisionId() {
-        String revisionId = UUID.randomUUID()
-                                .toString();
+    void whenInvalidRevisionIdAndValidAuthor_thenNoRevisionShouldBeFound() {
+        String revisionId = UUID.randomUUID().toString();
         assertThat(revisionRepository.findByRevisionIdAndAuthor(revisionId, revision.getAuthor())).isEmpty();
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenRevisionNotFoundByRevisionIdAndInvalidAuthor() {
+    void whenInvalidAuthorAndValidRevisionId_thenNoRevisionShouldBeFound() {
         User author = createUser();
         author.setEmail("john@email.com");
         author = userRepository.save(author);
@@ -65,19 +64,19 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldFindRevisionByDocumentAndRevisionId() {
+    void whenValidDocumentAndRevisionId_thenRevisionShouldBeFound() {
         assertThat(revisionRepository.findByDocumentAndRevisionId(revision.getDocument(), revision.getRevisionId())).isPresent();
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenRevisionNotFoundByDocumentAndInvalidRevisionId() {
+    void whenInvalidRevisionIdAndValidDocument_thenNoRevisionShouldBeFound() {
         String revisionId = UUID.randomUUID()
                                 .toString();
         assertThat(revisionRepository.findByDocumentAndRevisionId(revision.getDocument(), revisionId)).isEmpty();
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenRevisionNotFoundByRevisionIdAndInvalidDocument() {
+    void whenInvalidDocumentAndValidRevisionId_thenNoRevisionShouldBeFound() {
         User author = createUser();
         author.setEmail("john@gmail.com");
         author = userRepository.save(author);
@@ -89,7 +88,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldReturnRevisionsByDocumentOrderByCreatedAtAsc() {
+    void whenTwoRevisionsExist_thenRevisionCountShouldBeTwo() {
         DocumentRevision anotherRevision = createRevision(revision.getAuthor(), revision.getDocument());
         revisionRepository.save(anotherRevision);
 
@@ -98,7 +97,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldReturnRevisionsOrderedByCreatedAtAscByDocument() {
+    void whenTwoReivisonsExist_thenTwoRevisionsOrderedByCreatedAtAscShouldBeReturned() {
         DocumentRevision anotherRevision = createRevision(revision.getAuthor(), revision.getDocument());
         anotherRevision.setCreatedAt(LocalDateTime.now()
                                                   .minusHours(1));
@@ -109,13 +108,13 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldDeleteRevisionByRevisionId() {
+    void whenValidRevisionId_thenRevisionShouldBeDeleted() {
         revisionRepository.deleteByRevisionId(revision.getRevisionId());
         assertThat(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), revision.getAuthor())).isEmpty();
     }
 
     @Test
-    void shouldReturnTrueWhenDuplicateHashExists() {
+    void whenTwoDuplicateHashesExist_thenShouldReturnTrue() {
         DocumentRevision anotherRevision = createRevision(revision.getAuthor(), revision.getDocument());
         revisionRepository.save(anotherRevision);
 
@@ -123,7 +122,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldReturnFalseWhenDuplicateHashDoesNotExist() {
+    void whenTwoDistinctHashesExist_thenShouldReturnFalse() {
         DocumentRevision anotherRevision = createRevision(revision.getAuthor(), revision.getDocument());
         anotherRevision.setHash("04cda4ddf5773cbc4f80452696112091f60380015b17973aae8a11f3d92e7c7d");
         revisionRepository.save(anotherRevision);
@@ -132,7 +131,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldFindPreviousRevisionByDocumentAndVersion() {
+    void whenValidDocumentAndVersion_thenPreviousRevisionShouldBeFound() {
         DocumentRevision anotherRevision = createRevision(revision.getAuthor(), revision.getDocument());
         anotherRevision.setVersion(revision.getVersion() + 1);
         revisionRepository.save(anotherRevision);
@@ -141,7 +140,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenPreviousRevisonDoesNotExistByInvalidDocument() {
+    void whenInvalidDocumentAndValidVersion_thenNoPreviousRevisionShouldBeFound() {
         Document document = createDocument(revision.getAuthor());
         document = documentRepository.save(document);
 
@@ -149,12 +148,12 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenPreviousRevisionByDocumentAndVersionDoesNotExist() {
+    void whenRevisionIsTheOnlyOne_thenNoPreviousRevisionShouldBeFound() {
         assertThat(revisionRepository.findPreviousByDocumentAndVersion(revision.getDocument(), revision.getVersion())).isEmpty();
     }
 
     @Test
-    void shouldFindNextRevisionByDocumentAndVersion() {
+    void whenValidDocumentAndVersion_thenNextRevisionShouldBeFound() {
         DocumentRevision anotherRevision = createRevision(revision.getAuthor(), revision.getDocument());
         anotherRevision.setVersion(revision.getVersion() + 1);
         revisionRepository.save(anotherRevision);
@@ -163,7 +162,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenNextRevisonDoesNotExistByInvalidDocument() {
+    void whenInvalidDocumentAndValidVersion_thenNoNextRevisionShouldBeFound() {
         Document document = createDocument(revision.getAuthor());
         document = documentRepository.save(document);
 
@@ -171,17 +170,17 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenNextRevisionByDocumentAndVersionDoesNotExist() {
+    void whenRevisionIsTheOnlyOne_thenNoNextRevisionShouldBeFound() {
         assertThat(revisionRepository.findNextByDocumentAndVersion(revision.getDocument(), revision.getVersion())).isEmpty();
     }
 
     @Test
-    void shouldFindLastRevisionVersionByDocument() {
-        assertThat(revisionRepository.findLastRevisionVersionByDocument(revision.getDocument())).isPresent();
+    void whenRevisionWithVersionOneIsTheOnlyOne_thenLastRevisionVersionShouldBeOne() {
+        assertThat(revisionRepository.findLastRevisionVersionByDocument(revision.getDocument()).get()).isEqualTo(1);
     }
 
     @Test
-    void shouldFindLastRevisionVersionWithMultipleRevisionsByDocument() {
+    void whenThreeRevisionsExist_thenLastRevisionVersionShouldBeThree() {
         DocumentRevision anotherRevision = createRevision(revision.getAuthor(), revision.getDocument());
         anotherRevision.setVersion(revision.getVersion() + 1);
         revisionRepository.save(anotherRevision);
@@ -194,7 +193,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void shouldNotFindLastRevisionVersionWhenDocumentIsInvalid() {
+    void whenInvalidDocument_thenNoRevisionVersionShouldBeFound() {
         Document document = createDocument(revision.getAuthor());
         document = documentRepository.save(document);
 
@@ -239,6 +238,5 @@ class DocumentRevisionRepositoryTest {
                    .password("secret123!")
                    .build();
     }
-
 
 }

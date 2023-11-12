@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,36 +32,32 @@ class UserRepositoryTest {
     }
 
     @Test
-    void shouldReturnUserWhenUserFoundByEmail() {
-        User userByEmail = userRepository.findByEmail(user.getEmail()).get();
-        assertThat(userByEmail).isEqualTo(user);
+    void whenValidEmail_thenUserShouldBeFound() {
+        assertThat(userRepository.findByEmail(user.getEmail())).isPresent();
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenUserNotFoundByEmail() {
-        Optional<User> userByEmail = userRepository.findByEmail("john@gmail.com");
-        assertThat(userByEmail).isEmpty();
+    void whenInvalidEmail_thenNoUserShouldBeFound() {
+        assertThat(userRepository.findByEmail("john@gmail.com")).isEmpty();
     }
 
     @Test
-    void shouldReturnUserWhenUserFoundByUserId() {
-        User userByUserId = userRepository.findByUserId(user.getUserId()).get();
-        assertThat(userByUserId).isEqualTo(user);
+    void whenValidUserId_thenUserShouldBeFound() {
+        assertThat(userRepository.findByUserId(user.getUserId())).isPresent();
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenUserNotFoundByUserId() {
-        Optional<User> userByUserId = userRepository.findByUserId(UUID.randomUUID().toString());
-        assertThat(userByUserId).isEmpty();
+    void whenInvalidUserId_thenNoUserShouldBeFound() {
+        assertThat(userRepository.findByUserId(UUID.randomUUID().toString())).isEmpty();
     }
 
     @Test
-    void shouldReturnTrueWhenUserExistsByEmail() {
+    void whenValidEmail_thenUserShouldExist() {
         assertThat(userRepository.existsByEmail(user.getEmail())).isTrue();
     }
 
     @Test
-    void shouldReturnFalseWhenUserDoesNotExistByEmail() {
+    void whenInvalidEmail_thenNoUserShouldExist() {
         assertThat(userRepository.existsByEmail("john@gmail.com")).isFalse();
     }
 

@@ -1,0 +1,11 @@
+type: object
+required:
+  - file
+properties:
+  file:
+    type: string
+    format: binary
+    description: File to be uploaded.
+    x-constraints: "@ValidFile"
+  destination:
+    $ref: '../schema/Destination.yaml'

@@ -10,7 +10,7 @@ post:
     content:
       multipart/form-data:
         schema:
-          $ref: '../../requestBody/FileUploadRequest.yaml'
+          $ref: '../../requestBody/FileWithRequiredDestination.yaml'
   responses:
     201:
       description: Document uploaded successfully.

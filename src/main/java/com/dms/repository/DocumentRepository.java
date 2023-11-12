@@ -20,7 +20,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSp
     @Query("SELECT COUNT(document.hash) > 1 FROM Document document WHERE document.hash = :hash")
     boolean duplicateHashExists(String hash);
 
-    @Query("SELECT COUNT(document.path) >= 1 FROM Document document WHERE document.path = :path AND document.name = :filename AND document.author = :user")
-    boolean pathWithFileAlreadyExists(String path, String filename, User user);
+    @Query("SELECT COUNT(document.path) >= 1 FROM Document document WHERE document.path = :path AND document.name = :name AND document.author = :author")
+    boolean documentWithPathAlreadyExists(String name, String path, User author);
 
 }

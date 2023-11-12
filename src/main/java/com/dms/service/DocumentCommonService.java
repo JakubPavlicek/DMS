@@ -111,7 +111,7 @@ public class DocumentCommonService {
 
         Long version = 1L;
         for (DocumentRevision revision : documentRevisions) {
-            revisionRepository.updateVersion(revision, version);
+            revision.setVersion(version);
             version++;
         }
     }

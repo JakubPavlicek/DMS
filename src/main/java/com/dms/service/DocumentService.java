@@ -95,7 +95,7 @@ public class DocumentService {
         User author = document.getAuthor();
 
         // user can't have a duplicate path for a document with the same name
-        if (documentRepository.pathWithFileAlreadyExists(path, filename, author)) {
+        if (documentRepository.documentWithPathAlreadyExists(filename, path, author)) {
             throw new FileWithPathAlreadyExistsException("Document: " + filename + " with path: " + path + " already exists");
         }
     }
@@ -124,7 +124,7 @@ public class DocumentService {
         log.debug("Request - Uploading new document version: documentId={}, file={}, destination={}", documentId, file.getOriginalFilename(), destination);
 
         Document databaseDocument = getAuthUserDocument(documentId);
-        String path = destination.getPath();
+        String path = destination == null ? databaseDocument.getPath() : destination.getPath();
 
         Document document = createDocument(file, path);
         document.setId(databaseDocument.getId());
@@ -132,7 +132,9 @@ public class DocumentService {
         document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);
         document.setCreatedAt(databaseDocument.getCreatedAt());
 
-        validateUniquePath(path, document);
+        if(destination != null) {
+            validateUniquePath(path, document);
+        }
 
         // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
         Document savedDocument = documentRepository.saveAndFlush(document);

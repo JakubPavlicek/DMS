@@ -22,20 +22,8 @@ public class UserController implements UsersApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteUser(String userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
     public ResponseEntity<UserDTO> getCurrentUser() {
         UserDTO userDTO = userService.getCurrentUser();
-        return ResponseEntity.ok(userDTO);
-    }
-
-    @Override
-    public ResponseEntity<UserDTO> updateUser(String userId, UserDTO user) {
-        UserDTO userDTO = userService.updateUser(userId, user);
         return ResponseEntity.ok(userDTO);
     }
 

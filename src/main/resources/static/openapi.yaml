@@ -78,6 +78,3 @@ paths:
 
   /users/me:
     $ref: './path/users/users_me.yaml'
-
-  /users/{userId}:
-    $ref: './path/users/users_userId.yaml'

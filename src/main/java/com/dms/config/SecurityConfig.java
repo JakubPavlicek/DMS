@@ -60,7 +60,7 @@ public class SecurityConfig {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .securityMatcher("/actuator/**")
+            .securityMatcher("/actuator/**", "/users/password")
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize.anyRequest()
                                                          .hasAuthority("ADMIN"))

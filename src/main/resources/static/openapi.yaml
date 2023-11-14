@@ -78,3 +78,6 @@ paths:
 
   /users/me:
     $ref: './path/users/users_me.yaml'
+
+  /users/password:
+    $ref: './path/users/users_password.yaml'

@@ -1,6 +1,7 @@
 package com.dms.service;
 
 import com.dms.dto.UserDTO;
+import com.dms.dto.UserLoginDTO;
 import com.dms.dto.UserRegisterDTO;
 import com.dms.entity.User;
 import com.dms.exception.EmailAlreadyExistsException;
@@ -35,8 +36,12 @@ public class UserService implements UserDetailsService {
         String authUserEmail = SecurityContextHolder.getContext()
                                                     .getAuthentication()
                                                     .getName();
-        return userRepository.findByEmail(authUserEmail)
-                             .orElseThrow(() -> new UserNotFoundException("User with email: " + authUserEmail + " not found"));
+        return getUserByEmail(authUserEmail);
+    }
+
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                             .orElseThrow(() -> new UserNotFoundException("User with email: " + email + " not found"));
     }
 
     private User getUserById(String userId) {
@@ -63,9 +68,17 @@ public class UserService implements UserDetailsService {
 
     public UserDTO getCurrentUser() {
         log.debug("Request - Getting current user");
-        User authenticatedUser = getAuthenticatedUser();
+        User authUser = getAuthenticatedUser();
         log.info("Successfully retrieved current user");
-        return UserDTOMapper.mapToUserDTO(authenticatedUser);
+        return UserDTOMapper.mapToUserDTO(authUser);
+    }
+
+    public void changePassword(UserLoginDTO userLogin) {
+        log.debug("Request - Changing users password");
+        User user = getUserByEmail(userLogin.getEmail());
+        user.setPassword(passwordEncoder.encode(userLogin.getPassword()));
+        userRepository.save(user);
+        log.info("Successfully changed users {} password", user.getUserId());
     }
 
 }

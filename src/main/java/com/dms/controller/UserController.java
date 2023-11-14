@@ -2,6 +2,7 @@ package com.dms.controller;
 
 import com.dms.UsersApi;
 import com.dms.dto.UserDTO;
+import com.dms.dto.UserLoginDTO;
 import com.dms.dto.UserRegisterDTO;
 import com.dms.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,12 @@ public class UserController implements UsersApi {
     public ResponseEntity<UserDTO> getCurrentUser() {
         UserDTO userDTO = userService.getCurrentUser();
         return ResponseEntity.ok(userDTO);
+    }
+
+    @Override
+    public ResponseEntity<Void> changePassword(UserLoginDTO userLogin) {
+        userService.changePassword(userLogin);
+        return ResponseEntity.noContent().build();
     }
 
 }

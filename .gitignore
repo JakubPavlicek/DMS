@@ -1,6 +1,7 @@
 HELP.md
 target/
 log/
+src/main/resources/certs/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

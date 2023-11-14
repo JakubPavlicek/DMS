@@ -108,9 +108,8 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 #### /users/me
 - `GET` : Get current user
 
-#### /users/{userId}
-- `PUT` : Update user
-- `DELETE` : Delete user
+#### /users/password
+- `PUT` : Change user password
 
 ## Getting Started
 

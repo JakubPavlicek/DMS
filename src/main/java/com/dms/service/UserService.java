@@ -51,7 +51,7 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDTO createUser(UserRegisterDTO userRegister) {
-        log.debug("Request - Creating user: userRegister={}", userRegister);
+        log.debug("Request - Creating user");
         validateUniqueEmail(userRegister.getEmail());
 
         User user = UserDTOMapper.mapToUser(userRegister);
@@ -62,7 +62,7 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDTO getCurrentUser() {
-        log.debug("Request - Getting current user");
+        log.debug("Request - Retrieving current user");
         User authUser = getAuthenticatedUser();
         log.info("Successfully retrieved current user");
         return UserDTOMapper.mapToUserDTO(authUser);

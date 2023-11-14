@@ -25,8 +25,7 @@ public class AuthService {
 
     public TokenResponseDTO token(UserLoginDTO userLogin) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword()));
-
-        log.info("User {} authenticated successfully", userLogin.getEmail());
+        log.info("User authenticated successfully");
 
         String token = generateToken(authentication);
 

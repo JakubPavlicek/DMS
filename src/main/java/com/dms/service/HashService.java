@@ -25,7 +25,6 @@ public class HashService {
         try {
             MessageDigest digest = MessageDigest.getInstance(hashProperties.getAlgorithm());
             byte[] hash = digest.digest(file.getBytes());
-
             return HexUtils.toHexString(hash);
         } catch (Exception e) {
             String message = "Failed to retrieve data from file: " + filename;

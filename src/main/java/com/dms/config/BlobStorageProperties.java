@@ -47,9 +47,9 @@ public class BlobStorageProperties implements Validator {
             try {
                 Files.createDirectories(storagePath);
                 log.warn("The provided blob storage path {} did not exist. A new directory has been created at that path", storagePath);
-            } catch (Exception e) {
+            } catch (Exception exception) {
                 String message = "Blob storage couldn't be created";
-                log.error(message, e);
+                log.error(message, exception);
                 errors.rejectValue("path", "Blob Storage Error Occurred", message);
             }
         }

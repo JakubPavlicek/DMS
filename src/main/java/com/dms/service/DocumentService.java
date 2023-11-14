@@ -132,7 +132,7 @@ public class DocumentService {
         document.setVersion(documentCommonService.getLastRevisionVersion(document) + 1);
         document.setCreatedAt(databaseDocument.getCreatedAt());
 
-        if(destination != null) {
+        if (destination != null) {
             validateUniquePath(path, document);
         }
 

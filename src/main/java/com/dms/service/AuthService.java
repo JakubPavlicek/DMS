@@ -43,8 +43,9 @@ public class AuthService {
                                           .expiresAt(now.plus(1, ChronoUnit.HOURS))
                                           .build();
 
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims))
-                         .getTokenValue();
+        String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        log.info("Successfully generated token");
+        return token;
     }
 
 }

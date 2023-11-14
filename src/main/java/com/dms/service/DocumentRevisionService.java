@@ -72,8 +72,7 @@ public class DocumentRevisionService {
     }
 
     private boolean isRevisionSetAsCurrent(DocumentRevision revision, Document document) {
-        return revision.getVersion()
-                       .equals(document.getVersion());
+        return revision.getVersion().equals(document.getVersion());
     }
 
     @Transactional
@@ -94,8 +93,7 @@ public class DocumentRevisionService {
         documentCommonService.updateRevisionVersionsForDocument(document);
 
         // document's previous version was deleted -> decrement current document's version
-        if (revision.getVersion()
-                    .compareTo(document.getVersion()) < 0) {
+        if (revision.getVersion().compareTo(document.getVersion()) < 0) {
             document.setVersion(document.getVersion() - 1);
         }
 

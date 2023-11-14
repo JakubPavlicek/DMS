@@ -28,9 +28,9 @@ public class HashProperties implements Validator {
     public void validate(Object target, Errors errors) {
         try {
             MessageDigest.getInstance(algorithm);
-        } catch (Exception e) {
+        } catch (Exception exception) {
             String message = "Hash algorithm does not exist";
-            log.error(message, e);
+            log.error(message, exception);
             errors.rejectValue("algorithm", "Hash Algorithm Not Found", message);
         }
     }

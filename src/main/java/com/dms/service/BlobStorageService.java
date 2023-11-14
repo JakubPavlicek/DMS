@@ -60,7 +60,7 @@ public class BlobStorageService {
             Resource resource = new UrlResource(filePath.toUri());
             log.info("Blob retrieved succeffully");
             return resource;
-        } catch (Exception e) {
+        } catch (Exception exception) {
             throw new FileOperationException(FileOperation.READ, "An error occurred while reading the file");
         }
     }
@@ -74,7 +74,7 @@ public class BlobStorageService {
             if (wasFileDeleted) {
                 log.info("Blob deleted successfully");
             }
-        } catch (Exception e) {
+        } catch (Exception exception) {
             throw new FileOperationException(FileOperation.DELETE, "An error occurred while deleting the file");
         }
 
@@ -83,7 +83,7 @@ public class BlobStorageService {
         if (isDirectoryEmpty(directoryPath)) {
             try {
                 Files.deleteIfExists(directoryPath);
-            } catch (Exception e) {
+            } catch (Exception exception) {
                 throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
             }
         }
@@ -93,7 +93,7 @@ public class BlobStorageService {
         try {
             String directoryName = hash.substring(0, blobStorageProperties.getDirectoryPrefixLength());
             return Paths.get(blobStorageProperties.getPath(), directoryName);
-        } catch (Exception e) {
+        } catch (Exception exception) {
             throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
         }
     }
@@ -105,7 +105,7 @@ public class BlobStorageService {
             String directoryName = directoryPath.getName(directoryPath.getNameCount() - 1).toString();
             String fileName = hash.substring(blobStorageProperties.getDirectoryPrefixLength());
             return Paths.get(blobStorageProperties.getPath(), directoryName, fileName);
-        } catch (Exception e) {
+        } catch (Exception exception) {
             throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
         }
     }
@@ -116,7 +116,7 @@ public class BlobStorageService {
                 return false;
             }
             return !directory.iterator().hasNext();
-        } catch (Exception e) {
+        } catch (Exception exception) {
             throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
         }
     }

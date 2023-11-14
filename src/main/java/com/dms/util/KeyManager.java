@@ -43,7 +43,7 @@ public class KeyManager {
         RSAPublicKey publicKey;
         RSAPrivateKey privateKey;
 
-        if(Files.exists(privateKeyPath) && Files.exists(publicKeyPath)) {
+        if (Files.exists(privateKeyPath) && Files.exists(publicKeyPath)) {
             privateKey = loadPrivateKey(privateKeyPath);
             publicKey = loadPublicKey(publicKeyPath);
         }
@@ -57,29 +57,37 @@ public class KeyManager {
         }
 
         RSAKey rsaKey = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
-        log.info("Successfully generated RSA Key");
+        log.info("Successfully created RSA Key");
         return rsaKey;
     }
 
     private RSAPrivateKey loadPrivateKey(Path privateKeyPath) {
-        try(FileReader fileReader = new FileReader(privateKeyPath.toString())) {
+        try (FileReader fileReader = new FileReader(privateKeyPath.toString())) {
             PemReader pemReader = new PemReader(fileReader);
             PemObject pemObject = pemReader.readPemObject();
             PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(pemObject.getContent());
-            return (RSAPrivateKey) KeyFactory.getInstance(ALGORITHM).generatePrivate(privateKeySpec);
-        } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            RSAPrivateKey privateKey = (RSAPrivateKey) KeyFactory.getInstance(ALGORITHM).generatePrivate(privateKeySpec);
+            log.info("Successfully loaded private key");
+            return privateKey;
+        } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException exception) {
+            String message = "Couldn't load private key";
+            log.error(message, exception);
+            throw new RuntimeException(message);
         }
     }
 
     private RSAPublicKey loadPublicKey(Path publicKeyPath) {
-        try(FileReader fileReader = new FileReader(publicKeyPath.toString())){
+        try (FileReader fileReader = new FileReader(publicKeyPath.toString())) {
             PemReader pemReader = new PemReader(fileReader);
             PemObject pemObject = pemReader.readPemObject();
             X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(pemObject.getContent());
-            return (RSAPublicKey) KeyFactory.getInstance(ALGORITHM).generatePublic(publicKeySpec);
-        } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            RSAPublicKey publicKey = (RSAPublicKey) KeyFactory.getInstance(ALGORITHM).generatePublic(publicKeySpec);
+            log.info("Successfully loaded public key");
+            return publicKey;
+        } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException exception) {
+            String message = "Couldn't load public key";
+            log.error(message, exception);
+            throw new RuntimeException(message);
         }
     }
 
@@ -90,9 +98,9 @@ public class KeyManager {
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
             log.info("Successfully generated key pair");
             return keyPair;
-        } catch (Exception e) {
-            String message = "RSA key pair couldn't be created";
-            log.error(message);
+        } catch (Exception exception) {
+            String message = "Key pair couldn't be created";
+            log.error(message, exception);
             throw new RuntimeException(message);
         }
     }
@@ -100,10 +108,12 @@ public class KeyManager {
     private void writeKeyToFile(String description, Key key, String filepath) {
         PemObject pemKey = new PemObject(description, key.getEncoded());
 
-        try(PemWriter pemWriter = new PemWriter(new OutputStreamWriter(new FileOutputStream(filepath)))) {
+        try (PemWriter pemWriter = new PemWriter(new OutputStreamWriter(new FileOutputStream(filepath)))) {
             pemWriter.writeObject(pemKey);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save key: " + description);
+        } catch (IOException exception) {
+            String message = "Failed to save key: " + description;
+            log.error(message, exception);
+            throw new RuntimeException(message);
         }
 
         log.info("Successfully saved key {} to file {}", description, filepath);

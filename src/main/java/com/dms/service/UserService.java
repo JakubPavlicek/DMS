@@ -44,11 +44,6 @@ public class UserService implements UserDetailsService {
                              .orElseThrow(() -> new UserNotFoundException("User with email: " + email + " not found"));
     }
 
-    private User getUserById(String userId) {
-        return userRepository.findByUserId(userId)
-                             .orElseThrow(() -> new UserNotFoundException("User with ID: " + userId + " not found"));
-    }
-
     private void validateUniqueEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyExistsException("Email: " + email + " is already taken");

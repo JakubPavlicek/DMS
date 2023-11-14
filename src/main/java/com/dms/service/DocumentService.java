@@ -165,7 +165,11 @@ public class DocumentService {
         log.debug("Request - Deleting document with revisions: documentId={}", documentId);
 
         Document document = getAuthUserDocument(documentId);
-        documentCommonService.deleteDocumentWithRevisions(document);
+
+        List<DocumentRevision> documentRevisions = document.getRevisions();
+        documentRevisions.forEach(revision -> documentCommonService.deleteBlobIfDuplicateHashNotExists(revision.getHash()));
+
+        documentRepository.delete(document);
 
         log.info("Document {} with revisions deleted successfully", documentId);
     }

@@ -3,7 +3,6 @@ package com.dms.service;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
-import com.dms.entity.User;
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
 import com.dms.exception.InvalidRegexInputException;
@@ -52,17 +51,6 @@ public class DocumentCommonService {
         log.debug("Getting revision by document and ID: documentId={}, revisionId={}", document.getDocumentId(), revisionId);
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found for document with ID: " + document.getDocumentId()));
-    }
-
-    public void deleteDocumentWithRevisions(Document document) {
-        List<DocumentRevision> documentRevisions = document.getRevisions();
-        documentRevisions.forEach(revision -> deleteBlobIfDuplicateHashNotExists(revision.getHash()));
-
-        documentRepository.delete(document);
-    }
-
-    public List<Document> getDocumentsByAuthor(User user) {
-        return documentRepository.findAllByAuthor(user);
     }
 
     public void saveDocument(Document document) {

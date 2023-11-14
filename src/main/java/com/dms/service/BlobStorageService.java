@@ -58,7 +58,7 @@ public class BlobStorageService {
 
         try {
             Resource resource = new UrlResource(filePath.toUri());
-            log.info("Blob retrieved succeffully");
+            log.info("Blob retrieved successfully");
             return resource;
         } catch (Exception exception) {
             throw new FileOperationException(FileOperation.READ, "An error occurred while reading the file");

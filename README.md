@@ -31,19 +31,19 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     ├── main
     │   ├── java
     │   │   └── com.dms
-    │   │       ├── config                            // config and properties validation
+    │   │       ├── config                            // Config and properties validation
     │   │       ├── controller                        // REST-API controller
-    │   │       ├── entity                            // database tables
-    │   │       ├── exception                         // exceptions and exception handling
-    │   │       ├── mapper                            // mapping between objects
-    │   │       │   ├── dto                           // dto mappers
-    │   │       │   └── entity                        // entity mappers
+    │   │       ├── entity                            // Database tables
+    │   │       ├── exception                         // Exceptions and exception handling
+    │   │       ├── mapper                            // Mapping between objects
+    │   │       │   ├── dto                           // DTO mappers
+    │   │       │   └── entity                        // Entity mappers
     │   │       ├── repository                        // DAOs
-    │   │       ├── service                           // service
-    │   │       ├── specification                     // specifications used for filtering
-    │   │       ├── util                              // utility classes
-    │   │       ├── validation                        // validation annotations
-    │   │       └── DocumentManagerApplication.java   // main application class
+    │   │       ├── service                           // Service
+    │   │       ├── specification                     // Specifications used for filtering
+    │   │       ├── util                              // Utility classes
+    │   │       ├── validation                        // Validation annotations
+    │   │       └── DocumentManagerApplication.java   // Main application class
     │   └── resources
     │       ├── db.changelog                          // LiquiBase changelogs
     │       ├── static                                // OpenAPI files
@@ -58,8 +58,8 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │       │   ├── response                          // OpenAPI responses
     │       │   ├── schema                            // OpenAPI schemas
     │       │   ├── templates                         // OpenAPI generator templates
-    │       │   └── openapi.yaml                      // main OpenAPI file 
-    │       ├── application.yaml                      // SpringBoot + application config
+    │       │   └── openapi.yaml                      // Main OpenAPI file 
+    │       ├── application.yaml                      // Application config
     │       └── log4j2.yaml                           // Logger config
     └── test
 ```

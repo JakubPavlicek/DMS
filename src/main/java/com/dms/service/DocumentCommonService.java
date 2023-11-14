@@ -65,6 +65,10 @@ public class DocumentCommonService {
         return documentRepository.findAllByAuthor(user);
     }
 
+    public void saveDocument(Document document) {
+        documentRepository.save(document);
+    }
+
     public Document updateDocumentToRevision(Document document, DocumentRevision revision) {
         log.debug("Updating document to revision: documentId={}, revisionId={}", document.getDocumentId(), revision.getRevisionId());
 
@@ -112,6 +116,7 @@ public class DocumentCommonService {
         Long version = 1L;
         for (DocumentRevision revision : documentRevisions) {
             revision.setVersion(version);
+            revisionRepository.save(revision);
             version++;
         }
     }

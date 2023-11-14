@@ -95,6 +95,7 @@ public class DocumentRevisionService {
         // document's previous version was deleted -> decrement current document's version
         if (revision.getVersion().compareTo(document.getVersion()) < 0) {
             document.setVersion(document.getVersion() - 1);
+            documentCommonService.saveDocument(document);
         }
 
         log.info("Revision {} deleted successfully", revisionId);

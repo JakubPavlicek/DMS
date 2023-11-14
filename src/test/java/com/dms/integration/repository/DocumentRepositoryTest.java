@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,13 +40,14 @@ class DocumentRepositoryTest {
 
     @Test
     void whenInvalidDocumentIdAndValidAuthor_thenNoDocumentShouldBeFound() {
-        String documentId = UUID.randomUUID().toString();
+        String documentId = "ad9f1826-f847-4069-b57c-938b8d843c1d";
         assertThat(documentRepository.findByDocumentIdAndAuthor(documentId, document.getAuthor())).isEmpty();
     }
 
     @Test
     void whenInvalidAuthorAndValidDocumentId_thenNoDocumentShouldBeFound() {
         User author = createUser();
+        author.setUserId("ad9f1826-f847-4069-b57c-938b8d843c1d");
         author.setEmail("john@gmail.com");
         author = userRepository.save(author);
 
@@ -57,6 +57,7 @@ class DocumentRepositoryTest {
     @Test
     void whenTwoDocumentsWithSameAuthorExists_thenTwoDocumentsShouldBeFound() {
         Document anotherDocument = createDocument(document.getAuthor());
+        anotherDocument.setDocumentId("de5bebab-dc1c-4bc2-bf41-8039c076b63e");
         documentRepository.save(anotherDocument);
 
         assertThat(documentRepository.findAllByAuthor(document.getAuthor()).size()).isEqualTo(2);
@@ -65,6 +66,7 @@ class DocumentRepositoryTest {
     @Test
     void whenInvalidAuthor_thenNoDocumentsShouldBeFound() {
         User author = createUser();
+        author.setUserId("ad9f1826-f847-4069-b57c-938b8d843c1d");
         author.setEmail("john@gmail.com");
         author = userRepository.save(author);
 
@@ -74,6 +76,7 @@ class DocumentRepositoryTest {
     @Test
     void whenTwoEqualHashesExist_thenShouldReturnTrue() {
         Document anotherDocument = createDocument(document.getAuthor());
+        anotherDocument.setDocumentId("ad9f1826-f847-4069-b57c-938b8d843c1d");
         documentRepository.save(anotherDocument);
 
         assertThat(documentRepository.duplicateHashExists(document.getHash())).isTrue();
@@ -82,6 +85,7 @@ class DocumentRepositoryTest {
     @Test
     void whenNoDuplicateHashesExist_thenShouldReturnFalse() {
         Document anotherDocument = createDocument(document.getAuthor());
+        anotherDocument.setDocumentId("ad9f1826-f847-4069-b57c-938b8d843c1d");
         anotherDocument.setHash("04cda4ddf5773cbc4f80452696112091f60380015b17973aae8a11f3d92e7c7d");
         documentRepository.save(anotherDocument);
 
@@ -106,6 +110,7 @@ class DocumentRepositoryTest {
     @Test
     void whenTwoDistinctAuthorsOfTheSameDocumentExist_thenShouldReturnFalse() {
         User author = createUser();
+        author.setUserId("ad9f1826-f847-4069-b57c-938b8d843c1d");
         author.setEmail("john@gmail.com");
         author = userRepository.save(author);
 
@@ -114,8 +119,7 @@ class DocumentRepositoryTest {
 
     private User createUser() {
         return User.builder()
-                   .userId(UUID.randomUUID()
-                               .toString())
+                   .userId("6ab79b7e-4cb0-481c-8fc0-0e40c5bd076b")
                    .name("james")
                    .email("james@gmail.com")
                    .password("secret123!")
@@ -125,15 +129,14 @@ class DocumentRepositoryTest {
     private Document createDocument(User author) {
         return Document.builder()
                        .author(author)
-                       .documentId(UUID.randomUUID()
-                                       .toString())
+                       .documentId("3195ce96-c5c6-447c-9437-55d8d6fcf785")
                        .version(1L)
                        .name("dog.jpeg")
                        .type("image/jpeg")
                        .path("/test")
                        .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
-                       .createdAt(LocalDateTime.now())
-                       .updatedAt(LocalDateTime.now())
+                       .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
+                       .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                        .build();
     }
 

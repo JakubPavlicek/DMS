@@ -5,6 +5,10 @@ storage:
 hash:
   algorithm: SHA-256
 
+rsa:
+  private-key: src/main/resources/certs/private.pem
+  public-key: src/main/resources/certs/public.pem
+
 server:
   error:
     path: /errors

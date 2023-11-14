@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -22,7 +20,7 @@ class UserRepositoryTest {
     @BeforeEach
     void setUp() {
         user = User.builder()
-                   .userId(UUID.randomUUID().toString())
+                   .userId("24af2142-0183-432a-89a7-78ea84a663f9")
                    .name("james")
                    .email("james@gmail.com")
                    .password("secret123!")
@@ -48,7 +46,7 @@ class UserRepositoryTest {
 
     @Test
     void whenInvalidUserId_thenNoUserShouldBeFound() {
-        assertThat(userRepository.findByUserId(UUID.randomUUID().toString())).isEmpty();
+        assertThat(userRepository.findByUserId("b3a4f897-cfd3-4f1b-a68c-8c175963f0a0")).isEmpty();
     }
 
     @Test

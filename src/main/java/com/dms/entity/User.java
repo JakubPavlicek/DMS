@@ -49,15 +49,18 @@ public class User implements UserDetails {
         length = 40,
         nullable = false
     )
+    @ToString.Exclude
     private String name;
 
     @Column(
         nullable = false,
         unique = true
     )
+    @ToString.Exclude
     private String email;
 
     @Column(nullable = false)
+    @ToString.Exclude
     private String password;
 
     @PrePersist

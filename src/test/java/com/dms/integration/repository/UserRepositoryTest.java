@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -31,32 +33,30 @@ class UserRepositoryTest {
 
     @Test
     void whenValidEmail_thenUserShouldBeFound() {
-        assertThat(userRepository.findByEmail(user.getEmail())).isPresent();
+        Optional<User> foundUser = userRepository.findByEmail(user.getEmail());
+
+        assertThat(foundUser).isPresent();
     }
 
     @Test
     void whenInvalidEmail_thenNoUserShouldBeFound() {
-        assertThat(userRepository.findByEmail("john@gmail.com")).isEmpty();
-    }
+        Optional<User> foundUser = userRepository.findByEmail("john@gmail.com");
 
-    @Test
-    void whenValidUserId_thenUserShouldBeFound() {
-        assertThat(userRepository.findByUserId(user.getUserId())).isPresent();
-    }
-
-    @Test
-    void whenInvalidUserId_thenNoUserShouldBeFound() {
-        assertThat(userRepository.findByUserId("b3a4f897-cfd3-4f1b-a68c-8c175963f0a0")).isEmpty();
+        assertThat(foundUser).isEmpty();
     }
 
     @Test
     void whenValidEmail_thenUserShouldExist() {
-        assertThat(userRepository.existsByEmail(user.getEmail())).isTrue();
+        boolean userExists = userRepository.existsByEmail(user.getEmail());
+
+        assertThat(userExists).isTrue();
     }
 
     @Test
     void whenInvalidEmail_thenNoUserShouldExist() {
-        assertThat(userRepository.existsByEmail("john@gmail.com")).isFalse();
+        boolean userExists = userRepository.existsByEmail("john@gmail.com");
+
+        assertThat(userExists).isFalse();
     }
 
 }

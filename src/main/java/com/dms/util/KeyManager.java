@@ -4,15 +4,10 @@ import com.dms.config.KeyProperties;
 import com.nimbusds.jose.jwk.RSAKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemReader;
-import org.bouncycastle.util.io.pem.PemWriter;
 import org.springframework.stereotype.Component;
 
-import java.io.FileOutputStream;
-import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,6 +21,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 @Component
 @RequiredArgsConstructor
@@ -33,68 +29,17 @@ import java.security.spec.X509EncodedKeySpec;
 public class KeyManager {
 
     private final static String ALGORITHM = "RSA";
+    private final static int KEY_SIZE = 2048;
+
+    private final static String PRIVATE_KEY = "RSA PRIVATE";
+    private final static String PUBLIC_KEY = "RSA PUBLIC";
 
     private final KeyProperties keyProperties;
-
-    public RSAKey getRsaKey() {
-        Path privateKeyPath = Paths.get(keyProperties.getPrivateKey());
-        Path publicKeyPath = Paths.get(keyProperties.getPublicKey());
-
-        RSAPublicKey publicKey;
-        RSAPrivateKey privateKey;
-
-        if (Files.exists(privateKeyPath) && Files.exists(publicKeyPath)) {
-            privateKey = loadPrivateKey(privateKeyPath);
-            publicKey = loadPublicKey(publicKeyPath);
-        }
-        else {
-            KeyPair keyPair = generateRsaKeyPair();
-            privateKey = (RSAPrivateKey) keyPair.getPrivate();
-            publicKey = (RSAPublicKey) keyPair.getPublic();
-
-            writeKeyToFile("RSA PRIVATE KEY", privateKey, privateKeyPath.toString());
-            writeKeyToFile("RSA PUBLIC KEY", publicKey, publicKeyPath.toString());
-        }
-
-        RSAKey rsaKey = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
-        log.info("Successfully created RSA Key");
-        return rsaKey;
-    }
-
-    private RSAPrivateKey loadPrivateKey(Path privateKeyPath) {
-        try (FileReader fileReader = new FileReader(privateKeyPath.toString())) {
-            PemReader pemReader = new PemReader(fileReader);
-            PemObject pemObject = pemReader.readPemObject();
-            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(pemObject.getContent());
-            RSAPrivateKey privateKey = (RSAPrivateKey) KeyFactory.getInstance(ALGORITHM).generatePrivate(privateKeySpec);
-            log.info("Successfully loaded private key");
-            return privateKey;
-        } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException exception) {
-            String message = "Couldn't load private key";
-            log.error(message, exception);
-            throw new RuntimeException(message);
-        }
-    }
-
-    private RSAPublicKey loadPublicKey(Path publicKeyPath) {
-        try (FileReader fileReader = new FileReader(publicKeyPath.toString())) {
-            PemReader pemReader = new PemReader(fileReader);
-            PemObject pemObject = pemReader.readPemObject();
-            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(pemObject.getContent());
-            RSAPublicKey publicKey = (RSAPublicKey) KeyFactory.getInstance(ALGORITHM).generatePublic(publicKeySpec);
-            log.info("Successfully loaded public key");
-            return publicKey;
-        } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException exception) {
-            String message = "Couldn't load public key";
-            log.error(message, exception);
-            throw new RuntimeException(message);
-        }
-    }
 
     private KeyPair generateRsaKeyPair() {
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
-            keyPairGenerator.initialize(2048);
+            keyPairGenerator.initialize(KEY_SIZE);
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
             log.info("Successfully generated key pair");
             return keyPair;
@@ -105,18 +50,77 @@ public class KeyManager {
         }
     }
 
-    private void writeKeyToFile(String description, Key key, String filepath) {
-        PemObject pemKey = new PemObject(description, key.getEncoded());
+    public RSAKey getRsaKey() {
+        Path privateKeyPath = Paths.get(keyProperties.getPrivateKey());
+        Path publicKeyPath = Paths.get(keyProperties.getPublicKey());
 
-        try (PemWriter pemWriter = new PemWriter(new OutputStreamWriter(new FileOutputStream(filepath)))) {
-            pemWriter.writeObject(pemKey);
-        } catch (IOException exception) {
-            String message = "Failed to save key: " + description;
+        RSAPrivateKey privateKey;
+        RSAPublicKey publicKey;
+
+        if (Files.exists(privateKeyPath) && Files.exists(publicKeyPath)) {
+            privateKey = (RSAPrivateKey) loadKey(PRIVATE_KEY, privateKeyPath);
+            publicKey = (RSAPublicKey) loadKey(PUBLIC_KEY, publicKeyPath);
+        }
+        else {
+            KeyPair keyPair = generateRsaKeyPair();
+            privateKey = (RSAPrivateKey) keyPair.getPrivate();
+            publicKey = (RSAPublicKey) keyPair.getPublic();
+
+            writeKeyToFile(PRIVATE_KEY, privateKey, privateKeyPath.toString());
+            writeKeyToFile(PUBLIC_KEY, publicKey, publicKeyPath.toString());
+        }
+
+        RSAKey rsaKey = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
+        log.info("Successfully created {} key", ALGORITHM);
+        return rsaKey;
+    }
+
+    private Key loadKey(String keyType, Path keyPath) {
+        try {
+            byte[] keyBytes = Files.readAllBytes(keyPath);
+
+            String encodedKey = new String(keyBytes)
+                .replaceAll("\n", "")
+                .replace("-----BEGIN " + keyType + " KEY-----", "")
+                .replace("-----END " + keyType + " KEY-----", "");
+
+            keyBytes = Base64.getDecoder().decode(encodedKey);
+
+            KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
+
+            if (keyType.equals(PRIVATE_KEY))
+            {
+                PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+                return keyFactory.generatePrivate(keySpec);
+            }
+            else
+            {
+                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+                return keyFactory.generatePublic(keySpec);
+            }
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException exception) {
+            String message = "Couldn't load " + keyType + " key";
             log.error(message, exception);
             throw new RuntimeException(message);
         }
+    }
 
-        log.info("Successfully saved key {} to file {}", description, filepath);
+    private void writeKeyToFile(String keyType, Key key, String filepath) {
+        byte[] keyBytes = key.getEncoded();
+        String encodedKey = Base64.getEncoder().encodeToString(keyBytes);
+
+        try(FileWriter fileWriter = new FileWriter(filepath))
+        {
+            fileWriter.write("-----BEGIN " + keyType + " KEY-----\n");
+            fileWriter.write(encodedKey);
+            fileWriter.write("\n-----END " + keyType + " KEY-----");
+        } catch (IOException exception) {
+            String message = "Failed to save " + keyType + " key";
+            log.error(message, exception);
+            throw new RuntimeException(exception);
+        }
+
+        log.info("Successfully saved {} key to file {}", keyType, filepath);
     }
 
 }

@@ -6,6 +6,10 @@ import org.springframework.data.domain.Page;
 
 public class PageWithDocumentsDTOMapper {
 
+    private PageWithDocumentsDTOMapper()
+    {
+    }
+
     public static PageWithDocumentsDTO map(Page<DocumentDTO> documentDtoPage) {
         return PageWithDocumentsDTO.builder()
                                    .content(documentDtoPage.getContent())

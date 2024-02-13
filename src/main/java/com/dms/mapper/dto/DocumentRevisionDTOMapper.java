@@ -5,6 +5,10 @@ import com.dms.entity.DocumentRevision;
 
 public class DocumentRevisionDTOMapper {
 
+    private DocumentRevisionDTOMapper()
+    {
+    }
+
     public static DocumentRevisionDTO map(DocumentRevision revision) {
         return DocumentRevisionDTO.builder()
                                   .revisionId(revision.getRevisionId())

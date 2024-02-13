@@ -5,6 +5,10 @@ import org.springframework.data.domain.Sort;
 
 public class SortDTOMapper {
 
+    private SortDTOMapper()
+    {
+    }
+
     public static SortDTO map(Sort sort) {
         return SortDTO.builder()
                       .empty(sort.isEmpty())

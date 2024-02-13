@@ -6,6 +6,10 @@ import org.springframework.data.domain.Page;
 
 public class PageWithRevisionsDTOMapper {
 
+    private PageWithRevisionsDTOMapper()
+    {
+    }
+
     public static PageWithRevisionsDTO map(Page<DocumentRevisionDTO> revisionDtoPage) {
         return PageWithRevisionsDTO.builder()
                                    .content(revisionDtoPage.getContent())

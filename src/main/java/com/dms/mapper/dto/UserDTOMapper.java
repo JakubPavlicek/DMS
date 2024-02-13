@@ -6,6 +6,10 @@ import com.dms.entity.User;
 
 public class UserDTOMapper {
 
+    private UserDTOMapper()
+    {
+    }
+
     public static UserDTO mapToUserDTO(User user) {
         return UserDTO.builder()
                       .userId(user.getUserId())

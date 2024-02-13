@@ -5,6 +5,10 @@ import com.dms.entity.Document;
 
 public class DocumentDTOMapper {
 
+    private DocumentDTOMapper()
+    {
+    }
+
     public static DocumentDTO map(Document document) {
         return DocumentDTO.builder()
                           .documentId(document.getDocumentId())

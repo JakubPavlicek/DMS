@@ -1,5 +1,5 @@
 storage:
-  path: /Users/kuba/Downloads/blob_storage
+  path: src/test/resources/file
   directory-prefix-length: 2
 
 hash:

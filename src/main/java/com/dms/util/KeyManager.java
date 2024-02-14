@@ -15,10 +15,8 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -80,7 +78,7 @@ public class KeyManager {
             byte[] keyBytes = Files.readAllBytes(keyPath);
 
             String encodedKey = new String(keyBytes)
-                .replaceAll("\n", "")
+                .replaceAll("\\n", "")
                 .replace("-----BEGIN " + keyType + " KEY-----", "")
                 .replace("-----END " + keyType + " KEY-----", "");
 
@@ -98,7 +96,7 @@ public class KeyManager {
                 X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
                 return keyFactory.generatePublic(keySpec);
             }
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException exception) {
+        } catch (Exception exception) {
             String message = "Couldn't load " + keyType + " key";
             log.error(message, exception);
             throw new RuntimeException(message);

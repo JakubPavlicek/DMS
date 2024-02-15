@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -28,7 +27,7 @@ class HashServiceTest {
     void whenValidFile_thenHashShouldBeCreated() {
         when(hashProperties.getAlgorithm()).thenReturn("SHA-256");
 
-        MultipartFile file = new MockMultipartFile("document.pdf", "Some text".getBytes());
+        MockMultipartFile file = new MockMultipartFile("document.pdf", "Some text".getBytes());
 
         String hash = hashService.hashFile(file);
 
@@ -39,7 +38,7 @@ class HashServiceTest {
     void whenInvalidHashAlgorithm_thenExceptionShouldBeThrown() {
         when(hashProperties.getAlgorithm()).thenReturn("algorithm");
 
-        MultipartFile file = new MockMultipartFile("document.pdf", "Some text".getBytes());
+        MockMultipartFile file = new MockMultipartFile("document.pdf", "Some text".getBytes());
 
         assertThatExceptionOfType(FileOperationException.class).isThrownBy(() -> hashService.hashFile(file));
     }

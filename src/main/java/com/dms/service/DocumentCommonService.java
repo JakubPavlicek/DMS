@@ -49,6 +49,7 @@ public class DocumentCommonService {
 
     public DocumentRevision getRevisionByDocumentAndId(Document document, String revisionId) {
         log.debug("Getting revision by document and ID: documentId={}, revisionId={}", document.getDocumentId(), revisionId);
+
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found for document with ID: " + document.getDocumentId()));
     }
@@ -198,13 +199,13 @@ public class DocumentCommonService {
         }
     }
 
-    public void deleteBlobIfDuplicateHashNotExists(String hash) {
-        if (!isDuplicateHashPresent(hash)) {
+    public void deleteBlobIfNoDuplicateHash(String hash) {
+        if (!isHashDuplicate(hash)) {
             blobStorageService.deleteBlob(hash);
         }
     }
 
-    private boolean isDuplicateHashPresent(String hash) {
+    private boolean isHashDuplicate(String hash) {
         return documentRepository.duplicateHashExists(hash) || revisionRepository.duplicateHashExists(hash);
     }
 

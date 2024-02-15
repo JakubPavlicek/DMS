@@ -38,7 +38,7 @@ public class DocumentRevisionService {
     private final DocumentCommonService documentCommonService;
     private final UserService userService;
 
-    public DocumentRevision getAuthUserRevision(String revisionId) {
+    public DocumentRevision getAuthenticatedUserRevision(String revisionId) {
         log.debug("Getting revision: revisionId={}", revisionId);
         User user = userService.getAuthenticatedUser();
         return revisionRepository.findByRevisionIdAndAuthor(revisionId, user)
@@ -48,7 +48,7 @@ public class DocumentRevisionService {
     public DocumentRevisionDTO getRevision(String revisionId) {
         log.debug("Request - Getting revision: revisionId={}", revisionId);
 
-        DocumentRevision revision = getAuthUserRevision(revisionId);
+        DocumentRevision revision = getAuthenticatedUserRevision(revisionId);
         log.info("Revision {} retrieved successfully", revisionId);
 
         return DocumentRevisionDTOMapper.map(revision);
@@ -60,13 +60,13 @@ public class DocumentRevisionService {
                                                                .orElse(revisionRepository.findNextByDocumentAndVersion(document, currentVersion)
                                                                                          .orElse(null));
 
-        log.debug("Replacing document with adjacent revision: document={}, replacingRevision={}", document, replacingRevision);
-
         if (replacingRevision == null) {
             throw new RevisionDeletionException(
-                "Revision cannnot be deleted because this is the only version left for the document with ID: " + document.getDocumentId()
+                "Revision cannot be deleted because this is the only version left for the document with ID: " + document.getDocumentId()
             );
         }
+
+        log.debug("Replacing document with adjacent revision: document={}, replacingRevision={}", document, replacingRevision);
 
         documentCommonService.updateDocumentToRevision(document, replacingRevision);
     }
@@ -79,7 +79,7 @@ public class DocumentRevisionService {
     public void deleteRevision(String revisionId) {
         log.debug("Request - Deleting revision: revisionId={}", revisionId);
 
-        DocumentRevision revision = getAuthUserRevision(revisionId);
+        DocumentRevision revision = getAuthenticatedUserRevision(revisionId);
         Document document = revision.getDocument();
 
         // revision which is also a current document is being deleted -> switch document to adjacent revision
@@ -87,7 +87,7 @@ public class DocumentRevisionService {
             replaceDocumentWithAdjacentRevision(document);
         }
 
-        documentCommonService.deleteBlobIfDuplicateHashNotExists(revision.getHash());
+        documentCommonService.deleteBlobIfNoDuplicateHash(revision.getHash());
         revisionRepository.deleteByRevisionId(revisionId);
 
         documentCommonService.updateRevisionVersionsForDocument(document);
@@ -104,9 +104,8 @@ public class DocumentRevisionService {
     public ResponseEntity<Resource> downloadRevision(String revisionId) {
         log.debug("Request - Downloading revision: revisionId={}", revisionId);
 
-        DocumentRevision revision = getAuthUserRevision(revisionId);
-        String hash = revision.getHash();
-        Resource file = documentCommonService.getBlob(hash);
+        DocumentRevision revision = getAuthenticatedUserRevision(revisionId);
+        Resource file = documentCommonService.getBlob(revision.getHash());
 
         log.info("Revision {} downloaded successfully", revisionId);
 

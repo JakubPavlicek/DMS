@@ -6,7 +6,6 @@ import com.dms.dto.UserRegisterDTO;
 import com.dms.entity.User;
 import com.dms.exception.EmailAlreadyExistsException;
 import com.dms.exception.UserNotFoundException;
-import com.dms.mapper.dto.UserDTOMapper;
 import com.dms.repository.UserRepository;
 import com.dms.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -27,7 +25,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,6 +52,7 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         user = User.builder()
+                   .userId("0e60c305-f63c-4a69-9d93-e73cebd2c070")
                    .name("james")
                    .email("james@gmail.com")
                    .password("secret123!")
@@ -137,19 +135,12 @@ class UserServiceTest {
         when(userRepository.save(any())).thenReturn(savedUser);
         when(passwordEncoder.encode(any())).thenReturn(hashedPassword);
 
-        MockedStatic<UserDTOMapper> staticMock = mockStatic(UserDTOMapper.class);
-
-        when(UserDTOMapper.mapToUser(any(UserRegisterDTO.class))).thenReturn(user);
-        when(UserDTOMapper.mapToUserDTO(any(User.class))).thenReturn(userDTO);
-
         UserDTO actualUser = userService.createUser(userRegisterDTO);
 
         assertThat(actualUser).isEqualTo(userDTO);
 
         verify(userRepository, times(1)).existsByEmail(any());
         verify(userRepository, times(1)).save(any());
-
-        staticMock.close();
     }
 
     @Test
@@ -163,6 +154,8 @@ class UserServiceTest {
         when(userRepository.existsByEmail(any())).thenReturn(true);
 
         assertThatThrownBy(() -> userService.createUser(userRegisterDTO)).isInstanceOf(EmailAlreadyExistsException.class);
+
+        verify(userRepository, times(1)).existsByEmail(any());
     }
 
     @Test
@@ -179,15 +172,11 @@ class UserServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        MockedStatic<UserDTOMapper> staticMock = mockStatic(UserDTOMapper.class);
-
-        when(UserDTOMapper.mapToUserDTO(user)).thenReturn(userDTO);
-
         UserDTO currentUser = userService.getCurrentUser();
 
         assertThat(currentUser).isEqualTo(userDTO);
 
-        staticMock.close();
+        verify(userRepository, times(1)).findByEmail(any());
     }
 
     @Test
@@ -212,6 +201,9 @@ class UserServiceTest {
         userService.changePassword(userLoginDTO);
 
         assertThat(user.getPassword()).isEqualTo(hashedPassword);
+
+        verify(userRepository, times(1)).findByEmail(any());
+        verify(userRepository, times(1)).save(any());
     }
 
     @Test
@@ -224,6 +216,8 @@ class UserServiceTest {
         when(userRepository.findByEmail(any())).thenThrow(UserNotFoundException.class);
 
         assertThatThrownBy(() -> userService.changePassword(userLoginDTO)).isInstanceOf(UserNotFoundException.class);
+
+        verify(userRepository, times(0)).save(any());
     }
 
 }

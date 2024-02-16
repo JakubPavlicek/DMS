@@ -52,27 +52,37 @@ public class UserService implements UserDetailsService {
 
     public UserDTO createUser(UserRegisterDTO userRegister) {
         log.debug("Request - Creating user");
+
         validateUniqueEmail(userRegister.getEmail());
 
         User user = UserDTOMapper.mapToUser(userRegister);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         User savedUser = userRepository.save(user);
+
         log.info("Successfully created user {}", savedUser.getUserId());
+
         return UserDTOMapper.mapToUserDTO(savedUser);
     }
 
     public UserDTO getCurrentUser() {
         log.debug("Request - Retrieving current user");
+
         User authUser = getAuthenticatedUser();
+
         log.info("Successfully retrieved current user");
+
         return UserDTOMapper.mapToUserDTO(authUser);
     }
 
     public void changePassword(UserLoginDTO userLogin) {
         log.debug("Request - Changing users password");
+
         User user = getUserByEmail(userLogin.getEmail());
         user.setPassword(passwordEncoder.encode(userLogin.getPassword()));
+
         userRepository.save(user);
+
         log.info("Successfully changed users {} password", user.getUserId());
     }
 

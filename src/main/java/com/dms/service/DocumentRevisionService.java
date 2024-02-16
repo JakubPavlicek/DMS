@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -56,17 +57,25 @@ public class DocumentRevisionService {
 
     private void replaceDocumentWithAdjacentRevision(Document document) {
         Long currentVersion = document.getVersion();
-        DocumentRevision replacingRevision = revisionRepository.findPreviousByDocumentAndVersion(document, currentVersion)
-                                                               .orElse(revisionRepository.findNextByDocumentAndVersion(document, currentVersion)
-                                                                                         .orElse(null));
 
-        if (replacingRevision == null) {
+        Optional<DocumentRevision> previousRevision = revisionRepository.findPreviousByDocumentAndVersion(document, currentVersion);
+        Optional<DocumentRevision> nextRevision = revisionRepository.findNextByDocumentAndVersion(document, currentVersion);
+
+        DocumentRevision replacingRevision;
+
+        if (previousRevision.isPresent()) {
+            replacingRevision = previousRevision.get();
+        }
+        else if (nextRevision.isPresent()) {
+            replacingRevision = nextRevision.get();
+        }
+        else {
             throw new RevisionDeletionException(
                 "Revision cannot be deleted because this is the only version left for the document with ID: " + document.getDocumentId()
             );
         }
 
-        log.debug("Replacing document with adjacent revision: document={}, replacingRevision={}", document, replacingRevision);
+        log.debug("Replacing document with adjacent revision: document={}, revision={}", document, replacingRevision);
 
         documentCommonService.updateDocumentToRevision(document, replacingRevision);
     }
@@ -93,12 +102,20 @@ public class DocumentRevisionService {
         documentCommonService.updateRevisionVersionsForDocument(document);
 
         // document's previous version was deleted -> decrement current document's version
-        if (revision.getVersion().compareTo(document.getVersion()) < 0) {
-            document.setVersion(document.getVersion() - 1);
-            documentCommonService.saveDocument(document);
+        if (hasRevisionLowerVersionThanDocument(revision, document)) {
+            decrementDocumentVersion(document);
         }
 
         log.info("Revision {} deleted successfully", revisionId);
+    }
+
+    private boolean hasRevisionLowerVersionThanDocument(DocumentRevision revision, Document document) {
+        return revision.getVersion().compareTo(document.getVersion()) < 0;
+    }
+
+    private void decrementDocumentVersion(Document document) {
+        document.setVersion(document.getVersion() - 1);
+        documentCommonService.saveDocument(document);
     }
 
     public ResponseEntity<Resource> downloadRevision(String revisionId) {

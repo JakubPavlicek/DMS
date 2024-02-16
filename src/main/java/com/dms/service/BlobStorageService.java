@@ -45,7 +45,7 @@ public class BlobStorageService {
             InputStream fileStream = file.getInputStream();
             Files.copy(fileStream, filePath);
         } catch (Exception exception) {
-            throw new FileOperationException(FileOperation.WRITE, "An error occurred while writing data from file: '" + filename + "' to storage");
+            throw new FileOperationException(FileOperation.WRITE);
         }
 
         log.info("Blob of the file {} stored successfully", filename);
@@ -61,7 +61,7 @@ public class BlobStorageService {
             log.info("Blob retrieved successfully");
             return resource;
         } catch (Exception exception) {
-            throw new FileOperationException(FileOperation.READ, "An error occurred while reading the file");
+            throw new FileOperationException(FileOperation.READ);
         }
     }
 
@@ -75,7 +75,7 @@ public class BlobStorageService {
                 log.info("Blob deleted successfully");
             }
         } catch (Exception exception) {
-            throw new FileOperationException(FileOperation.DELETE, "An error occurred while deleting the file");
+            throw new FileOperationException(FileOperation.DELETE);
         }
 
         Path directoryPath = getDirectoryPath(hash);
@@ -84,29 +84,31 @@ public class BlobStorageService {
             try {
                 Files.deleteIfExists(directoryPath);
             } catch (Exception exception) {
-                throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
+                throw new FileOperationException(FileOperation.DEFAULT);
             }
         }
     }
 
+    private String getDirectoryName(String hash) {
+        return hash.substring(0, blobStorageProperties.getDirectoryPrefixLength());
+    }
+
     private Path getDirectoryPath(String hash) {
         try {
-            String directoryName = hash.substring(0, blobStorageProperties.getDirectoryPrefixLength());
+            String directoryName = getDirectoryName(hash);
             return Paths.get(blobStorageProperties.getPath(), directoryName);
         } catch (Exception exception) {
-            throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
+            throw new FileOperationException(FileOperation.DEFAULT);
         }
     }
 
     private Path getFilePath(String hash) {
-        Path directoryPath = getDirectoryPath(hash);
-
         try {
-            String directoryName = directoryPath.getName(directoryPath.getNameCount() - 1).toString();
+            String directoryName = getDirectoryName(hash);
             String fileName = hash.substring(blobStorageProperties.getDirectoryPrefixLength());
             return Paths.get(blobStorageProperties.getPath(), directoryName, fileName);
         } catch (Exception exception) {
-            throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
+            throw new FileOperationException(FileOperation.DEFAULT);
         }
     }
 
@@ -117,7 +119,7 @@ public class BlobStorageService {
             }
             return !directory.iterator().hasNext();
         } catch (Exception exception) {
-            throw new FileOperationException(FileOperation.DEFAULT, "An error occurred while working with the file");
+            throw new FileOperationException(FileOperation.DEFAULT);
         }
     }
 

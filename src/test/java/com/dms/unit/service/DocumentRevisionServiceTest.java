@@ -87,25 +87,6 @@ class DocumentRevisionServiceTest {
     }
 
     @Test
-    void shouldReturnAuthenticatedUserRevision() {
-        when(userService.getAuthenticatedUser()).thenReturn(author);
-        when(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), author)).thenReturn(Optional.of(revision));
-
-        DocumentRevision actualRevision = documentRevisionService.getAuthenticatedUserRevision(revision.getRevisionId());
-
-        assertThat(actualRevision).isNotNull();
-        assertThat(actualRevision.getRevisionId()).isEqualTo(revision.getRevisionId());
-    }
-
-    @Test
-    void shouldThrowRevisionNotFoundExceptionWhenRevisionIsNotFound() {
-        when(userService.getAuthenticatedUser()).thenReturn(author);
-        when(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), author)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> documentRevisionService.getAuthenticatedUserRevision(revision.getRevisionId())).isInstanceOf(RevisionNotFoundException.class);
-    }
-
-    @Test
     void shouldReturnRevision() {
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), author)).thenReturn(Optional.of(revision));
@@ -117,6 +98,14 @@ class DocumentRevisionServiceTest {
 
         verify(userService, times(1)).getAuthenticatedUser();
         verify(revisionRepository, times(1)).findByRevisionIdAndAuthor(revision.getRevisionId(), author);
+    }
+
+    @Test
+    void shouldThrowRevisionNotFoundExceptionWhenRevisionIsNotFound() {
+        when(userService.getAuthenticatedUser()).thenReturn(author);
+        when(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), author)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> documentRevisionService.getRevision(revision.getRevisionId())).isInstanceOf(RevisionNotFoundException.class);
     }
 
     @Test

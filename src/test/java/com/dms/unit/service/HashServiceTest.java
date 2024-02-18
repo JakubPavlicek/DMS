@@ -25,13 +25,14 @@ class HashServiceTest {
 
     @Test
     void shouldReturnHash() {
+        String expectedHash = "4c2e9e6da31a64c70623619c449a040968cdbea85945bf384fa30ed2d5d24fa3";
         MockMultipartFile file = new MockMultipartFile("document.pdf", "Some text".getBytes());
 
         when(hashProperties.getAlgorithm()).thenReturn("SHA-256");
 
-        String hash = hashService.hashFile(file);
+        String actualHash = hashService.hashFile(file);
 
-        assertThat(hash).isNotEmpty();
+        assertThat(actualHash).isEqualTo(expectedHash);
     }
 
     @Test

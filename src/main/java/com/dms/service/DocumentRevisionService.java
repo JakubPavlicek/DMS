@@ -39,7 +39,7 @@ public class DocumentRevisionService {
     private final DocumentCommonService documentCommonService;
     private final UserService userService;
 
-    public DocumentRevision getAuthenticatedUserRevision(String revisionId) {
+    private DocumentRevision getAuthenticatedUserRevision(String revisionId) {
         log.debug("Getting revision: revisionId={}", revisionId);
         User user = userService.getAuthenticatedUser();
         return revisionRepository.findByRevisionIdAndAuthor(revisionId, user)

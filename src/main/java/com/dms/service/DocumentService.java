@@ -173,7 +173,7 @@ public class DocumentService {
         Document document = getAuthenticatedUserDocument(documentId);
 
         List<DocumentRevision> documentRevisions = document.getRevisions();
-        documentRevisions.forEach(revision -> documentCommonService.deleteBlobIfNoDuplicateHash(revision.getHash()));
+        documentRevisions.forEach(revision -> documentCommonService.deleteBlobIfHashIsNotADuplicate(revision.getHash()));
 
         documentRepository.delete(document);
 

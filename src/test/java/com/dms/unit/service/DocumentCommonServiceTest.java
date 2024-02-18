@@ -362,36 +362,36 @@ class DocumentCommonServiceTest {
     }
 
     @Test
-    void shouldDeleteBlobIfNoDuplicateHashExist() {
+    void shouldDeleteBlobIfHashIsNotADuplicate() {
         String hash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
 
         when(documentRepository.duplicateHashExists(hash)).thenReturn(false);
         when(revisionRepository.duplicateHashExists(hash)).thenReturn(false);
 
-        documentCommonService.deleteBlobIfNoDuplicateHash(hash);
+        documentCommonService.deleteBlobIfHashIsNotADuplicate(hash);
 
         verify(blobStorageService, times(1)).deleteBlob(hash);
     }
 
     @Test
-    void shouldNotDeleteBlobIfDuplicateHashExistInDocumentRepository() {
+    void shouldNotDeleteBlobIfHashHasDuplicateInDocumentRepository() {
         String hash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
 
         when(documentRepository.duplicateHashExists(hash)).thenReturn(true);
 
-        documentCommonService.deleteBlobIfNoDuplicateHash(hash);
+        documentCommonService.deleteBlobIfHashIsNotADuplicate(hash);
 
         verify(blobStorageService, never()).deleteBlob(hash);
     }
 
     @Test
-    void shouldNotDeleteBlobIfDuplicateHashExistInRevisionRepository() {
+    void shouldNotDeleteBlobIfHashHasDuplicateInRevisionRepository() {
         String hash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
 
         when(documentRepository.duplicateHashExists(hash)).thenReturn(false);
         when(revisionRepository.duplicateHashExists(hash)).thenReturn(true);
 
-        documentCommonService.deleteBlobIfNoDuplicateHash(hash);
+        documentCommonService.deleteBlobIfHashIsNotADuplicate(hash);
 
         verify(blobStorageService, never()).deleteBlob(hash);
     }

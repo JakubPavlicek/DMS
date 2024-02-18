@@ -197,7 +197,7 @@ public class DocumentCommonService {
         }
     }
 
-    public void deleteBlobIfNoDuplicateHash(String hash) {
+    public void deleteBlobIfHashIsNotADuplicate(String hash) {
         if (!isHashDuplicate(hash)) {
             blobStorageService.deleteBlob(hash);
         }

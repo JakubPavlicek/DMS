@@ -23,7 +23,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,10 +47,10 @@ public class DocumentCommonService {
     private final BlobStorageService blobStorageService;
 
     public DocumentRevision getRevisionByDocumentAndId(Document document, String revisionId) {
-        log.debug("Getting revision by document and ID: documentId={}, revisionId={}", document.getDocumentId(), revisionId);
+        log.debug("Getting revision by document and ID: document={}, revisionId={}", document, revisionId);
 
         return revisionRepository.findByDocumentAndRevisionId(document, revisionId)
-                                 .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found for document with ID: " + document.getDocumentId()));
+                                 .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found for document: " + document));
     }
 
     public void saveDocument(Document document) {
@@ -59,18 +58,17 @@ public class DocumentCommonService {
     }
 
     public Document updateDocumentToRevision(Document document, DocumentRevision revision) {
-        log.debug("Updating document to revision: documentId={}, revisionId={}", document.getDocumentId(), revision.getRevisionId());
+        log.debug("Updating document to revision: document={}, revision={}", document, revision);
 
         document.setName(revision.getName());
         document.setType(revision.getType());
         document.setHash(revision.getHash());
         document.setVersion(revision.getVersion());
-        document.setAuthor(revision.getAuthor());
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields
         Document updatedDocument = documentRepository.saveAndFlush(document);
 
-        log.info("Successfully updated details of document {} from revision {}", document.getDocumentId(), revision.getRevisionId());
+        log.info("Successfully updated details of document {} from revision {}", document, revision);
 
         return updatedDocument;
     }
@@ -89,7 +87,7 @@ public class DocumentCommonService {
 
         DocumentRevision savedRevision = revisionRepository.save(documentRevision);
 
-        log.info("Revision {} saved successfully from document {}", savedRevision.getRevisionId(), document.getDocumentId());
+        log.info("Revision {} saved successfully from document {}", savedRevision, document);
     }
 
     public Long getLastRevisionVersion(Document document) {
@@ -98,7 +96,7 @@ public class DocumentCommonService {
     }
 
     public void updateRevisionVersionsForDocument(Document document) {
-        log.debug("Updating revision versions for document: documentId={}", document.getDocumentId());
+        log.debug("Updating revision versions for document: document={}", document);
 
         List<DocumentRevision> documentRevisions = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(document);
 
@@ -194,8 +192,8 @@ public class DocumentCommonService {
     public String getContentLength(Resource resource) {
         try {
             return String.valueOf(resource.contentLength());
-        } catch (IOException e) {
-            throw new FileOperationException(FileOperation.READ, "Content length could not be retrieved");
+        } catch (Exception e) {
+            throw new FileOperationException(FileOperation.LENGTH);
         }
     }
 

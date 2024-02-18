@@ -167,6 +167,7 @@
                     <excludes>
                         <exclude>com/dms/dto/**</exclude>
                         <exclude>com/dms/*.class</exclude>
+                        <exclude>com/dms/entity/*.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

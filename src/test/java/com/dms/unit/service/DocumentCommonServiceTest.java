@@ -1,9 +1,13 @@
 package com.dms.unit.service;
 
+import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.DocumentRevision_;
+import com.dms.entity.Document_;
 import com.dms.entity.User;
 import com.dms.exception.FileOperationException;
+import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
@@ -16,16 +20,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -211,6 +222,104 @@ class DocumentCommonServiceTest {
 
         verify(revisionRepository, times(1)).findAllByDocumentOrderByCreatedAtAsc(null);
         verify(revisionRepository, never()).save(any(DocumentRevision.class));
+    }
+
+    @Test
+    void testFindRevisions() {
+        Specification<DocumentRevision> specification = mock(Specification.class);
+
+        List<DocumentRevision> revisions = List.of(revision);
+        Pageable pageable = Pageable.unpaged();
+        long totalElements = revisions.size();
+
+        Page<DocumentRevision> pageWithRevisions = new PageImpl<>(revisions, pageable, totalElements);
+
+        when(revisionRepository.findAll(specification, pageable)).thenReturn(pageWithRevisions);
+
+        Page<DocumentRevisionDTO> pageWithRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
+
+        assertThat(pageWithRevisionDTOs.getTotalElements()).isEqualTo(pageWithRevisions.getTotalElements());
+        assertThat(pageWithRevisionDTOs.getTotalPages()).isEqualTo(pageWithRevisions.getTotalPages());
+        assertThat(pageWithRevisionDTOs.getNumber()).isEqualTo(pageWithRevisions.getNumber());
+        assertThat(pageWithRevisionDTOs.getSize()).isEqualTo(pageWithRevisions.getSize());
+        assertThat(pageWithRevisionDTOs.hasNext()).isEqualTo(pageWithRevisions.hasNext());
+        assertThat(pageWithRevisionDTOs.hasPrevious()).isEqualTo(pageWithRevisions.hasPrevious());
+    }
+
+    @Test
+    void shouldReturnDocumentFilters() {
+        String filter = "name:\"doc\",type:\"app\"";
+
+        Map<String, String> filters = documentCommonService.getDocumentFilters(filter);
+
+        assertThat(filters.size()).isEqualTo(2);
+        assertThat(filters.get("name")).isEqualTo("doc");
+        assertThat(filters.get("type")).isEqualTo("app");
+    }
+
+    @Test
+    void shouldThrowInvalidRegexInputExceptionForInvalidDocumentFilter() {
+        String filter = "some regex";
+
+        assertThatThrownBy(() -> documentCommonService.getDocumentFilters(filter)).isInstanceOf(InvalidRegexInputException.class);
+    }
+
+    @Test
+    void shouldReturnRevisionFilters() {
+        String filter = "name:\"doc\",type:\"app\"";
+
+        Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
+
+        assertThat(filters.size()).isEqualTo(2);
+        assertThat(filters.get("name")).isEqualTo("doc");
+        assertThat(filters.get("type")).isEqualTo("app");
+    }
+
+    @Test
+    void shouldThrowInvalidRegexInputExceptionForInvalidRevisionFilter() {
+        String filter = "some regex";
+
+        assertThatThrownBy(() -> documentCommonService.getRevisionFilters(filter)).isInstanceOf(InvalidRegexInputException.class);
+    }
+
+    @Test
+    void shouldReturnDocumentSortOrders() {
+        String sort = "name:desc,type:asc";
+
+        List<Sort.Order> orders = documentCommonService.getDocumentSortOrders(sort);
+
+        assertThat(orders.size()).isEqualTo(2);
+        assertThat(orders.get(0).getProperty()).isEqualTo(Document_.NAME);
+        assertThat(orders.get(0).getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(orders.get(1).getProperty()).isEqualTo(Document_.TYPE);
+        assertThat(orders.get(1).getDirection()).isEqualTo(Sort.Direction.ASC);
+    }
+
+    @Test
+    void shouldThrowInvalidRegexInputExceptionForInvalidDocumentSort() {
+        String sort = "some regex";
+
+        assertThatThrownBy(() -> documentCommonService.getDocumentSortOrders(sort)).isInstanceOf(InvalidRegexInputException.class);
+    }
+
+    @Test
+    void shouldReturnRevisionSortOrders() {
+        String sort = "name:desc,type:asc";
+
+        List<Sort.Order> orders = documentCommonService.getRevisionSortOrders(sort);
+
+        assertThat(orders.size()).isEqualTo(2);
+        assertThat(orders.get(0).getProperty()).isEqualTo(DocumentRevision_.NAME);
+        assertThat(orders.get(0).getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(orders.get(1).getProperty()).isEqualTo(DocumentRevision_.TYPE);
+        assertThat(orders.get(1).getDirection()).isEqualTo(Sort.Direction.ASC);
+    }
+
+    @Test
+    void shouldThrowInvalidRegexInputExceptionForInvalidRevisionSort() {
+        String sort = "some regex";
+
+        assertThatThrownBy(() -> documentCommonService.getRevisionSortOrders(sort)).isInstanceOf(InvalidRegexInputException.class);
     }
 
     @Test

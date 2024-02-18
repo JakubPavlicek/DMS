@@ -51,7 +51,6 @@ class DocumentRevisionServiceTest {
     private DocumentRevisionService documentRevisionService;
 
     private User author;
-    private Document document;
     private DocumentRevision revision;
 
     @BeforeEach
@@ -64,16 +63,16 @@ class DocumentRevisionServiceTest {
                      .password("secret123!")
                      .build();
 
-        document = Document.builder()
-                           .id(1L)
-                           .author(author)
-                           .documentId("d1246d35-3f46-4c57-b037-f9466c313ec3")
-                           .version(2L)
-                           .name("document.txt")
-                           .type("text/plain")
-                           .path("/")
-                           .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
-                           .build();
+        Document document = Document.builder()
+                                    .id(1L)
+                                    .author(author)
+                                    .documentId("d1246d35-3f46-4c57-b037-f9466c313ec3")
+                                    .version(2L)
+                                    .name("document.txt")
+                                    .type("text/plain")
+                                    .path("/")
+                                    .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
+                                    .build();
 
         revision = DocumentRevision.builder()
                                    .id(2L)

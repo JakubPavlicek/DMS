@@ -61,7 +61,7 @@ class UserServiceTest {
     }
 
     @Test
-    void whenValidUsername_thenShouldReturnUser() {
+    void shouldReturnUserByEmail() {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
@@ -74,14 +74,14 @@ class UserServiceTest {
     }
 
     @Test
-    void whenInvalidUsername_thenShouldThrowUserNotFoundException() {
+    void shouldThrowUserNotFoundExceptionWhenUsernameIsInvalid() {
         assertThatThrownBy(() -> userService.loadUserByUsername(user.getEmail())).isInstanceOf(UserNotFoundException.class);
 
         verify(userRepository, times(1)).findByEmail(user.getEmail());
     }
 
     @Test
-    void whenUserIsAuthenticated_thenShouldReturnUser() {
+    void shouldReturnAuthenticatedUser() {
         SecurityContextHolder.setContext(securityContext);
 
         when(authentication.getName()).thenReturn(user.getEmail());
@@ -97,7 +97,7 @@ class UserServiceTest {
     }
 
     @Test
-    void whenUserIsNotAuthenticated_thenShouldThrowUserNotFoundException() {
+    void shouldThrowUserNotFoundExceptionWhenUserIsNotAuthenticated() {
         SecurityContextHolder.setContext(securityContext);
 
         when(authentication.getName()).thenReturn(user.getEmail());
@@ -109,7 +109,7 @@ class UserServiceTest {
     }
 
     @Test
-    void whenValidUserRegister_thenUserShouldBeCreated() {
+    void shouldCreateUser() {
         String hashedPassword = "$2a$10$j53AK./k2ElWhOSsSB757.8WpiGa3naFdVYW.GRWx5kTL77TRCCpG";
 
         UserRegisterDTO userRegisterDTO = UserRegisterDTO.builder()
@@ -145,7 +145,7 @@ class UserServiceTest {
     }
 
     @Test
-    void whenEmailAlreadyExists_thenShouldThrowEmailAlreadyExistsException() {
+    void shouldThrowEmailAlreadyExistsExceptionWhenEmailAlreadyExists() {
         UserRegisterDTO userRegisterDTO = UserRegisterDTO.builder()
                                                          .name("james")
                                                          .email("james@gmail.com")
@@ -160,7 +160,7 @@ class UserServiceTest {
     }
 
     @Test
-    void whenUserIsAuthenticated_thenShouldReturnCurrentUser() {
+    void shouldReturnCurrentUser() {
         UserDTO userDTO = UserDTO.builder()
                                  .userId("0e60c305-f63c-4a69-9d93-e73cebd2c070")
                                  .name("james")
@@ -181,7 +181,7 @@ class UserServiceTest {
     }
 
     @Test
-    void whenValidUserLogin_thenShouldChangePassword() {
+    void shouldChangePassword() {
         String hashedPassword = "$2a$10$tulEZFULNzQ5.uzak/TR9OOIIDA57K7DRijI2BruMmMty5IKSyDwO";
 
         UserLoginDTO userLoginDTO = UserLoginDTO.builder()
@@ -208,7 +208,7 @@ class UserServiceTest {
     }
 
     @Test
-    void whenInvalidUserLogin_thenShouldThrowUserNotFoundExcpetion() {
+    void shouldThrowUserNotFoundExceptionWhenUserLoginIsInvalid() {
         UserLoginDTO userLoginDTO = UserLoginDTO.builder()
                                                 .email("james@gmail.com")
                                                 .password("password123!")

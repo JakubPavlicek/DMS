@@ -72,21 +72,21 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenValidRevisionIdAndAuthor_thenRevisionShouldBeFound() {
+    void shouldFindRevisionByRevisionIdAndAuthor() {
         Optional<DocumentRevision> foundRevision = revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), revision.getAuthor());
 
         assertThat(foundRevision).isPresent();
     }
 
     @Test
-    void whenInvalidRevisionIdAndValidAuthor_thenNoRevisionShouldBeFound() {
+    void shouldNotFindRevisionByRevisionIdAndAuthorWhenRevisionIdIsInvalid() {
         Optional<DocumentRevision> foundRevision = revisionRepository.findByRevisionIdAndAuthor("09bb6fd7-8c8f-4508-9b7b-417f0fe501ba", revision.getAuthor());
 
         assertThat(foundRevision).isEmpty();
     }
 
     @Test
-    void whenInvalidAuthorAndValidRevisionId_thenNoRevisionShouldBeFound() {
+    void shouldNotFindRevisionWhenAuthorIsInvalid() {
         User author = User.builder()
                           .userId("8d118708-9e09-4053-883d-8c2079f5c0a3")
                           .name("john")
@@ -102,21 +102,21 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenValidDocumentAndRevisionId_thenRevisionShouldBeFound() {
+    void shouldFindRevisionWhenByDocumentAndRevisionId() {
         Optional<DocumentRevision> foundRevision = revisionRepository.findByDocumentAndRevisionId(revision.getDocument(), revision.getRevisionId());
 
         assertThat(foundRevision).isPresent();
     }
 
     @Test
-    void whenInvalidRevisionIdAndValidDocument_thenNoRevisionShouldBeFound() {
+    void shouldNotFindRevisionByDocumentAndRevisionIdWhenRevisionIdIsInvalid() {
         Optional<DocumentRevision> foundRevision = revisionRepository.findByDocumentAndRevisionId(revision.getDocument(), "6cf458dc-ee8c-47cb-accc-4a4f5ece0c8f");
 
         assertThat(foundRevision).isEmpty();
     }
 
     @Test
-    void whenInvalidDocumentAndValidRevisionId_thenNoRevisionShouldBeFound() {
+    void shouldNotFindRevisionByDocumentAndRevisionIdWhenDocumentIsInvalid() {
         User author = User.builder()
                           .userId("8d118708-9e09-4053-883d-8c2079f5c0a3")
                           .name("john")
@@ -146,7 +146,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenTwoRevisionsExist_thenRevisionCountShouldBeTwo() {
+    void shouldFindTwoRevisions() {
         DocumentRevision anotherRevision = DocumentRevision.builder()
                                                            .revisionId("57c00a2f-8435-4ea4-91d9-e195680dea37")
                                                            .author(revision.getAuthor())
@@ -166,7 +166,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenTwoReivisonsExist_thenTwoRevisionsOrderedByCreatedAtAscShouldBeReturned() {
+    void shouldReturnTwoRevisionsOrderedByCreatedAtAsc() {
         DocumentRevision anotherRevision = DocumentRevision.builder()
                                                            .revisionId("57c00a2f-8435-4ea4-91d9-e195680dea37")
                                                            .author(revision.getAuthor())
@@ -186,7 +186,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenValidRevisionId_thenRevisionShouldBeDeleted() {
+    void shouldDeleteRevision() {
         revisionRepository.deleteByRevisionId(revision.getRevisionId());
 
         Optional<DocumentRevision> foundRevision = revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), revision.getAuthor());
@@ -195,7 +195,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenInvalidRevisionId_thenRevisionShouldNotBeDeleted() {
+    void shouldNotDeleteRevision() {
         revisionRepository.deleteByRevisionId("57c00a2f-8435-4ea4-91d9-e195680dea37");
 
         Optional<DocumentRevision> foundRevision = revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), revision.getAuthor());
@@ -204,7 +204,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenTwoDuplicateHashesExist_thenShouldReturnTrue() {
+    void shouldReturnTrueWhenTwoDuplicateHashesExist() {
         DocumentRevision anotherRevision = DocumentRevision.builder()
                                                            .revisionId("57c00a2f-8435-4ea4-91d9-e195680dea37")
                                                            .author(revision.getAuthor())
@@ -224,7 +224,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenTwoDistinctHashesExist_thenShouldReturnFalse() {
+    void shouldReturnFalseWhenTwoDistinctHashesExist() {
         DocumentRevision anotherRevision = DocumentRevision.builder()
                                                            .revisionId("57c00a2f-8435-4ea4-91d9-e195680dea37")
                                                            .author(revision.getAuthor())
@@ -244,7 +244,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenValidDocumentAndVersion_thenPreviousRevisionShouldBeFound() {
+    void shouldFindPreviousRevision() {
         DocumentRevision anotherRevision = DocumentRevision.builder()
                                                            .revisionId("57c00a2f-8435-4ea4-91d9-e195680dea37")
                                                            .author(revision.getAuthor())
@@ -264,7 +264,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenInvalidDocumentAndValidVersion_thenNoPreviousRevisionShouldBeFound() {
+    void shouldNotFindPreviousRevisionWhenDocumentIsInvalid() {
         Document document = Document.builder()
                                     .author(revision.getAuthor())
                                     .documentId("8d118708-9e09-4053-883d-8c2079f5c0a3")
@@ -285,14 +285,14 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenRevisionIsTheOnlyOne_thenNoPreviousRevisionShouldBeFound() {
+    void shouldNotFindPreviousRevisionWhenRevisionIsTheOnlyOne() {
         Optional<DocumentRevision> previousRevision = revisionRepository.findPreviousByDocumentAndVersion(revision.getDocument(), revision.getVersion());
 
         assertThat(previousRevision).isEmpty();
     }
 
     @Test
-    void whenValidDocumentAndVersion_thenNextRevisionShouldBeFound() {
+    void shouldFindNextRevision() {
         DocumentRevision anotherRevision = DocumentRevision.builder()
                                                            .revisionId("57c00a2f-8435-4ea4-91d9-e195680dea37")
                                                            .author(revision.getAuthor())
@@ -312,7 +312,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenInvalidDocumentAndValidVersion_thenNoNextRevisionShouldBeFound() {
+    void shouldNotFindNextRevisionWhenDocumentIsInvalid() {
         Document document = Document.builder()
                                     .author(revision.getAuthor())
                                     .documentId("8d118708-9e09-4053-883d-8c2079f5c0a3")
@@ -333,14 +333,14 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenRevisionIsTheOnlyOne_thenNoNextRevisionShouldBeFound() {
+    void shouldNotFindNextRevisionWhenRevisionIsTheOnlyOne() {
         Optional<DocumentRevision> nextRevision = revisionRepository.findNextByDocumentAndVersion(revision.getDocument(), revision.getVersion());
 
         assertThat(nextRevision).isEmpty();
     }
 
     @Test
-    void whenRevisionWithVersionOneIsTheOnlyOne_thenLastRevisionVersionShouldBeOne() {
+    void shouldFindLastRevisionVersionByDocument() {
         Optional<Long> revisionVersion = revisionRepository.findLastRevisionVersionByDocument(revision.getDocument());
 
         assertThat(revisionVersion).isPresent();
@@ -348,7 +348,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenThreeRevisionsExist_thenLastRevisionVersionShouldBeThree() {
+    void shouldFindLastRevisionVersionEqualToThreeWhenThreeRevisionsExist() {
         DocumentRevision anotherRevision = DocumentRevision.builder()
                                                            .revisionId("57c00a2f-8435-4ea4-91d9-e195680dea37")
                                                            .author(revision.getAuthor())
@@ -381,7 +381,7 @@ class DocumentRevisionRepositoryTest {
     }
 
     @Test
-    void whenInvalidDocument_thenNoRevisionVersionShouldBeFound() {
+    void shouldNotFindRevisionVersionWhenDocumentIsInvalid() {
         Document document = Document.builder()
                                     .author(revision.getAuthor())
                                     .documentId("8d118708-9e09-4053-883d-8c2079f5c0a3")

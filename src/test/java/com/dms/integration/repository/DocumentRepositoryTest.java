@@ -54,21 +54,21 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void whenValidDocumentIdAndAuthor_thenDocumentShouldBeFound() {
+    void shouldFindDocumentByDocumentIdAndAuthor() {
         Optional<Document> foundDocument = documentRepository.findByDocumentIdAndAuthor(document.getDocumentId(), document.getAuthor());
 
         assertThat(foundDocument).isPresent();
     }
 
     @Test
-    void whenInvalidDocumentIdAndValidAuthor_thenNoDocumentShouldBeFound() {
+    void shouldNotFindDocumentByDocumentIdAndAuthorWhenDocumentIdIsInvalid() {
         Optional<Document> foundDocument = documentRepository.findByDocumentIdAndAuthor("ad9f1826-f847-4069-b57c-938b8d843c1d", document.getAuthor());
 
         assertThat(foundDocument).isEmpty();
     }
 
     @Test
-    void whenInvalidAuthorAndValidDocumentId_thenNoDocumentShouldBeFound() {
+    void shouldNotFindDocumentByDocumentIdAndAuthorWhenAuthorIsInvalid() {
         User anotherAuthor = User.builder()
                                  .userId("ad9f1826-f847-4069-b57c-938b8d843c1d")
                                  .name("john")
@@ -84,7 +84,7 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void whenTwoDocumentsWithSameAuthorExists_thenTwoDocumentsShouldBeFound() {
+    void shouldFindTwoDocumentsWhenTwoDocumentsWithSameAuthorExists() {
         Document anotherDocument = Document.builder()
                                            .author(author)
                                            .documentId("de5bebab-dc1c-4bc2-bf41-8039c076b63e")
@@ -105,7 +105,7 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void whenInvalidAuthor_thenNoDocumentsShouldBeFound() {
+    void shouldNotFindDocumentsWhenAuthorIsInvalid() {
         User anotherAuthor = User.builder()
                                  .userId("ad9f1826-f847-4069-b57c-938b8d843c1d")
                                  .name("john")
@@ -121,7 +121,7 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void whenTwoEqualHashesExist_thenShouldReturnTrue() {
+    void shouldReturnTrueWhenTwoEqualHashesExist() {
         Document anotherDocument = Document.builder()
                                            .author(author)
                                            .documentId("de5bebab-dc1c-4bc2-bf41-8039c076b63e")
@@ -142,7 +142,7 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void whenNoDuplicateHashesExist_thenShouldReturnFalse() {
+    void shouldReturnFalseWhenNoDuplicateHashesExist() {
         Document anotherDocument = Document.builder()
                                            .author(author)
                                            .documentId("de5bebab-dc1c-4bc2-bf41-8039c076b63e")
@@ -163,28 +163,28 @@ class DocumentRepositoryTest {
     }
 
     @Test
-    void whenDocumentExistsAtPathForGivenAuthor_thenShouldReturnTrue() {
+    void shouldReturnTrueWhenDocumentExistsAtPathForGivenAuthor() {
         boolean duplicateDocumentExists = documentRepository.documentWithPathAlreadyExists(document.getName(), document.getPath(), document.getAuthor());
 
         assertThat(duplicateDocumentExists).isTrue();
     }
 
     @Test
-    void whenTwoDistinctDocumentNamesWithSamePathAndAuthorExist_thenShouldReturnFalse() {
+    void shouldReturnFalseWhenTwoDistinctDocumentNamesWithSamePathAndAuthorExist() {
         boolean duplicateDocumentExists = documentRepository.documentWithPathAlreadyExists("cat.jpeg", document.getPath(), document.getAuthor());
 
         assertThat(duplicateDocumentExists).isFalse();
     }
 
     @Test
-    void whenTwoDistinctPathsWithSameDocumentNameAndAuthorExist_thenShouldReturnFalse() {
+    void shouldReturnFalseWhenTwoDistinctPathsWithSameDocumentNameAndAuthorExist() {
         boolean duplicateDocumentExists = documentRepository.documentWithPathAlreadyExists(document.getName(), "/home", document.getAuthor());
 
         assertThat(duplicateDocumentExists).isFalse();
     }
 
     @Test
-    void whenTwoDistinctAuthorsOfTheSameDocumentExist_thenShouldReturnFalse() {
+    void shouldReturnFalseWhenTwoDistinctAuthorsOfTheSameDocumentExist() {
         User anotherAuthor = User.builder()
                                  .userId("ad9f1826-f847-4069-b57c-938b8d843c1d")
                                  .name("john")

@@ -27,13 +27,13 @@ class RevisionMapperTest {
 
     @ParameterizedTest
     @MethodSource("revisionFieldNames")
-    void whenValidRevisionField_thenReturnCorrectRevisionField(RevisionMapper.Field field, String expectedFieldName) {
+    void shouldReturnCorrectRevisionField(RevisionMapper.Field field, String expectedFieldName) {
         String revisionFieldName = RevisionMapper.getMappedRevisionField(field.name());
         assertThat(revisionFieldName).isEqualTo(expectedFieldName);
     }
 
     @Test
-    void whenInvalidRevisionField_thenThrowException() {
+    void shouldThrowIllegalArgumentExceptionWhenRevisionFieldIsInvalid() {
         assertThatIllegalArgumentException().isThrownBy(() -> RevisionMapper.getMappedRevisionField("null"));
     }
 

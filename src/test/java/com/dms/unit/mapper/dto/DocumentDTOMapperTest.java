@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.*;
 class DocumentDTOMapperTest {
 
     @Test
-    void whenValidDocument_thenReturnDocumentDTO() {
+    void shouldReturnDocumentDTO() {
         User author = User.builder()
                           .userId("fde1be20-54b1-41f6-8506-bdd0d63c189f")
                           .name("james")

@@ -24,7 +24,7 @@ class HashServiceTest {
     private HashService hashService;
 
     @Test
-    void whenValidFile_thenHashShouldBeCreated() {
+    void shouldReturnHash() {
         MockMultipartFile file = new MockMultipartFile("document.pdf", "Some text".getBytes());
 
         when(hashProperties.getAlgorithm()).thenReturn("SHA-256");
@@ -35,7 +35,7 @@ class HashServiceTest {
     }
 
     @Test
-    void whenInvalidHashAlgorithm_thenExceptionShouldBeThrown() {
+    void shouldThrowFileOperationExceptionWhenAlgorithmDoesNotExist() {
         MockMultipartFile file = new MockMultipartFile("document.pdf", "Some text".getBytes());
 
         when(hashProperties.getAlgorithm()).thenReturn("algorithm");

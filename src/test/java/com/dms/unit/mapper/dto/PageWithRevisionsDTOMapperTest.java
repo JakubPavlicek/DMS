@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PageWithRevisionsDTOMapperTest {
 
     @Test
-    void whenValidPageWithRevisions_thenReturnPageWithRevisionsDTO() {
+    void shouldReturnPageWithRevisionsDTO() {
         User author = User.builder()
                           .userId("fde1be20-54b1-41f6-8506-bdd0d63c189f")
                           .name("james")

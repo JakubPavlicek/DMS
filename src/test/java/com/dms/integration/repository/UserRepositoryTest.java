@@ -32,28 +32,28 @@ class UserRepositoryTest {
     }
 
     @Test
-    void whenValidEmail_thenUserShouldBeFound() {
+    void shouldFindUserByEmail() {
         Optional<User> foundUser = userRepository.findByEmail(user.getEmail());
 
         assertThat(foundUser).isPresent();
     }
 
     @Test
-    void whenInvalidEmail_thenNoUserShouldBeFound() {
+    void shouldNotFindUserByEmail() {
         Optional<User> foundUser = userRepository.findByEmail("john@gmail.com");
 
         assertThat(foundUser).isEmpty();
     }
 
     @Test
-    void whenValidEmail_thenUserShouldExist() {
+    void shouldReturnTrueWhenUserExists() {
         boolean userExists = userRepository.existsByEmail(user.getEmail());
 
         assertThat(userExists).isTrue();
     }
 
     @Test
-    void whenInvalidEmail_thenNoUserShouldExist() {
+    void shouldReturnFalseWhenUserDoesNotExist() {
         boolean userExists = userRepository.existsByEmail("john@gmail.com");
 
         assertThat(userExists).isFalse();

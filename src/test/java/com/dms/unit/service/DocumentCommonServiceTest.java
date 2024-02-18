@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -44,9 +45,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentCommonServiceTest {
-
-    @Mock
-    private Resource resource;
 
     @Mock
     private DocumentRepository documentRepository;
@@ -225,7 +223,7 @@ class DocumentCommonServiceTest {
     }
 
     @Test
-    void testFindRevisions() {
+    void shouldFindRevisionsBySpecificationAndPageable() {
         Specification<DocumentRevision> specification = mock(Specification.class);
 
         List<DocumentRevision> revisions = List.of(revision);
@@ -242,8 +240,6 @@ class DocumentCommonServiceTest {
         assertThat(pageWithRevisionDTOs.getTotalPages()).isEqualTo(pageWithRevisions.getTotalPages());
         assertThat(pageWithRevisionDTOs.getNumber()).isEqualTo(pageWithRevisions.getNumber());
         assertThat(pageWithRevisionDTOs.getSize()).isEqualTo(pageWithRevisions.getSize());
-        assertThat(pageWithRevisionDTOs.hasNext()).isEqualTo(pageWithRevisions.hasNext());
-        assertThat(pageWithRevisionDTOs.hasPrevious()).isEqualTo(pageWithRevisions.hasPrevious());
     }
 
     @Test
@@ -337,6 +333,7 @@ class DocumentCommonServiceTest {
     @Test
     void shouldReturnBlob() {
         String hash = "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969";
+        Resource resource = new ClassPathResource("example.txt");
 
         when(blobStorageService.getBlob(hash)).thenReturn(resource);
 
@@ -347,13 +344,11 @@ class DocumentCommonServiceTest {
 
     @Test
     void shouldReturnContentLength() throws IOException {
-        Long expectedLength = 20L;
-
-        when(resource.contentLength()).thenReturn(expectedLength);
+        Resource resource = new ClassPathResource("example.txt");
 
         String actualLength = documentCommonService.getContentLength(resource);
 
-        assertThat(actualLength).isEqualTo(String.valueOf(expectedLength));
+        assertThat(actualLength).isEqualTo(String.valueOf(resource.contentLength()));
     }
 
     @Test

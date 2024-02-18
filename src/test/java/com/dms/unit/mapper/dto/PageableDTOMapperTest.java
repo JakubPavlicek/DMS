@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.*;
 class PageableDTOMapperTest {
 
     @Test
-    void whenValidPageable_thenReturnPageableDTO() {
+    void shouldReturnPageableDTO() {
         Pageable pageable = Pageable.ofSize(10);
 
         PageableDTO pageableDTO = PageableDTOMapper.map(pageable);

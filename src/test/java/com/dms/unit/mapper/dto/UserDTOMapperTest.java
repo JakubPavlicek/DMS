@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.*;
 class UserDTOMapperTest {
 
     @Test
-    void whenValidUser_thenReturnUserDTO() {
+    void shouldReturnUserDTO() {
         User user = User.builder()
                         .userId("195d2cf3-e3fd-4e15-80dd-15e43e63b25b")
                         .name("james")
@@ -26,7 +26,7 @@ class UserDTOMapperTest {
     }
 
     @Test
-    void whenValidUserDTO_thenReturnUser() {
+    void shouldReturnUserWhenUserDTOIsValid() {
         UserDTO userDTO = UserDTO.builder()
                                  .userId("195d2cf3-e3fd-4e15-80dd-15e43e63b25b")
                                  .name("james")
@@ -41,7 +41,7 @@ class UserDTOMapperTest {
     }
 
     @Test
-    void whenValidUserRegisterDTO_thenReturnUser() {
+    void shouldReturnUserWhenUserRegisterDTOIsValid() {
         UserRegisterDTO userRegisterDTO = UserRegisterDTO.builder()
                                                          .name("james")
                                                          .email("james@gmail.com")

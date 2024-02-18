@@ -29,13 +29,13 @@ class DocumentMapperTest {
 
     @ParameterizedTest
     @MethodSource("documentFieldNames")
-    void whenValidDocumentField_thenReturnCorrectDocumentField(DocumentMapper.Field field, String expectedFieldName) {
+    void shouldReturnCorrectDocumentField(DocumentMapper.Field field, String expectedFieldName) {
         String documentFieldName = DocumentMapper.getMappedDocumentField(field.name());
         assertThat(documentFieldName).isEqualTo(expectedFieldName);
     }
 
     @Test
-    void whenInvalidDocumentField_thenThrowException() {
+    void shouldThrowIllegalArgumentExceptionWhenDocumentFieldIsInvalid() {
         assertThatIllegalArgumentException().isThrownBy(() -> DocumentMapper.getMappedDocumentField("null"));
     }
 

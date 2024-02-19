@@ -1,8 +1,10 @@
 package com.dms.unit.service;
 
 import com.dms.dto.DocumentRevisionDTO;
+import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.DocumentRevision_;
 import com.dms.entity.User;
 import com.dms.exception.RevisionDeletionException;
 import com.dms.exception.RevisionNotFoundException;
@@ -10,19 +12,31 @@ import com.dms.repository.DocumentRevisionRepository;
 import com.dms.service.DocumentCommonService;
 import com.dms.service.DocumentRevisionService;
 import com.dms.service.UserService;
+import com.dms.specification.RevisionFilterSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -234,6 +249,50 @@ class DocumentRevisionServiceTest {
         assertThat(revisionDownloadResponse.getHeaders().getContentDisposition().getFilename()).isEqualTo(resource.getFilename());
         assertThat(revisionDownloadResponse.getHeaders().getContentLength()).isEqualTo(resource.contentLength());
         assertThat(revisionDownloadResponse.getBody()).isEqualTo(resource);
+    }
+
+    @Test
+    void shouldReturnRevisions() {
+        int pageNumber = 0;
+        int pageSize = 10;
+        String sort = "name:desc";
+        String filter = "name:\"doc\",type:\"app\"";
+
+        List<Sort.Order> sortOrders = new ArrayList<>();
+        sortOrders.add(new Sort.Order(Sort.Direction.DESC, DocumentRevision_.NAME));
+
+        Map<String, String> filters = new HashMap<>();
+        filters.put(DocumentRevision_.NAME, "doc");
+        filters.put(DocumentRevision_.TYPE, "app");
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
+        Specification<DocumentRevision> specification = RevisionFilterSpecification.filter(filters, author);
+
+        MockedStatic<RevisionFilterSpecification> mockSpecification = mockStatic(RevisionFilterSpecification.class);
+        mockSpecification.when(() -> RevisionFilterSpecification.filter(filters, author)).thenReturn(specification);
+
+        List<DocumentRevisionDTO> revisionsDTOList = List.of(new DocumentRevisionDTO());
+        Page<DocumentRevisionDTO> revisionDTOPage = new PageImpl<>(revisionsDTOList, pageable, revisionsDTOList.size());
+
+        when(userService.getAuthenticatedUser()).thenReturn(author);
+        when(documentCommonService.getRevisionSortOrders(sort)).thenReturn(sortOrders);
+        when(documentCommonService.getRevisionFilters(filter)).thenReturn(filters);
+        when(documentCommonService.findRevisions(specification, pageable)).thenReturn(revisionDTOPage);
+
+        PageWithRevisionsDTO pageWithRevisionsDTO = documentRevisionService.getRevisions(pageNumber, pageSize, sort, filter);
+
+        assertThat(pageWithRevisionsDTO).isNotNull();
+        assertThat(pageWithRevisionsDTO.getContent()).hasSize(revisionDTOPage.getContent().size());
+        assertThat(pageWithRevisionsDTO.getTotalElements()).isEqualTo(revisionDTOPage.getTotalElements());
+        assertThat(pageWithRevisionsDTO.getTotalPages()).isEqualTo(revisionDTOPage.getTotalPages());
+        assertThat(pageWithRevisionsDTO.getFirst()).isEqualTo(revisionDTOPage.isFirst());
+
+        verify(userService, times(1)).getAuthenticatedUser();
+        verify(documentCommonService, times(1)).getRevisionSortOrders(any());
+        verify(documentCommonService, times(1)).getRevisionFilters(anyString());
+        verify(documentCommonService, times(1)).findRevisions(any(), any());
+
+        mockSpecification.close();
     }
 
 }

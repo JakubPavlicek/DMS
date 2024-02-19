@@ -123,13 +123,14 @@ public class DocumentRevisionService {
 
         DocumentRevision revision = getAuthenticatedUserRevision(revisionId);
         Resource file = documentCommonService.getBlob(revision.getHash());
+        String contentLength = documentCommonService.getContentLength(file);
 
         log.info("Revision {} downloaded successfully", revisionId);
 
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(revision.getType()))
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + revision.getName() + "\"")
-                             .header(HttpHeaders.CONTENT_LENGTH, documentCommonService.getContentLength(file))
+                             .header(HttpHeaders.CONTENT_LENGTH, contentLength)
                              .body(file);
     }
 

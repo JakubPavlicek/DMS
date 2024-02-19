@@ -47,7 +47,7 @@ public class DocumentService {
     private final DocumentCommonService documentCommonService;
     private final UserService userService;
 
-    public Document getAuthenticatedUserDocument(String documentId) {
+    private Document getAuthenticatedUserDocument(String documentId) {
         log.debug("Getting document: documentId={}", documentId);
         User user = userService.getAuthenticatedUser();
         return documentRepository.findByDocumentIdAndAuthor(documentId, user)
@@ -88,15 +88,14 @@ public class DocumentService {
         return StringUtils.getFilename(cleanPath);
     }
 
-    private void ensureUniquePath(String path, Document document) {
-        log.debug("Ensuring unique document path: path={}, document={}", path, document);
+    private void ensureUniquePath(String path, String fileName) {
+        log.debug("Ensuring unique document path: path={}, fileName={}", path, fileName);
 
-        String name = document.getName();
-        User author = document.getAuthor();
+        User author = userService.getAuthenticatedUser();
 
         // user can't have a duplicate path for a document with the same name
-        if (documentRepository.documentWithPathAlreadyExists(name, path, author)) {
-            throw new FileWithPathAlreadyExistsException("Document: " + name + " with path: " + path + " already exists");
+        if (documentRepository.documentWithPathAlreadyExists(fileName, path, author)) {
+            throw new FileWithPathAlreadyExistsException("Document: " + fileName + " with path: " + path + " already exists");
         }
     }
 
@@ -104,10 +103,12 @@ public class DocumentService {
     public DocumentDTO uploadDocument(MultipartFile file, DestinationDTO destination) {
         log.debug("Request - Uploading document: file={}, destination={}", file.getOriginalFilename(), destination);
 
+        String fileName = getFilename(file);
         String path = destination.getPath();
-        Document document = createDocument(file, path);
 
-        ensureUniquePath(path, document);
+        ensureUniquePath(path, fileName);
+
+        Document document = createDocument(file, path);
 
         // flush to immediately initialize the "createdAt" and "updatedAt" fields, ensuring the DTO does not contain null values for these properties
         Document savedDocument = documentRepository.saveAndFlush(document);
@@ -124,7 +125,15 @@ public class DocumentService {
         log.debug("Request - Uploading new document version: documentId={}, file={}, destination={}", documentId, file.getOriginalFilename(), destination);
 
         Document oldDocument = getAuthenticatedUserDocument(documentId);
-        Document newDocument = createNewDocumentVersion(oldDocument, file, destination);
+
+        String path = destination == null ? oldDocument.getPath() : destination.getPath();
+        String fileName = getFilename(file);
+
+        if (destination != null) {
+            ensureUniquePath(path, fileName);
+        }
+
+        Document newDocument = createNewDocumentVersion(oldDocument, file, path);
 
         // flush to immediately initialize the "updatedAt" field, ensuring the DTO does not contain null values for this property
         Document savedDocument = documentRepository.saveAndFlush(newDocument);
@@ -136,18 +145,12 @@ public class DocumentService {
         return DocumentDTOMapper.map(savedDocument);
     }
 
-    private Document createNewDocumentVersion(Document oldDocument, MultipartFile file, DestinationDTO destination) {
-        String path = destination == null ? oldDocument.getPath() : destination.getPath();
-
+    private Document createNewDocumentVersion(Document oldDocument, MultipartFile file, String path) {
         Document newDocument = createDocument(file, path);
         newDocument.setId(oldDocument.getId());
         newDocument.setDocumentId(oldDocument.getDocumentId());
         newDocument.setVersion(documentCommonService.getLastRevisionVersion(newDocument) + 1);
         newDocument.setCreatedAt(oldDocument.getCreatedAt());
-
-        if (destination != null) {
-            ensureUniquePath(path, newDocument);
-        }
 
         return newDocument;
     }
@@ -185,14 +188,24 @@ public class DocumentService {
 
         Document document = getAuthenticatedUserDocument(documentId);
         Resource file = documentCommonService.getBlob(document.getHash());
+        String contentLength = documentCommonService.getContentLength(file);
 
         log.info("Document {} downloaded successfully", documentId);
 
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(document.getType()))
                              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
-                             .header(HttpHeaders.CONTENT_LENGTH, documentCommonService.getContentLength(file))
+                             .header(HttpHeaders.CONTENT_LENGTH, contentLength)
                              .body(file);
+    }
+
+    private Page<DocumentDTO> findDocuments(Specification<Document> specification, Pageable pageable) {
+        Page<Document> documents = documentRepository.findAll(specification, pageable);
+        List<DocumentDTO> documentDTOs = documents.stream()
+                                                  .map(DocumentDTOMapper::map)
+                                                  .toList();
+
+        return new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
     }
 
     public PageWithDocumentsDTO getDocuments(int pageNumber, int pageSize, String sort, String filter) {
@@ -213,26 +226,16 @@ public class DocumentService {
         return PageWithDocumentsDTOMapper.map(documentDTOs);
     }
 
-    private Page<DocumentDTO> findDocuments(Specification<Document> specification, Pageable pageable) {
-        Page<Document> documents = documentRepository.findAll(specification, pageable);
-        List<DocumentDTO> documentDTOs = documents.stream()
-                                                  .map(DocumentDTOMapper::map)
-                                                  .toList();
-
-        return new PageImpl<>(documentDTOs, pageable, documents.getTotalElements());
-    }
-
     public PageWithRevisionsDTO getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing document revisions: documentId={} pageNumber={}, pageSize={}, sort={}, filter={}", documentId, pageNumber, pageSize, sort, filter);
 
         Document document = getAuthenticatedUserDocument(documentId);
-        User user = userService.getAuthenticatedUser();
 
         List<Sort.Order> sortOrders = documentCommonService.getRevisionSortOrders(sort);
         Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<DocumentRevision> specification = RevisionFilterSpecification.filterByDocument(document, filters, user);
+        Specification<DocumentRevision> specification = RevisionFilterSpecification.filterByDocument(document, filters, document.getAuthor());
 
         Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
 
@@ -248,7 +251,7 @@ public class DocumentService {
         Document document = getAuthenticatedUserDocument(documentId);
         String path = destination.getPath();
 
-        ensureUniquePath(path, document);
+        ensureUniquePath(path, document.getName());
 
         document.setPath(path);
         Document savedDocument = documentRepository.save(document);

@@ -92,7 +92,6 @@ class DocumentCommonServiceTest {
                                    .type("text/plain")
                                    .hash("5a49eb92b351b9c1812ade678bd12e1a38583772733ee41e8607d3d830426855")
                                    .build();
-
     }
 
     @Test

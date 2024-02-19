@@ -11,6 +11,10 @@ import java.util.Map;
 
 public class DocumentFilterSpecification {
 
+    private DocumentFilterSpecification()
+    {
+    }
+
     public static Specification<Document> filter(Map<String, String> filters, User user) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = FilterPredicateGenerator.getLikePredicates(filters, root, criteriaBuilder);

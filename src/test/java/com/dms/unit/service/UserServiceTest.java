@@ -75,7 +75,9 @@ class UserServiceTest {
 
     @Test
     void shouldThrowUserNotFoundExceptionWhenUsernameIsInvalid() {
-        assertThatThrownBy(() -> userService.loadUserByUsername(user.getEmail())).isInstanceOf(UserNotFoundException.class);
+        String email = user.getEmail();
+
+        assertThatThrownBy(() -> userService.loadUserByUsername(email)).isInstanceOf(UserNotFoundException.class);
 
         verify(userRepository, times(1)).findByEmail(user.getEmail());
     }

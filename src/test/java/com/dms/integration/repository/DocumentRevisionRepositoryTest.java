@@ -343,8 +343,8 @@ class DocumentRevisionRepositoryTest {
     void shouldFindLastRevisionVersionByDocument() {
         Optional<Long> revisionVersion = revisionRepository.findLastRevisionVersionByDocument(revision.getDocument());
 
-        assertThat(revisionVersion).isPresent();
-        assertThat(revisionVersion.get()).isEqualTo(1);
+        assertThat(revisionVersion).isPresent()
+                                   .contains(1L);
     }
 
     @Test
@@ -376,8 +376,8 @@ class DocumentRevisionRepositoryTest {
 
         Optional<Long> revisionVersion = revisionRepository.findLastRevisionVersionByDocument(revision.getDocument());
 
-        assertThat(revisionVersion).isPresent();
-        assertThat(revisionVersion.get()).isEqualTo(3);
+        assertThat(revisionVersion).isPresent()
+                                   .contains(3L);
     }
 
     @Test

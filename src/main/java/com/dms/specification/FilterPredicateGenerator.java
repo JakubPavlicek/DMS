@@ -11,6 +11,10 @@ import java.util.Map;
 
 public class FilterPredicateGenerator {
 
+    private FilterPredicateGenerator()
+    {
+    }
+
     public static <E> List<Predicate> getLikePredicates(Map<String, String> filters, Root<E> root, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 

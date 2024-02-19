@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Key;
+import java.security.KeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -26,15 +27,19 @@ import java.util.Base64;
 @Log4j2
 public class KeyManager {
 
-    private final static String ALGORITHM = "RSA";
-    private final static int KEY_SIZE = 2048;
+    private static final String ALGORITHM = "RSA";
+    private static final int KEY_SIZE = 2048;
 
-    private final static String PRIVATE_KEY = "RSA PRIVATE";
-    private final static String PUBLIC_KEY = "RSA PUBLIC";
+    private static final String PRIVATE_KEY = "RSA PRIVATE";
+    private static final String PUBLIC_KEY = "RSA PUBLIC";
+
+    private static final String KEY_BEGIN = "-----BEGIN ";
+    private static final String KEY_END = "-----END ";
+    private static final String KEY_SUFFIX = " KEY-----";
 
     private final KeyProperties keyProperties;
 
-    private KeyPair generateRsaKeyPair() {
+    private KeyPair generateRsaKeyPair() throws KeyException {
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
             keyPairGenerator.initialize(KEY_SIZE);
@@ -44,11 +49,11 @@ public class KeyManager {
         } catch (Exception exception) {
             String message = "Key pair couldn't be created";
             log.error(message, exception);
-            throw new RuntimeException(message);
+            throw new KeyException(message);
         }
     }
 
-    public RSAKey getRsaKey() {
+    public RSAKey getRsaKey() throws KeyException {
         Path privateKeyPath = Paths.get(keyProperties.getPrivateKey());
         Path publicKeyPath = Paths.get(keyProperties.getPublicKey());
 
@@ -73,14 +78,14 @@ public class KeyManager {
         return rsaKey;
     }
 
-    private Key loadKey(String keyType, Path keyPath) {
+    private Key loadKey(String keyType, Path keyPath) throws KeyException {
         try {
             byte[] keyBytes = Files.readAllBytes(keyPath);
 
             String encodedKey = new String(keyBytes)
                 .replaceAll("\\n", "")
-                .replace("-----BEGIN " + keyType + " KEY-----", "")
-                .replace("-----END " + keyType + " KEY-----", "");
+                .replace(KEY_BEGIN + keyType + KEY_SUFFIX, "")
+                .replace(KEY_END + keyType + KEY_SUFFIX, "");
 
             keyBytes = Base64.getDecoder().decode(encodedKey);
 
@@ -99,23 +104,25 @@ public class KeyManager {
         } catch (Exception exception) {
             String message = "Couldn't load " + keyType + " key";
             log.error(message, exception);
-            throw new RuntimeException(message);
+            throw new KeyException(message);
         }
     }
 
-    private void writeKeyToFile(String keyType, Key key, String filepath) {
+    private void writeKeyToFile(String keyType, Key key, String filepath) throws KeyException {
         byte[] keyBytes = key.getEncoded();
         String encodedKey = Base64.getEncoder().encodeToString(keyBytes);
 
         try(FileWriter fileWriter = new FileWriter(filepath))
         {
-            fileWriter.write("-----BEGIN " + keyType + " KEY-----\n");
+            fileWriter.write(KEY_BEGIN + keyType + KEY_SUFFIX);
+            fileWriter.write("\n");
             fileWriter.write(encodedKey);
-            fileWriter.write("\n-----END " + keyType + " KEY-----");
+            fileWriter.write("\n");
+            fileWriter.write(KEY_END + keyType + KEY_SUFFIX);
         } catch (IOException exception) {
             String message = "Failed to save " + keyType + " key";
             log.error(message, exception);
-            throw new RuntimeException(exception);
+            throw new KeyException(exception);
         }
 
         log.info("Successfully saved {} key to file {}", keyType, filepath);

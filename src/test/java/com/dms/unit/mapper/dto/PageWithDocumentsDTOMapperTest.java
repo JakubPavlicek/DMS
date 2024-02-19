@@ -63,7 +63,7 @@ class PageWithDocumentsDTOMapperTest {
 
         PageWithDocumentsDTO pageWithDocumentsDTO = PageWithDocumentsDTOMapper.map(documentPage);
 
-        assertThat(pageWithDocumentsDTO.getContent().size()).isEqualTo(documentPage.getContent().size());
+        assertThat(pageWithDocumentsDTO.getContent()).hasSize(documentPage.getContent().size());
         assertThat(pageWithDocumentsDTO.getPageable()).isNotNull();
         assertThat(pageWithDocumentsDTO.getLast()).isEqualTo(documentPage.isLast());
         assertThat(pageWithDocumentsDTO.getTotalElements()).isEqualTo(documentPage.getTotalElements());

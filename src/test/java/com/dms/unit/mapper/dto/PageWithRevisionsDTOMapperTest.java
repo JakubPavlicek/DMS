@@ -74,7 +74,7 @@ class PageWithRevisionsDTOMapperTest {
 
         PageWithRevisionsDTO pageWithDocumentsDTO = PageWithRevisionsDTOMapper.map(revisionPage);
 
-        assertThat(pageWithDocumentsDTO.getContent().size()).isEqualTo(revisionPage.getContent().size());
+        assertThat(pageWithDocumentsDTO.getContent()).hasSize(revisionPage.getContent().size());
         assertThat(pageWithDocumentsDTO.getPageable()).isNotNull();
         assertThat(pageWithDocumentsDTO.getLast()).isEqualTo(revisionPage.isLast());
         assertThat(pageWithDocumentsDTO.getTotalElements()).isEqualTo(revisionPage.getTotalElements());

@@ -102,10 +102,12 @@ class DocumentRevisionServiceTest {
 
     @Test
     void shouldThrowRevisionNotFoundExceptionWhenRevisionIsNotFound() {
-        when(userService.getAuthenticatedUser()).thenReturn(author);
-        when(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), author)).thenReturn(Optional.empty());
+        String revisionId = revision.getRevisionId();
 
-        assertThatThrownBy(() -> documentRevisionService.getRevision(revision.getRevisionId())).isInstanceOf(RevisionNotFoundException.class);
+        when(userService.getAuthenticatedUser()).thenReturn(author);
+        when(revisionRepository.findByRevisionIdAndAuthor(revisionId, author)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> documentRevisionService.getRevision(revisionId)).isInstanceOf(RevisionNotFoundException.class);
     }
 
     @Test
@@ -173,12 +175,14 @@ class DocumentRevisionServiceTest {
         revision.setVersion(1L);
         revision.setDocument(document);
 
+        String revisionId = revision.getRevisionId();
+
         when(userService.getAuthenticatedUser()).thenReturn(author);
-        when(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), author)).thenReturn(Optional.of(revision));
+        when(revisionRepository.findByRevisionIdAndAuthor(revisionId, author)).thenReturn(Optional.of(revision));
         when(revisionRepository.findPreviousByDocumentAndVersion(document, document.getVersion())).thenReturn(Optional.empty());
         when(revisionRepository.findNextByDocumentAndVersion(document, document.getVersion())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> documentRevisionService.deleteRevision(revision.getRevisionId())).isInstanceOf(RevisionDeletionException.class);
+        assertThatThrownBy(() -> documentRevisionService.deleteRevision(revisionId)).isInstanceOf(RevisionDeletionException.class);
 
         verify(revisionRepository, times(1)).findPreviousByDocumentAndVersion(document, document.getVersion());
         verify(revisionRepository, times(1)).findNextByDocumentAndVersion(document, document.getVersion());

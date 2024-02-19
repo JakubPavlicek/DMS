@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -125,7 +125,7 @@ public class DocumentCommonService {
         return getFilters(filter, RevisionMapper::getMappedRevisionField);
     }
 
-    private Map<String, String> getFilters(String filter, Function<String, String> fieldMapper) {
+    private Map<String, String> getFilters(String filter, UnaryOperator<String> fieldMapper) {
         if (!filter.matches("(" + FILTER_REGEX + ")+")) {
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
         }
@@ -157,7 +157,7 @@ public class DocumentCommonService {
         return getSortOrders(sort, REVISION_SORT_REGEX, RevisionMapper::getMappedRevisionField);
     }
 
-    private List<Sort.Order> getSortOrders(String sort, String regex, Function<String, String> fieldMapper) {
+    private List<Sort.Order> getSortOrders(String sort, String regex, UnaryOperator<String> fieldMapper) {
         if (!sort.matches("(" + regex + ")+")) {
             throw new InvalidRegexInputException("The 'sort' parameter does not match the expected format");
         }

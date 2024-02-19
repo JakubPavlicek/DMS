@@ -12,6 +12,10 @@ import java.util.Map;
 
 public class RevisionFilterSpecification {
 
+    private RevisionFilterSpecification()
+    {
+    }
+
     public static Specification<DocumentRevision> filter(Map<String, String> filters, User user) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = FilterPredicateGenerator.getLikePredicates(filters, root, criteriaBuilder);

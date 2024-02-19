@@ -106,14 +106,18 @@ class DocumentCommonServiceTest {
 
     @Test
     void shouldThrowExceptionWhenRevisionNotFound() {
-        when(revisionRepository.findByDocumentAndRevisionId(document, revision.getRevisionId())).thenReturn(Optional.empty());
+        String revisionId = revision.getRevisionId();
 
-        assertThatThrownBy(() -> documentCommonService.getRevisionByDocumentAndId(document, revision.getRevisionId())).isInstanceOf(RevisionNotFoundException.class);
+        when(revisionRepository.findByDocumentAndRevisionId(document, revisionId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> documentCommonService.getRevisionByDocumentAndId(document, revisionId)).isInstanceOf(RevisionNotFoundException.class);
     }
 
     @Test
     void shouldThrowRevisionNotFoundExceptionWhenDocumentIsNull() {
-        assertThatThrownBy(() -> documentCommonService.getRevisionByDocumentAndId(null, revision.getRevisionId())).isInstanceOf(RevisionNotFoundException.class);
+        String revisionId = revision.getRevisionId();
+
+        assertThatThrownBy(() -> documentCommonService.getRevisionByDocumentAndId(null, revisionId)).isInstanceOf(RevisionNotFoundException.class);
     }
 
     @Test
@@ -248,9 +252,9 @@ class DocumentCommonServiceTest {
 
         Map<String, String> filters = documentCommonService.getDocumentFilters(filter);
 
-        assertThat(filters.size()).isEqualTo(2);
-        assertThat(filters.get("name")).isEqualTo("doc");
-        assertThat(filters.get("type")).isEqualTo("app");
+        assertThat(filters).hasSize(2)
+                           .containsEntry("name", "doc")
+                           .containsEntry("type", "app");
     }
 
     @Test
@@ -266,9 +270,9 @@ class DocumentCommonServiceTest {
 
         Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
 
-        assertThat(filters.size()).isEqualTo(2);
-        assertThat(filters.get("name")).isEqualTo("doc");
-        assertThat(filters.get("type")).isEqualTo("app");
+        assertThat(filters).hasSize(2)
+                           .containsEntry("name", "doc")
+                           .containsEntry("type", "app");
     }
 
     @Test
@@ -284,11 +288,15 @@ class DocumentCommonServiceTest {
 
         List<Sort.Order> orders = documentCommonService.getDocumentSortOrders(sort);
 
-        assertThat(orders.size()).isEqualTo(2);
-        assertThat(orders.get(0).getProperty()).isEqualTo(Document_.NAME);
-        assertThat(orders.get(0).getDirection()).isEqualTo(Sort.Direction.DESC);
-        assertThat(orders.get(1).getProperty()).isEqualTo(Document_.TYPE);
-        assertThat(orders.get(1).getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(orders).hasSize(2);
+        assertThat(orders.get(0)
+                         .getProperty()).isEqualTo(Document_.NAME);
+        assertThat(orders.get(0)
+                         .getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(orders.get(1)
+                         .getProperty()).isEqualTo(Document_.TYPE);
+        assertThat(orders.get(1)
+                         .getDirection()).isEqualTo(Sort.Direction.ASC);
     }
 
     @Test
@@ -304,11 +312,15 @@ class DocumentCommonServiceTest {
 
         List<Sort.Order> orders = documentCommonService.getRevisionSortOrders(sort);
 
-        assertThat(orders.size()).isEqualTo(2);
-        assertThat(orders.get(0).getProperty()).isEqualTo(DocumentRevision_.NAME);
-        assertThat(orders.get(0).getDirection()).isEqualTo(Sort.Direction.DESC);
-        assertThat(orders.get(1).getProperty()).isEqualTo(DocumentRevision_.TYPE);
-        assertThat(orders.get(1).getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(orders).hasSize(2);
+        assertThat(orders.get(0)
+                         .getProperty()).isEqualTo(DocumentRevision_.NAME);
+        assertThat(orders.get(0)
+                         .getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(orders.get(1)
+                         .getProperty()).isEqualTo(DocumentRevision_.TYPE);
+        assertThat(orders.get(1)
+                         .getDirection()).isEqualTo(Sort.Direction.ASC);
     }
 
     @Test
@@ -390,4 +402,5 @@ class DocumentCommonServiceTest {
 
         verify(blobStorageService, never()).deleteBlob(hash);
     }
+
 }

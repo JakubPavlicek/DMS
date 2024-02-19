@@ -30,6 +30,8 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.security.KeyException;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -72,7 +74,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtEncoder jwtEncoder() {
+    JwtEncoder jwtEncoder() throws KeyException {
         rsaKey = keyManager.getRsaKey();
         JWKSet jwkSet = new JWKSet(rsaKey);
         JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(jwkSet);

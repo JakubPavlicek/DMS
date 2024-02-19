@@ -86,7 +86,9 @@ public class DocumentController implements DocumentsApi {
 
     @Override
     public ResponseEntity<DocumentDTO> uploadNewDocumentVersion(String documentId, MultipartFile file, DestinationDTO destination) {
+        // destination is optional parameter
         String path = destination == null ? null : destination.getPath();
+
         Document document = documentService.uploadNewDocumentVersion(documentId, file, path);
         DocumentDTO documentDTO = DocumentDTOMapper.map(document);
 

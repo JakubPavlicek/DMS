@@ -1,10 +1,5 @@
 package com.dms.unit.service;
 
-import com.dms.dto.DestinationDTO;
-import com.dms.dto.DocumentDTO;
-import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.PageWithDocumentsDTO;
-import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.Document_;
@@ -97,13 +92,13 @@ class DocumentServiceTest {
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(documentRepository.findByDocumentIdAndAuthor(document.getDocumentId(), author)).thenReturn(Optional.of(document));
 
-        DocumentDTO documentDTO = documentService.getDocument(document.getDocumentId());
+        Document actualDocument = documentService.getDocument(document.getDocumentId());
 
-        assertThat(documentDTO).isNotNull();
-        assertThat(documentDTO.getVersion()).isEqualTo(document.getVersion());
-        assertThat(documentDTO.getName()).isEqualTo(document.getName());
-        assertThat(documentDTO.getType()).isEqualTo(document.getType());
-        assertThat(documentDTO.getPath()).isEqualTo(document.getPath());
+        assertThat(actualDocument).isNotNull();
+        assertThat(actualDocument.getVersion()).isEqualTo(document.getVersion());
+        assertThat(actualDocument.getName()).isEqualTo(document.getName());
+        assertThat(actualDocument.getType()).isEqualTo(document.getType());
+        assertThat(actualDocument.getPath()).isEqualTo(document.getPath());
     }
 
     @Test
@@ -130,38 +125,38 @@ class DocumentServiceTest {
                                          .build();
 
         MockMultipartFile file = new MockMultipartFile("document.txt", "some text".getBytes());
-        DestinationDTO destination = new DestinationDTO("/home");
+        String path = "/home";
 
         when(documentCommonService.storeBlob(file)).thenReturn(document.getHash());
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(documentRepository.documentWithPathAlreadyExists(anyString(), anyString(), any(User.class))).thenReturn(false);
-        when(documentRepository.saveAndFlush(any(Document.class))).thenReturn(savedDocument);
+        when(documentRepository.save(any(Document.class))).thenReturn(savedDocument);
 
-        DocumentDTO documentDTO = documentService.uploadDocument(file, destination);
+        Document actualDocument = documentService.uploadDocument(file, path);
 
-        assertThat(documentDTO).isNotNull();
-        assertThat(documentDTO.getDocumentId()).isEqualTo(savedDocument.getDocumentId());
-        assertThat(documentDTO.getPath()).isEqualTo(savedDocument.getPath());
+        assertThat(actualDocument).isNotNull();
+        assertThat(actualDocument.getDocumentId()).isEqualTo(savedDocument.getDocumentId());
+        assertThat(actualDocument.getPath()).isEqualTo(savedDocument.getPath());
 
         verify(documentCommonService, times(1)).storeBlob(any(MultipartFile.class));
         verify(userService, times(2)).getAuthenticatedUser();
         verify(documentRepository, times(1)).documentWithPathAlreadyExists(anyString(), anyString(), any(User.class));
-        verify(documentRepository, times(1)).saveAndFlush(any(Document.class));
+        verify(documentRepository, times(1)).save(any(Document.class));
         verify(documentCommonService, times(1)).saveRevisionFromDocument(any(Document.class));
     }
 
     @Test
     void shouldNotUploadDocumentWhenPathIsNotUnique() {
         MockMultipartFile file = new MockMultipartFile("document.txt", "some text".getBytes());
-        DestinationDTO destination = new DestinationDTO("/home");
+        String path = "/home";
 
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(documentRepository.documentWithPathAlreadyExists(anyString(), anyString(), any(User.class))).thenReturn(true);
 
-        assertThatThrownBy(() -> documentService.uploadDocument(file, destination)).isInstanceOf(FileWithPathAlreadyExistsException.class);
+        assertThatThrownBy(() -> documentService.uploadDocument(file, path)).isInstanceOf(FileWithPathAlreadyExistsException.class);
 
         verify(documentCommonService, never()).storeBlob(any(MultipartFile.class));
-        verify(documentRepository, never()).saveAndFlush(any(Document.class));
+        verify(documentRepository, never()).save(any(Document.class));
         verify(documentRepository, never()).save(any(Document.class));
     }
 
@@ -179,24 +174,24 @@ class DocumentServiceTest {
                                          .build();
 
         MockMultipartFile file = new MockMultipartFile("document.txt", "some text".getBytes());
-        DestinationDTO destination = new DestinationDTO("/home");
+        String path = "/home";
 
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(documentRepository.findByDocumentIdAndAuthor(document.getDocumentId(), author)).thenReturn(Optional.of(document));
         when(documentRepository.documentWithPathAlreadyExists(anyString(), anyString(), any(User.class))).thenReturn(false);
         when(documentCommonService.storeBlob(file)).thenReturn(document.getHash());
         when(documentCommonService.getLastRevisionVersion(any(Document.class))).thenReturn(1L);
-        when(documentRepository.saveAndFlush(any(Document.class))).thenReturn(savedDocument);
+        when(documentRepository.save(any(Document.class))).thenReturn(savedDocument);
 
-        DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(document.getDocumentId(), file, destination);
+        Document actualDocument = documentService.uploadNewDocumentVersion(document.getDocumentId(), file, path);
 
-        assertThat(documentDTO).isNotNull();
-        assertThat(documentDTO.getDocumentId()).isEqualTo(savedDocument.getDocumentId());
-        assertThat(documentDTO.getVersion()).isEqualTo(savedDocument.getVersion());
-        assertThat(documentDTO.getPath()).isEqualTo(savedDocument.getPath());
+        assertThat(actualDocument).isNotNull();
+        assertThat(actualDocument.getDocumentId()).isEqualTo(savedDocument.getDocumentId());
+        assertThat(actualDocument.getVersion()).isEqualTo(savedDocument.getVersion());
+        assertThat(actualDocument.getPath()).isEqualTo(savedDocument.getPath());
 
         verify(documentRepository, times(1)).documentWithPathAlreadyExists(anyString(), anyString(), any(User.class));
-        verify(documentRepository, times(1)).saveAndFlush(any(Document.class));
+        verify(documentRepository, times(1)).save(any(Document.class));
     }
 
     @Test
@@ -218,17 +213,17 @@ class DocumentServiceTest {
         when(documentRepository.findByDocumentIdAndAuthor(document.getDocumentId(), author)).thenReturn(Optional.of(document));
         when(documentCommonService.storeBlob(file)).thenReturn(document.getHash());
         when(documentCommonService.getLastRevisionVersion(any(Document.class))).thenReturn(1L);
-        when(documentRepository.saveAndFlush(any(Document.class))).thenReturn(savedDocument);
+        when(documentRepository.save(any(Document.class))).thenReturn(savedDocument);
 
-        DocumentDTO documentDTO = documentService.uploadNewDocumentVersion(document.getDocumentId(), file, null);
+        Document actualDocument = documentService.uploadNewDocumentVersion(document.getDocumentId(), file, null);
 
-        assertThat(documentDTO).isNotNull();
-        assertThat(documentDTO.getDocumentId()).isEqualTo(savedDocument.getDocumentId());
-        assertThat(documentDTO.getVersion()).isEqualTo(savedDocument.getVersion());
-        assertThat(documentDTO.getPath()).isEqualTo(savedDocument.getPath());
+        assertThat(actualDocument).isNotNull();
+        assertThat(actualDocument.getDocumentId()).isEqualTo(savedDocument.getDocumentId());
+        assertThat(actualDocument.getVersion()).isEqualTo(savedDocument.getVersion());
+        assertThat(actualDocument.getPath()).isEqualTo(savedDocument.getPath());
 
         verify(documentRepository, never()).documentWithPathAlreadyExists(anyString(), anyString(), any(User.class));
-        verify(documentRepository, times(1)).saveAndFlush(any(Document.class));
+        verify(documentRepository, times(1)).save(any(Document.class));
     }
 
     @Test
@@ -260,13 +255,13 @@ class DocumentServiceTest {
         when(documentCommonService.getRevisionByDocumentAndId(document, revision.getRevisionId())).thenReturn(revision);
         when(documentCommonService.updateDocumentToRevision(document, revision)).thenReturn(savedDocument);
 
-        DocumentDTO documentDTO = documentService.switchToRevision(document.getDocumentId(), revision.getRevisionId());
+        Document actualDocument = documentService.switchToRevision(document.getDocumentId(), revision.getRevisionId());
 
-        assertThat(documentDTO).isNotNull();
-        assertThat(documentDTO.getVersion()).isEqualTo(savedDocument.getVersion());
-        assertThat(documentDTO.getName()).isEqualTo(savedDocument.getName());
-        assertThat(documentDTO.getType()).isEqualTo(savedDocument.getType());
-        assertThat(documentDTO.getPath()).isEqualTo(savedDocument.getPath());
+        assertThat(actualDocument).isNotNull();
+        assertThat(actualDocument.getVersion()).isEqualTo(savedDocument.getVersion());
+        assertThat(actualDocument.getName()).isEqualTo(savedDocument.getName());
+        assertThat(actualDocument.getType()).isEqualTo(savedDocument.getType());
+        assertThat(actualDocument.getPath()).isEqualTo(savedDocument.getPath());
 
         verify(documentCommonService, times(1)).updateDocumentToRevision(any(Document.class), any(DocumentRevision.class));
     }
@@ -327,21 +322,18 @@ class DocumentServiceTest {
         List<Document> documentList = List.of(document);
         Page<Document> documentPage = new PageImpl<>(documentList, pageable, documentList.size());
 
-        List<DocumentDTO> documentDTOList = List.of(new DocumentDTO());
-        Page<DocumentDTO> documentDTOPage = new PageImpl<>(documentDTOList, pageable, documentDTOList.size());
-
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(documentCommonService.getDocumentSortOrders(sort)).thenReturn(sortOrders);
         when(documentCommonService.getDocumentFilters(filter)).thenReturn(filters);
         when(documentRepository.findAll(specification, pageable)).thenReturn(documentPage);
 
-        PageWithDocumentsDTO pageWithDocumentsDTO = documentService.getDocuments(pageNumber, pageSize, sort, filter);
+        Page<Document> actualDocumentPage = documentService.getDocuments(pageNumber, pageSize, sort, filter);
 
-        assertThat(pageWithDocumentsDTO).isNotNull();
-        assertThat(pageWithDocumentsDTO.getContent()).hasSize(documentDTOPage.getContent().size());
-        assertThat(pageWithDocumentsDTO.getTotalElements()).isEqualTo(documentDTOPage.getTotalElements());
-        assertThat(pageWithDocumentsDTO.getTotalPages()).isEqualTo(documentDTOPage.getTotalPages());
-        assertThat(pageWithDocumentsDTO.getFirst()).isEqualTo(documentDTOPage.isFirst());
+        assertThat(actualDocumentPage).isNotNull();
+        assertThat(actualDocumentPage.getContent()).hasSize(documentPage.getContent().size());
+        assertThat(actualDocumentPage.getTotalElements()).isEqualTo(documentPage.getTotalElements());
+        assertThat(actualDocumentPage.getTotalPages()).isEqualTo(documentPage.getTotalPages());
+        assertThat(actualDocumentPage.isFirst()).isEqualTo(documentPage.isFirst());
 
         verify(userService, times(1)).getAuthenticatedUser();
         verify(documentCommonService, times(1)).getDocumentSortOrders(any());
@@ -371,22 +363,22 @@ class DocumentServiceTest {
         MockedStatic<RevisionFilterSpecification> mockSpecification = mockStatic(RevisionFilterSpecification.class);
         mockSpecification.when(() -> RevisionFilterSpecification.filterByDocument(document, filters, author)).thenReturn(specification);
 
-        List<DocumentRevisionDTO> revisionsDTOList = List.of(new DocumentRevisionDTO());
-        Page<DocumentRevisionDTO> revisionDTOPage = new PageImpl<>(revisionsDTOList, pageable, revisionsDTOList.size());
+        List<DocumentRevision> revisionList = List.of(new DocumentRevision());
+        Page<DocumentRevision> revisionPage = new PageImpl<>(revisionList, pageable, revisionList.size());
 
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(documentRepository.findByDocumentIdAndAuthor(document.getDocumentId(), author)).thenReturn(Optional.of(document));
         when(documentCommonService.getRevisionSortOrders(sort)).thenReturn(sortOrders);
         when(documentCommonService.getRevisionFilters(filter)).thenReturn(filters);
-        when(documentCommonService.findRevisions(specification, pageable)).thenReturn(revisionDTOPage);
+        when(documentCommonService.findRevisions(specification, pageable)).thenReturn(revisionPage);
 
-        PageWithRevisionsDTO pageWithRevisionsDTO = documentService.getDocumentRevisions(document.getDocumentId(), pageNumber, pageSize, sort, filter);
+        Page<DocumentRevision> actualRevisionPage = documentService.getDocumentRevisions(document.getDocumentId(), pageNumber, pageSize, sort, filter);
 
-        assertThat(pageWithRevisionsDTO).isNotNull();
-        assertThat(pageWithRevisionsDTO.getContent()).hasSize(revisionDTOPage.getContent().size());
-        assertThat(pageWithRevisionsDTO.getTotalElements()).isEqualTo(revisionDTOPage.getTotalElements());
-        assertThat(pageWithRevisionsDTO.getTotalPages()).isEqualTo(revisionDTOPage.getTotalPages());
-        assertThat(pageWithRevisionsDTO.getFirst()).isEqualTo(revisionDTOPage.isFirst());
+        assertThat(actualRevisionPage).isNotNull();
+        assertThat(actualRevisionPage.getContent()).hasSize(revisionPage.getContent().size());
+        assertThat(actualRevisionPage.getTotalElements()).isEqualTo(revisionPage.getTotalElements());
+        assertThat(actualRevisionPage.getTotalPages()).isEqualTo(revisionPage.getTotalPages());
+        assertThat(actualRevisionPage.isFirst()).isEqualTo(revisionPage.isFirst());
 
         verify(userService, times(1)).getAuthenticatedUser();
         verify(documentCommonService, times(1)).getRevisionSortOrders(any());
@@ -398,7 +390,7 @@ class DocumentServiceTest {
 
     @Test
     void shouldMoveDocument() {
-        DestinationDTO destination = new DestinationDTO("/home");
+        String path = "/home";
 
         Document savedDocument = Document.builder()
                                          .id(1L)
@@ -407,7 +399,7 @@ class DocumentServiceTest {
                                          .version(1L)
                                          .name("document.txt")
                                          .type("text/plain")
-                                         .path("/home")
+                                         .path(path)
                                          .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
                                          .build();
 
@@ -416,10 +408,10 @@ class DocumentServiceTest {
         when(documentRepository.documentWithPathAlreadyExists(anyString(), anyString(), any(User.class))).thenReturn(false);
         when(documentRepository.save(any(Document.class))).thenReturn(savedDocument);
 
-        DocumentDTO documentDTO = documentService.moveDocument(document.getDocumentId(), destination);
+        Document movedDocument = documentService.moveDocument(document.getDocumentId(), path);
 
-        assertThat(documentDTO).isNotNull();
-        assertThat(documentDTO.getPath()).isEqualTo(savedDocument.getPath());
+        assertThat(movedDocument).isNotNull();
+        assertThat(movedDocument.getPath()).isEqualTo(savedDocument.getPath());
 
         verify(documentRepository, times(1)).save(any(Document.class));
         verify(documentCommonService, times(1)).saveRevisionFromDocument(any(Document.class));
@@ -428,13 +420,13 @@ class DocumentServiceTest {
     @Test
     void shouldNotMoveDocumentWhenPathIsNotUnique() {
         String documentId = document.getDocumentId();
-        DestinationDTO destination = new DestinationDTO("/home");
+        String path = "/home";
 
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(documentRepository.findByDocumentIdAndAuthor(documentId, author)).thenReturn(Optional.of(document));
         when(documentRepository.documentWithPathAlreadyExists(anyString(), anyString(), any(User.class))).thenReturn(true);
 
-        assertThatThrownBy(() -> documentService.moveDocument(documentId, destination)).isInstanceOf(FileWithPathAlreadyExistsException.class);
+        assertThatThrownBy(() -> documentService.moveDocument(documentId, path)).isInstanceOf(FileWithPathAlreadyExistsException.class);
     }
 
 }

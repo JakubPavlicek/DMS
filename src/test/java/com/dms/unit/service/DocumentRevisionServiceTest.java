@@ -1,7 +1,5 @@
 package com.dms.unit.service;
 
-import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.DocumentRevision_;
@@ -106,10 +104,10 @@ class DocumentRevisionServiceTest {
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), author)).thenReturn(Optional.of(revision));
 
-        DocumentRevisionDTO revisionDTO = documentRevisionService.getRevision(revision.getRevisionId());
+        DocumentRevision actualRevision = documentRevisionService.getRevision(revision.getRevisionId());
 
-        assertThat(revisionDTO).isNotNull();
-        assertThat(revisionDTO.getRevisionId()).isEqualTo(revision.getRevisionId());
+        assertThat(actualRevision).isNotNull();
+        assertThat(actualRevision.getRevisionId()).isEqualTo(revision.getRevisionId());
 
         verify(userService, times(1)).getAuthenticatedUser();
         verify(revisionRepository, times(1)).findByRevisionIdAndAuthor(revision.getRevisionId(), author);
@@ -271,21 +269,21 @@ class DocumentRevisionServiceTest {
         MockedStatic<RevisionFilterSpecification> mockSpecification = mockStatic(RevisionFilterSpecification.class);
         mockSpecification.when(() -> RevisionFilterSpecification.filter(filters, author)).thenReturn(specification);
 
-        List<DocumentRevisionDTO> revisionsDTOList = List.of(new DocumentRevisionDTO());
-        Page<DocumentRevisionDTO> revisionDTOPage = new PageImpl<>(revisionsDTOList, pageable, revisionsDTOList.size());
+        List<DocumentRevision> revisionsList = List.of(new DocumentRevision());
+        Page<DocumentRevision> revisionPage = new PageImpl<>(revisionsList, pageable, revisionsList.size());
 
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(documentCommonService.getRevisionSortOrders(sort)).thenReturn(sortOrders);
         when(documentCommonService.getRevisionFilters(filter)).thenReturn(filters);
-        when(documentCommonService.findRevisions(specification, pageable)).thenReturn(revisionDTOPage);
+        when(documentCommonService.findRevisions(specification, pageable)).thenReturn(revisionPage);
 
-        PageWithRevisionsDTO pageWithRevisionsDTO = documentRevisionService.getRevisions(pageNumber, pageSize, sort, filter);
+        Page<DocumentRevision> actualRevisionPage = documentRevisionService.getRevisions(pageNumber, pageSize, sort, filter);
 
-        assertThat(pageWithRevisionsDTO).isNotNull();
-        assertThat(pageWithRevisionsDTO.getContent()).hasSize(revisionDTOPage.getContent().size());
-        assertThat(pageWithRevisionsDTO.getTotalElements()).isEqualTo(revisionDTOPage.getTotalElements());
-        assertThat(pageWithRevisionsDTO.getTotalPages()).isEqualTo(revisionDTOPage.getTotalPages());
-        assertThat(pageWithRevisionsDTO.getFirst()).isEqualTo(revisionDTOPage.isFirst());
+        assertThat(actualRevisionPage).isNotNull();
+        assertThat(actualRevisionPage.getContent()).hasSize(revisionPage.getContent().size());
+        assertThat(actualRevisionPage.getTotalElements()).isEqualTo(revisionPage.getTotalElements());
+        assertThat(actualRevisionPage.getTotalPages()).isEqualTo(revisionPage.getTotalPages());
+        assertThat(actualRevisionPage.isFirst()).isEqualTo(revisionPage.isFirst());
 
         verify(userService, times(1)).getAuthenticatedUser();
         verify(documentCommonService, times(1)).getRevisionSortOrders(any());

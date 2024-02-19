@@ -1,6 +1,5 @@
 package com.dms.unit.service;
 
-import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.DocumentRevision_;
@@ -143,7 +142,7 @@ class DocumentCommonServiceTest {
                                            .version(revision.getVersion())
                                            .build();
 
-        when(documentRepository.saveAndFlush(document)).thenReturn(updatedDocument);
+        when(documentRepository.save(document)).thenReturn(updatedDocument);
 
         Document actualDocument = documentCommonService.updateDocumentToRevision(document, revision);
 
@@ -153,7 +152,7 @@ class DocumentCommonServiceTest {
         assertThat(actualDocument.getHash()).isEqualTo(revision.getHash());
         assertThat(actualDocument.getVersion()).isEqualTo(revision.getVersion());
 
-        verify(documentRepository, times(1)).saveAndFlush(any(Document.class));
+        verify(documentRepository, times(1)).save(any(Document.class));
     }
 
     @Test
@@ -231,18 +230,17 @@ class DocumentCommonServiceTest {
 
         List<DocumentRevision> revisions = List.of(revision);
         Pageable pageable = Pageable.unpaged();
-        long totalElements = revisions.size();
 
-        Page<DocumentRevision> pageWithRevisions = new PageImpl<>(revisions, pageable, totalElements);
+        Page<DocumentRevision> revisionPage = new PageImpl<>(revisions, pageable, revisions.size());
 
-        when(revisionRepository.findAll(specification, pageable)).thenReturn(pageWithRevisions);
+        when(revisionRepository.findAll(specification, pageable)).thenReturn(revisionPage);
 
-        Page<DocumentRevisionDTO> pageWithRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
+        Page<DocumentRevision> actualRevisionPage = documentCommonService.findRevisions(specification, pageable);
 
-        assertThat(pageWithRevisionDTOs.getTotalElements()).isEqualTo(pageWithRevisions.getTotalElements());
-        assertThat(pageWithRevisionDTOs.getTotalPages()).isEqualTo(pageWithRevisions.getTotalPages());
-        assertThat(pageWithRevisionDTOs.getNumber()).isEqualTo(pageWithRevisions.getNumber());
-        assertThat(pageWithRevisionDTOs.getSize()).isEqualTo(pageWithRevisions.getSize());
+        assertThat(actualRevisionPage.getTotalElements()).isEqualTo(revisionPage.getTotalElements());
+        assertThat(actualRevisionPage.getTotalPages()).isEqualTo(revisionPage.getTotalPages());
+        assertThat(actualRevisionPage.getNumber()).isEqualTo(revisionPage.getNumber());
+        assertThat(actualRevisionPage.getSize()).isEqualTo(revisionPage.getSize());
     }
 
     @Test
@@ -288,14 +286,10 @@ class DocumentCommonServiceTest {
         List<Sort.Order> orders = documentCommonService.getDocumentSortOrders(sort);
 
         assertThat(orders).hasSize(2);
-        assertThat(orders.get(0)
-                         .getProperty()).isEqualTo(Document_.NAME);
-        assertThat(orders.get(0)
-                         .getDirection()).isEqualTo(Sort.Direction.DESC);
-        assertThat(orders.get(1)
-                         .getProperty()).isEqualTo(Document_.TYPE);
-        assertThat(orders.get(1)
-                         .getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(orders.get(0).getProperty()).isEqualTo(Document_.NAME);
+        assertThat(orders.get(0).getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(orders.get(1).getProperty()).isEqualTo(Document_.TYPE);
+        assertThat(orders.get(1).getDirection()).isEqualTo(Sort.Direction.ASC);
     }
 
     @Test
@@ -312,14 +306,10 @@ class DocumentCommonServiceTest {
         List<Sort.Order> orders = documentCommonService.getRevisionSortOrders(sort);
 
         assertThat(orders).hasSize(2);
-        assertThat(orders.get(0)
-                         .getProperty()).isEqualTo(DocumentRevision_.NAME);
-        assertThat(orders.get(0)
-                         .getDirection()).isEqualTo(Sort.Direction.DESC);
-        assertThat(orders.get(1)
-                         .getProperty()).isEqualTo(DocumentRevision_.TYPE);
-        assertThat(orders.get(1)
-                         .getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(orders.get(0).getProperty()).isEqualTo(DocumentRevision_.NAME);
+        assertThat(orders.get(0).getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(orders.get(1).getProperty()).isEqualTo(DocumentRevision_.TYPE);
+        assertThat(orders.get(1).getDirection()).isEqualTo(Sort.Direction.ASC);
     }
 
     @Test

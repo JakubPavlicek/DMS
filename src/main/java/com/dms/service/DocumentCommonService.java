@@ -1,13 +1,11 @@
 package com.dms.service;
 
-import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.exception.FileOperation;
 import com.dms.exception.FileOperationException;
 import com.dms.exception.InvalidRegexInputException;
 import com.dms.exception.RevisionNotFoundException;
-import com.dms.mapper.dto.DocumentRevisionDTOMapper;
 import com.dms.mapper.entity.DocumentMapper;
 import com.dms.mapper.entity.RevisionMapper;
 import com.dms.repository.DocumentRepository;
@@ -16,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -65,8 +62,7 @@ public class DocumentCommonService {
         document.setHash(revision.getHash());
         document.setVersion(revision.getVersion());
 
-        // flush to immediately initialize the "createdAt" and "updatedAt" fields
-        Document updatedDocument = documentRepository.saveAndFlush(document);
+        Document updatedDocument = documentRepository.save(document);
 
         log.info("Successfully updated details of document {} from revision {}", document, revision);
 
@@ -108,13 +104,8 @@ public class DocumentCommonService {
         }
     }
 
-    public Page<DocumentRevisionDTO> findRevisions(Specification<DocumentRevision> specification, Pageable pageable) {
-        Page<DocumentRevision> revisions = revisionRepository.findAll(specification, pageable);
-        List<DocumentRevisionDTO> revisionDTOs = revisions.stream()
-                                                          .map(DocumentRevisionDTOMapper::map)
-                                                          .toList();
-
-        return new PageImpl<>(revisionDTOs, pageable, revisions.getTotalElements());
+    public Page<DocumentRevision> findRevisions(Specification<DocumentRevision> specification, Pageable pageable) {
+        return revisionRepository.findAll(specification, pageable);
     }
 
     public Map<String, String> getDocumentFilters(String filter) {

@@ -1,10 +1,8 @@
 package com.dms.unit.mapper.dto;
 
-import com.dms.dto.DocumentDTO;
 import com.dms.dto.PageWithDocumentsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.User;
-import com.dms.mapper.dto.DocumentDTOMapper;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -12,7 +10,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,13 +50,9 @@ class PageWithDocumentsDTOMapperTest {
                                      .build();
 
         List<Document> documentList = List.of(document, document2);
+        Pageable pageable = Pageable.ofSize(documentList.size());
 
-        List<DocumentDTO> documentDTOList = new ArrayList<>();
-        documentList.forEach(doc -> documentDTOList.add(DocumentDTOMapper.map(doc)));
-
-        Pageable pageable = Pageable.ofSize(documentDTOList.size());
-
-        Page<DocumentDTO> documentPage = new PageImpl<>(documentDTOList, pageable, documentDTOList.size());
+        Page<Document> documentPage = new PageImpl<>(documentList, pageable, documentList.size());
 
         PageWithDocumentsDTO pageWithDocumentsDTO = PageWithDocumentsDTOMapper.map(documentPage);
 

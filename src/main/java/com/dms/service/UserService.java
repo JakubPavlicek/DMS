@@ -1,12 +1,8 @@
 package com.dms.service;
 
-import com.dms.dto.UserDTO;
-import com.dms.dto.UserLoginDTO;
-import com.dms.dto.UserRegisterDTO;
 import com.dms.entity.User;
 import com.dms.exception.EmailAlreadyExistsException;
 import com.dms.exception.UserNotFoundException;
-import com.dms.mapper.dto.UserDTOMapper;
 import com.dms.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -50,36 +46,35 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public UserDTO createUser(UserRegisterDTO userRegister) {
+    public User createUser(User user) {
         log.debug("Request - Creating user");
 
-        validateUniqueEmail(userRegister.getEmail());
+        validateUniqueEmail(user.getEmail());
 
-        User user = UserDTOMapper.mapToUser(userRegister);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(user);
 
         log.info("Successfully created user {}", savedUser.getUserId());
 
-        return UserDTOMapper.mapToUserDTO(savedUser);
+        return savedUser;
     }
 
-    public UserDTO getCurrentUser() {
+    public User getCurrentUser() {
         log.debug("Request - Retrieving current user");
 
         User authUser = getAuthenticatedUser();
 
         log.info("Successfully retrieved current user");
 
-        return UserDTOMapper.mapToUserDTO(authUser);
+        return authUser;
     }
 
-    public void changePassword(UserLoginDTO userLogin) {
+    public void changePassword(String email, String password) {
         log.debug("Request - Changing users password");
 
-        User user = getUserByEmail(userLogin.getEmail());
-        user.setPassword(passwordEncoder.encode(userLogin.getPassword()));
+        User user = getUserByEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
 
         userRepository.save(user);
 

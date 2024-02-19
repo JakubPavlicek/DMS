@@ -4,6 +4,8 @@ import com.dms.UsersApi;
 import com.dms.dto.UserDTO;
 import com.dms.dto.UserLoginDTO;
 import com.dms.dto.UserRegisterDTO;
+import com.dms.entity.User;
+import com.dms.mapper.dto.UserDTOMapper;
 import com.dms.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,19 +20,25 @@ public class UserController implements UsersApi {
 
     @Override
     public ResponseEntity<UserDTO> createUser(UserRegisterDTO userRegister) {
-        UserDTO userDTO = userService.createUser(userRegister);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        User user = UserDTOMapper.mapToUser(userRegister);
+        User createdUser = userService.createUser(user);
+        UserDTO createdUserDTO = UserDTOMapper.mapToUserDTO(createdUser);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUserDTO);
     }
 
     @Override
     public ResponseEntity<UserDTO> getCurrentUser() {
-        UserDTO userDTO = userService.getCurrentUser();
-        return ResponseEntity.ok(userDTO);
+        User currentUser = userService.getCurrentUser();
+        UserDTO currentUserDTO = UserDTOMapper.mapToUserDTO(currentUser);
+
+        return ResponseEntity.ok(currentUserDTO);
     }
 
     @Override
     public ResponseEntity<Void> changePassword(UserLoginDTO userLogin) {
-        userService.changePassword(userLogin);
+        userService.changePassword(userLogin.getEmail(), userLogin.getPassword());
+
         return ResponseEntity.noContent().build();
     }
 

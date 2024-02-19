@@ -1,14 +1,10 @@
 package com.dms.service;
 
-import com.dms.dto.DocumentRevisionDTO;
-import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
 import com.dms.exception.RevisionDeletionException;
 import com.dms.exception.RevisionNotFoundException;
-import com.dms.mapper.dto.DocumentRevisionDTOMapper;
-import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
 import com.dms.repository.DocumentRevisionRepository;
 import com.dms.specification.RevisionFilterSpecification;
 import jakarta.transaction.Transactional;
@@ -46,13 +42,13 @@ public class DocumentRevisionService {
                                  .orElseThrow(() -> new RevisionNotFoundException("Revision with ID: " + revisionId + " not found"));
     }
 
-    public DocumentRevisionDTO getRevision(String revisionId) {
+    public DocumentRevision getRevision(String revisionId) {
         log.debug("Request - Getting revision: revisionId={}", revisionId);
 
         DocumentRevision revision = getAuthenticatedUserRevision(revisionId);
         log.info("Revision {} retrieved successfully", revisionId);
 
-        return DocumentRevisionDTOMapper.map(revision);
+        return revision;
     }
 
     private void replaceDocumentWithAdjacentRevision(Document document) {
@@ -134,7 +130,7 @@ public class DocumentRevisionService {
                              .body(file);
     }
 
-    public PageWithRevisionsDTO getRevisions(int pageNumber, int pageSize, String sort, String filter) {
+    public Page<DocumentRevision> getRevisions(int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing revisisons: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
 
         User user = userService.getAuthenticatedUser();
@@ -145,11 +141,11 @@ public class DocumentRevisionService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
         Specification<DocumentRevision> specification = RevisionFilterSpecification.filter(filters, user);
 
-        Page<DocumentRevisionDTO> documentRevisionDTOs = documentCommonService.findRevisions(specification, pageable);
+        Page<DocumentRevision> documentRevisions = documentCommonService.findRevisions(specification, pageable);
 
         log.info("Revisions listed successfully");
 
-        return PageWithRevisionsDTOMapper.map(documentRevisionDTOs);
+        return documentRevisions;
     }
 
 }

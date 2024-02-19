@@ -1,11 +1,9 @@
 package com.dms.unit.mapper.dto;
 
-import com.dms.dto.DocumentRevisionDTO;
 import com.dms.dto.PageWithRevisionsDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
-import com.dms.mapper.dto.DocumentRevisionDTOMapper;
 import com.dms.mapper.dto.PageWithRevisionsDTOMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -13,7 +11,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,13 +61,9 @@ class PageWithRevisionsDTOMapperTest {
                                                     .build();
 
         List<DocumentRevision> revisionList = List.of(revision, revision2);
+        Pageable pageable = Pageable.ofSize(revisionList.size());
 
-        List<DocumentRevisionDTO> revisionDTOList = new ArrayList<>();
-        revisionList.forEach(rev -> revisionDTOList.add(DocumentRevisionDTOMapper.map(rev)));
-
-        Pageable pageable = Pageable.ofSize(revisionDTOList.size());
-
-        Page<DocumentRevisionDTO> revisionPage = new PageImpl<>(revisionDTOList, pageable, revisionDTOList.size());
+        Page<DocumentRevision> revisionPage = new PageImpl<>(revisionList, pageable, revisionList.size());
 
         PageWithRevisionsDTO pageWithDocumentsDTO = PageWithRevisionsDTOMapper.map(revisionPage);
 

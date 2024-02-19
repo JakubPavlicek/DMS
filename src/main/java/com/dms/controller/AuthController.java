@@ -16,7 +16,10 @@ public class AuthController implements Oauth2Api {
 
     @Override
     public ResponseEntity<TokenResponseDTO> token(UserLoginDTO userLogin) {
-        return ResponseEntity.ok(authService.token(userLogin));
+        String token = authService.token(userLogin.getEmail(), userLogin.getPassword());
+        TokenResponseDTO tokenResponse = new TokenResponseDTO(token);
+
+        return ResponseEntity.ok(tokenResponse);
     }
 
 }

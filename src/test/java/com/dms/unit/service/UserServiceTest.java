@@ -1,8 +1,5 @@
 package com.dms.unit.service;
 
-import com.dms.dto.UserDTO;
-import com.dms.dto.UserLoginDTO;
-import com.dms.dto.UserRegisterDTO;
 import com.dms.entity.User;
 import com.dms.exception.EmailAlreadyExistsException;
 import com.dms.exception.UserNotFoundException;
@@ -114,18 +111,6 @@ class UserServiceTest {
     void shouldCreateUser() {
         String hashedPassword = "$2a$10$j53AK./k2ElWhOSsSB757.8WpiGa3naFdVYW.GRWx5kTL77TRCCpG";
 
-        UserRegisterDTO userRegisterDTO = UserRegisterDTO.builder()
-                                                         .name("james")
-                                                         .email("james@gmail.com")
-                                                         .password("secret123!")
-                                                         .build();
-
-        UserDTO userDTO = UserDTO.builder()
-                                 .userId("0e60c305-f63c-4a69-9d93-e73cebd2c070")
-                                 .name("james")
-                                 .email("james@gmail.com")
-                                 .build();
-
         User savedUser = User.builder()
                              .id(1L)
                              .userId("0e60c305-f63c-4a69-9d93-e73cebd2c070")
@@ -138,9 +123,12 @@ class UserServiceTest {
         when(userRepository.save(any())).thenReturn(savedUser);
         when(passwordEncoder.encode(any())).thenReturn(hashedPassword);
 
-        UserDTO actualUser = userService.createUser(userRegisterDTO);
+        User actualUser = userService.createUser(user);
 
-        assertThat(actualUser).isEqualTo(userDTO);
+        assertThat(actualUser.getUserId()).isEqualTo(savedUser.getUserId());
+        assertThat(actualUser.getName()).isEqualTo(savedUser.getName());
+        assertThat(actualUser.getEmail()).isEqualTo(savedUser.getEmail());
+        assertThat(actualUser.getPassword()).isEqualTo(savedUser.getPassword());
 
         verify(userRepository, times(1)).existsByEmail(any());
         verify(userRepository, times(1)).save(any());
@@ -148,36 +136,27 @@ class UserServiceTest {
 
     @Test
     void shouldThrowEmailAlreadyExistsExceptionWhenEmailAlreadyExists() {
-        UserRegisterDTO userRegisterDTO = UserRegisterDTO.builder()
-                                                         .name("james")
-                                                         .email("james@gmail.com")
-                                                         .password("secret123!")
-                                                         .build();
-
         when(userRepository.existsByEmail(any())).thenReturn(true);
 
-        assertThatThrownBy(() -> userService.createUser(userRegisterDTO)).isInstanceOf(EmailAlreadyExistsException.class);
+        assertThatThrownBy(() -> userService.createUser(user)).isInstanceOf(EmailAlreadyExistsException.class);
 
         verify(userRepository, times(1)).existsByEmail(any());
     }
 
     @Test
     void shouldReturnCurrentUser() {
-        UserDTO userDTO = UserDTO.builder()
-                                 .userId("0e60c305-f63c-4a69-9d93-e73cebd2c070")
-                                 .name("james")
-                                 .email("james@gmail.com")
-                                 .build();
-
         SecurityContextHolder.setContext(securityContext);
 
         when(authentication.getName()).thenReturn(user.getEmail());
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        UserDTO currentUser = userService.getCurrentUser();
+        User currentUser = userService.getCurrentUser();
 
-        assertThat(currentUser).isEqualTo(userDTO);
+        assertThat(currentUser.getUserId()).isEqualTo(user.getUserId());
+        assertThat(currentUser.getName()).isEqualTo(user.getName());
+        assertThat(currentUser.getEmail()).isEqualTo(user.getEmail());
+        assertThat(currentUser.getPassword()).isEqualTo(user.getPassword());
 
         verify(userRepository, times(1)).findByEmail(any());
     }
@@ -185,11 +164,6 @@ class UserServiceTest {
     @Test
     void shouldChangePassword() {
         String hashedPassword = "$2a$10$tulEZFULNzQ5.uzak/TR9OOIIDA57K7DRijI2BruMmMty5IKSyDwO";
-
-        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
-                                                .email("james@gmail.com")
-                                                .password("password123!")
-                                                .build();
 
         User changedPasswordUser = User.builder()
                                        .name("james")
@@ -201,7 +175,7 @@ class UserServiceTest {
         when(passwordEncoder.encode(any())).thenReturn(hashedPassword);
         when(userRepository.save(any())).thenReturn(changedPasswordUser);
 
-        userService.changePassword(userLoginDTO);
+        userService.changePassword(user.getEmail(), user.getEmail());
 
         assertThat(user.getPassword()).isEqualTo(hashedPassword);
 
@@ -211,14 +185,12 @@ class UserServiceTest {
 
     @Test
     void shouldThrowUserNotFoundExceptionWhenUserLoginIsInvalid() {
-        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
-                                                .email("james@gmail.com")
-                                                .password("password123!")
-                                                .build();
+        String email = user.getEmail();
+        String password = user.getPassword();
 
         when(userRepository.findByEmail(any())).thenThrow(UserNotFoundException.class);
 
-        assertThatThrownBy(() -> userService.changePassword(userLoginDTO)).isInstanceOf(UserNotFoundException.class);
+        assertThatThrownBy(() -> userService.changePassword(email, password)).isInstanceOf(UserNotFoundException.class);
 
         verify(userRepository, never()).save(any());
     }

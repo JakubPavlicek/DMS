@@ -1,7 +1,5 @@
 package com.dms.service;
 
-import com.dms.dto.TokenResponseDTO;
-import com.dms.dto.UserLoginDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,15 +21,11 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtEncoder jwtEncoder;
 
-    public TokenResponseDTO token(UserLoginDTO userLogin) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword()));
+    public String token(String email, String password) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         log.info("User authenticated successfully");
 
-        String token = generateToken(authentication);
-
-        return TokenResponseDTO.builder()
-                               .token(token)
-                               .build();
+        return generateToken(authentication);
     }
 
     public String generateToken(Authentication authentication) {

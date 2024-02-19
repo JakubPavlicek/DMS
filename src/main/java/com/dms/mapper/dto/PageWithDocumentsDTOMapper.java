@@ -2,7 +2,11 @@ package com.dms.mapper.dto;
 
 import com.dms.dto.DocumentDTO;
 import com.dms.dto.PageWithDocumentsDTO;
+import com.dms.entity.Document;
 import org.springframework.data.domain.Page;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PageWithDocumentsDTOMapper {
 
@@ -10,20 +14,27 @@ public class PageWithDocumentsDTOMapper {
     {
     }
 
-    public static PageWithDocumentsDTO map(Page<DocumentDTO> documentDtoPage) {
+    public static PageWithDocumentsDTO map(Page<Document> documentPage) {
         return PageWithDocumentsDTO.builder()
-                                   .content(documentDtoPage.getContent())
-                                   .pageable(PageableDTOMapper.map(documentDtoPage.getPageable()))
-                                   .last(documentDtoPage.isLast())
-                                   .totalElements(documentDtoPage.getTotalElements())
-                                   .totalPages(documentDtoPage.getTotalPages())
-                                   .first(documentDtoPage.isFirst())
-                                   .size(documentDtoPage.getSize())
-                                   .number(documentDtoPage.getNumber())
-                                   .sort(SortDTOMapper.map(documentDtoPage.getSort()))
-                                   .numberOfElements(documentDtoPage.getNumberOfElements())
-                                   .empty(documentDtoPage.isEmpty())
+                                   .content(mapToDtoList(documentPage))
+                                   .pageable(PageableDTOMapper.map(documentPage.getPageable()))
+                                   .last(documentPage.isLast())
+                                   .totalElements(documentPage.getTotalElements())
+                                   .totalPages(documentPage.getTotalPages())
+                                   .first(documentPage.isFirst())
+                                   .size(documentPage.getSize())
+                                   .number(documentPage.getNumber())
+                                   .sort(SortDTOMapper.map(documentPage.getSort()))
+                                   .numberOfElements(documentPage.getNumberOfElements())
+                                   .empty(documentPage.isEmpty())
                                    .build();
+    }
+
+    private static List<DocumentDTO> mapToDtoList(Page<Document> documentPage) {
+        List<DocumentDTO> documentDTOList = new ArrayList<>();
+        documentPage.forEach(document -> documentDTOList.add(DocumentDTOMapper.map(document)));
+
+        return documentDTOList;
     }
 
 }

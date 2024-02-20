@@ -1,29 +1,44 @@
 package com.dms.integration.controller;
 
+import com.dms.config.SecurityConfig;
 import com.dms.controller.AuthController;
 import com.dms.dto.UserLoginDTO;
 import com.dms.service.AuthService;
+import com.dms.service.UserService;
+import com.dms.util.KeyManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import({SecurityConfig.class, KeyManager.class})
+@AutoConfigureMockMvc
 class AuthControllerTest {
 
-    @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private WebApplicationContext context;
+
+    // needed for application context load
+    @MockBean
+    private UserService userService;
 
     @MockBean
     private AuthService authService;
@@ -32,6 +47,12 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
+        mvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .apply(springSecurity())
+            .alwaysDo(print())
+            .build();
+
         userLogin = new UserLoginDTO("james@gmail.com", "secret123!");
     }
 

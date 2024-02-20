@@ -1,72 +1,56 @@
 package com.dms.integration.controller;
 
-import com.dms.config.SecurityConfig;
-import com.dms.controller.UserController;
 import com.dms.entity.User;
-import com.dms.exception.EmailAlreadyExistsException;
-import com.dms.service.UserService;
-import com.dms.util.KeyManager;
+import com.dms.repository.UserRepository;
+import com.dms.util.JwtManager;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
-@Import({SecurityConfig.class, KeyManager.class})
+@SpringBootTest
+@Transactional
 @AutoConfigureMockMvc
 class UserControllerTest {
 
+    @Autowired
     private MockMvc mvc;
 
     @Autowired
-    private WebApplicationContext context;
+    private UserRepository userRepository;
 
-    @MockBean
-    private UserService userService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private User user;
 
     @BeforeEach
     void setUp() {
-        mvc = MockMvcBuilders
-            .webAppContextSetup(context)
-            .apply(springSecurity())
-            .alwaysDo(print())
-            .build();
-
         user = User.builder()
-                   .userId("833a814e-da7c-4d64-8bea-57411e2e4f9d")
+                   .userId("4e2af452-4d8c-45aa-9a13-9811b5c7b999")
                    .name("james")
                    .email("james@gmail.com")
-                   .password("secret123!")
+                   .password(passwordEncoder.encode("secret123!"))
                    .build();
     }
 
     @Test
     void shouldCreateUser() throws Exception {
-        when(userService.createUser(any(User.class))).thenReturn(user);
-
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
@@ -79,7 +63,7 @@ class UserControllerTest {
            .andExpectAll(
                status().isCreated(),
                content().contentType(MediaType.APPLICATION_JSON),
-               jsonPath("$.userId").value("833a814e-da7c-4d64-8bea-57411e2e4f9d"),
+               jsonPath("$.userId").isNotEmpty(),
                jsonPath("$.name").value("james"),
                jsonPath("$.email").value("james@gmail.com")
            );
@@ -87,8 +71,6 @@ class UserControllerTest {
 
     @Test
     void shouldNotCreateUserWhenNameIsNull() throws Exception {
-        when(userService.createUser(any(User.class))).thenReturn(user);
-
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
@@ -106,8 +88,6 @@ class UserControllerTest {
 
     @Test
     void shouldNotCreateUserWhenEmailIsNull() throws Exception {
-        when(userService.createUser(any(User.class))).thenReturn(user);
-
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
@@ -125,8 +105,6 @@ class UserControllerTest {
 
     @Test
     void shouldNotCreateUserWhenPasswordIsNull() throws Exception {
-        when(userService.createUser(any(User.class))).thenReturn(user);
-
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
@@ -144,8 +122,6 @@ class UserControllerTest {
 
     @Test
     void shouldNotCreateUserWhenNoDataAreProvided() throws Exception {
-        when(userService.createUser(any(User.class))).thenReturn(user);
-
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
                .content("{}"))
@@ -157,8 +133,6 @@ class UserControllerTest {
 
     @Test
     void shouldNotCreateUserWhenNameContainsInvalidCharacters() throws Exception {
-        when(userService.createUser(any(User.class))).thenReturn(user);
-
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
@@ -177,8 +151,6 @@ class UserControllerTest {
 
     @Test
     void shouldNotCreateUserWhenEmailIsInvalid() throws Exception {
-        when(userService.createUser(any(User.class))).thenReturn(user);
-
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
@@ -197,8 +169,6 @@ class UserControllerTest {
 
     @Test
     void shouldNotCreateUserWhenPasswordDoesNotContainSpecialCharacter() throws Exception {
-        when(userService.createUser(any(User.class))).thenReturn(user);
-
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
@@ -217,7 +187,7 @@ class UserControllerTest {
 
     @Test
     void shouldNotCreateUserWhenEmailIsAlreadyTaken() throws Exception {
-        when(userService.createUser(any(User.class))).thenThrow(EmailAlreadyExistsException.class);
+        userRepository.save(user);
 
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
@@ -236,14 +206,15 @@ class UserControllerTest {
 
     @Test
     void shouldReturnCurrentUser() throws Exception {
-        when(userService.getCurrentUser()).thenReturn(user);
+        userRepository.save(user);
 
         mvc.perform(get("/users/me")
-               .with(jwt()))
+               .with(jwt().jwt(JwtManager.createJwt(user.getEmail())))
+           )
            .andExpectAll(
                status().isOk(),
                content().contentType(MediaType.APPLICATION_JSON),
-               jsonPath("$.userId").value("833a814e-da7c-4d64-8bea-57411e2e4f9d"),
+               jsonPath("$.userId").isNotEmpty(),
                jsonPath("$.name").value("james"),
                jsonPath("$.email").value("james@gmail.com")
            );
@@ -251,6 +222,8 @@ class UserControllerTest {
 
     @Test
     void shouldChangePassword() throws Exception {
+        userRepository.save(user);
+
         mvc.perform(put("/users/password")
                .with(httpBasic("admin", "admin123"))
                .contentType(MediaType.APPLICATION_JSON)

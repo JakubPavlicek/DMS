@@ -73,8 +73,6 @@ delete:
   responses:
     204:
       description: Document deleted successfully.
-    400:
-      $ref: '../../response/400InvalidOrMissingParams.yaml'
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:

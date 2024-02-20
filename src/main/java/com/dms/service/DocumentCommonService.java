@@ -184,7 +184,7 @@ public class DocumentCommonService {
         try {
             return String.valueOf(resource.contentLength());
         } catch (Exception e) {
-            throw new FileOperationException(FileOperation.LENGTH);
+            throw new FileOperationException(FileOperation.FILE);
         }
     }
 

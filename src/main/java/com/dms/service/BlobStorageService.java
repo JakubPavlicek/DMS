@@ -73,11 +73,15 @@ public class BlobStorageService {
 
             if (wasFileDeleted) {
                 log.info("Blob deleted successfully");
+
+                deleteDirectoryIfEmpty(hash);
             }
         } catch (Exception exception) {
             throw new FileOperationException(FileOperation.DELETE);
         }
+    }
 
+    private void deleteDirectoryIfEmpty(String hash) {
         Path directoryPath = getDirectoryPath(hash);
 
         if (isDirectoryEmpty(directoryPath)) {

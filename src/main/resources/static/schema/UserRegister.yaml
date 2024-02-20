@@ -1,8 +1,8 @@
 type: object
 title: User
-description: The author of the document.
+description: The register details of the user.
 required:
-  - username
+  - name
   - email
   - password
 properties:

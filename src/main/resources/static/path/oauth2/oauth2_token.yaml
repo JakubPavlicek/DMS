@@ -6,6 +6,7 @@ post:
     - oauth2
   requestBody:
     required: true
+    description: The login details of the user.
     content:
       application/json:
         schema:

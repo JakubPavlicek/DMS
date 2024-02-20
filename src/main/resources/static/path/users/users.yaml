@@ -6,6 +6,7 @@ post:
     - users
   requestBody:
     required: true
+    description: The register details of the user.
     content:
       application/json:
         schema:

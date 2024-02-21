@@ -57,13 +57,13 @@ class DocumentControllerTest {
     @Autowired
     private BlobStorageService blobStorageService;
 
-    MockMultipartFile firstFile;
-    MockMultipartFile secondFile;
-    MockMultipartFile thirdFile;
+    private MockMultipartFile firstFile;
+    private MockMultipartFile secondFile;
+    private MockMultipartFile thirdFile;
 
-    String firstHash;
-    String secondHash;
-    String thirdHash;
+    private String firstHash;
+    private String secondHash;
+    private String thirdHash;
 
     private User author;
     private Document document;
@@ -190,6 +190,34 @@ class DocumentControllerTest {
     @Test
     void shouldNotDownloadDocumentWhenDocumentIsNotFound() throws Exception {
         mvc.perform(get("/documents/{documentId}/download", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+           .andExpectAll(
+               status().isNotFound(),
+               jsonPath("$.detail").value(containsString("not found"))
+           );
+    }
+
+    @Test
+    void shouldReturnDocument() throws Exception {
+        mvc.perform(get("/documents/{documentId}", document.getDocumentId())
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+           .andExpectAll(
+               status().isOk(),
+               content().contentType(MediaType.APPLICATION_JSON),
+               jsonPath("$.documentId").value(document.getDocumentId()),
+               jsonPath("$.author.userId").value(author.getUserId()),
+               jsonPath("$.version").value(document.getVersion()),
+               jsonPath("$.name").value(document.getName()),
+               jsonPath("$.type").value(document.getType()),
+               jsonPath("$.path").value(document.getPath()),
+               jsonPath("$.createdAt").isNotEmpty(),
+               jsonPath("$.updatedAt").isNotEmpty()
+           );
+    }
+
+    @Test
+    void shouldNotReturnDocumentWhenDocumentIsNotFound() throws Exception {
+        mvc.perform(get("/documents/{documentId}", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
                .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),

@@ -1,5 +1,6 @@
 package com.dms.integration.controller;
 
+import com.dms.config.SecurityUserProperties;
 import com.dms.entity.User;
 import com.dms.repository.UserRepository;
 import com.dms.util.JwtManager;
@@ -33,6 +34,9 @@ class UserControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private SecurityUserProperties securityUserProperties;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -209,8 +213,7 @@ class UserControllerTest {
         userRepository.save(user);
 
         mvc.perform(get("/users/me")
-               .with(jwt().jwt(JwtManager.createJwt(user.getEmail())))
-           )
+               .with(jwt().jwt(JwtManager.createJwt(user.getEmail()))))
            .andExpectAll(
                status().isOk(),
                content().contentType(MediaType.APPLICATION_JSON),
@@ -225,7 +228,7 @@ class UserControllerTest {
         userRepository.save(user);
 
         mvc.perform(put("/users/password")
-               .with(httpBasic("admin", "admin123"))
+               .with(httpBasic(securityUserProperties.getName(), securityUserProperties.getPassword()))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -239,7 +242,7 @@ class UserControllerTest {
     @Test
     void shouldNotChangePasswordWhenEmailIsNull() throws Exception {
         mvc.perform(put("/users/password")
-               .with(httpBasic("admin", "admin123"))
+               .with(httpBasic(securityUserProperties.getName(), securityUserProperties.getPassword()))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {

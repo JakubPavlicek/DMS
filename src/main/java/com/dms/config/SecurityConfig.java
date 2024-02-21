@@ -8,7 +8,6 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,11 +42,6 @@ public class SecurityConfig {
 
     private RSAKey rsaKey;
 
-    @PostConstruct
-    public void init() throws KeyException {
-        rsaKey = keyManager.getRsaKey();
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -80,7 +74,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtEncoder jwtEncoder() {
+    JwtEncoder jwtEncoder() throws KeyException {
+        rsaKey = keyManager.getRsaKey();
         JWKSet jwkSet = new JWKSet(rsaKey);
         JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(jwkSet);
         return new NimbusJwtEncoder(jwkSource);

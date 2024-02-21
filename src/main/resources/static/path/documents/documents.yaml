@@ -10,7 +10,7 @@ get:
     - $ref: '../../parameter/Page.yaml'
     - $ref: '../../parameter/Limit.yaml'
     - $ref: '../../parameter/DocumentSort.yaml'
-    - $ref: '../../parameter/Filter.yaml'
+    - $ref: '../../parameter/DocumentFilter.yaml'
   responses:
     200:
       description: Successfully retrieved list of the documents.

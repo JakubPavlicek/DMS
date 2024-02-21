@@ -10,7 +10,7 @@ get:
     - $ref: '../../parameter/Page.yaml'
     - $ref: '../../parameter/Limit.yaml'
     - $ref: '../../parameter/RevisionSort.yaml'
-    - $ref: '../../parameter/Filter.yaml'
+    - $ref: '../../parameter/RevisionFilter.yaml'
   responses:
     200:
       description: Successfully retrieved list of the revisions.

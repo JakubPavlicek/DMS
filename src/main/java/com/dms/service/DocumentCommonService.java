@@ -33,7 +33,8 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class DocumentCommonService {
 
-    private static final String FILTER_REGEX = "(name|type|path):\"([^,]*)\"(?:,|$)";
+    private static final String DOCUMENT_FILTER_REGEX = "(name|type|path):\"([\\w\\s]*)\"(?:,|$)";
+    private static final String REVISION_FILTER_REGEX = "(name|type):\"([\\w\\s]*)\"(?:,|$)";
 
     private static final String DOCUMENT_SORT_REGEX = "(document_id|name|type|path|version|created_at|updated_at):(asc|desc)(?:,|$)";
     private static final String REVISION_SORT_REGEX = "(revision_id|name|type|version|created_at):(asc|desc)(?:,|$)";
@@ -109,23 +110,23 @@ public class DocumentCommonService {
     }
 
     public Map<String, String> getDocumentFilters(String filter) {
-        return getFilters(filter, DocumentMapper::getMappedDocumentField);
+        return getFilters(filter, DOCUMENT_FILTER_REGEX, DocumentMapper::getMappedDocumentField);
     }
 
     public Map<String, String> getRevisionFilters(String filter) {
-        return getFilters(filter, RevisionMapper::getMappedRevisionField);
+        return getFilters(filter, REVISION_FILTER_REGEX, RevisionMapper::getMappedRevisionField);
     }
 
-    private Map<String, String> getFilters(String filter, UnaryOperator<String> fieldMapper) {
-        if (!filter.matches("(" + FILTER_REGEX + ")+")) {
+    private Map<String, String> getFilters(String filter, String regex, UnaryOperator<String> fieldMapper) {
+        if (!filter.matches("(" + regex + ")+")) {
             throw new InvalidRegexInputException("The 'filter' parameter does not match the expected format");
         }
 
-        log.debug("Getting filter items: filter={}, regex={}", filter, FILTER_REGEX);
+        log.debug("Getting filter items: filter={}, regex={}", filter, regex);
 
         Map<String, String> filterItems = new HashMap<>();
 
-        Pattern pattern = Pattern.compile(FILTER_REGEX);
+        Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(filter);
 
         while (matcher.find()) {

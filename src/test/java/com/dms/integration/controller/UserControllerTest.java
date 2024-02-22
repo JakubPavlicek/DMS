@@ -224,6 +224,17 @@ class UserControllerTest {
     }
 
     @Test
+    void shouldNotReturnCurrentUserWhenUserIsNotFound() throws Exception {
+        mvc.perform(get("/users/me")
+               .with(jwt().jwt(JwtManager.createJwt(user.getEmail()))))
+           .andExpectAll(
+               status().isNotFound(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("not found"))
+           );
+    }
+
+    @Test
     void shouldChangePassword() throws Exception {
         userRepository.save(user);
 

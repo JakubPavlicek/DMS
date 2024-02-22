@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +33,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -520,6 +522,78 @@ class DocumentControllerTest {
            .andExpectAll(
                status().isUnsupportedMediaType(),
                jsonPath("$.context_info.messages[0]").value("Request must contain data")
+           );
+    }
+
+    @Test
+    void shouldSwitchDocumentToRevision() throws Exception {
+        mvc.perform(put("/documents/{documentId}/revisions/{revisionId}", document.getDocumentId(), secondRevision.getRevisionId())
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+           .andExpectAll(
+               status().isOk(),
+               content().contentType(MediaType.APPLICATION_JSON),
+               jsonPath("$.documentId").value(document.getDocumentId()),
+               jsonPath("$.author.userId").value(author.getUserId()),
+               jsonPath("$.version").value(secondRevision.getVersion()),
+               jsonPath("$.name").value(secondRevision.getName()),
+               jsonPath("$.type").value(secondRevision.getType()),
+               jsonPath("$.path").value(document.getPath())
+           );
+
+        Optional<Document> documentById = documentRepository.findById(document.getId());
+
+        assertThat(documentById).isPresent();
+        assertThat(documentById.get()
+                               .getHash()).isEqualTo(secondRevision.getHash());
+    }
+
+    @Test
+    void shouldNotSwitchDocumentToRevisionWhenUserIsUnauthenticated() throws Exception {
+        mvc.perform(put("/documents/{documentId}/revisions/{revisionId}", document.getDocumentId(), secondRevision.getRevisionId()))
+           .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldNotSwitchDocumentToRevisionWhenDocumentIsNotFound() throws Exception {
+        mvc.perform(put("/documents/{documentId}/revisions/{revisionId}", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed", secondRevision.getRevisionId())
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+           .andExpectAll(
+               status().isNotFound(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("not found"))
+           );
+    }
+
+    @Test
+    void shouldNotSwitchDocumentToRevisionWhenRevisionIsNotFound() throws Exception {
+        mvc.perform(put("/documents/{documentId}/revisions/{revisionId}", document.getDocumentId(), "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+           .andExpectAll(
+               status().isNotFound(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("not found"))
+           );
+    }
+
+    @Test
+    void shouldUploadDocument() throws Exception {
+        documentRepository.deleteAll();
+        revisionRepository.deleteAll();
+
+        mvc.perform(multipart(HttpMethod.POST, "/documents/upload")
+               .file(firstFile)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .param("destination", "{\"path\":\"/home\"}")
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isCreated(),
+               content().contentType(MediaType.APPLICATION_JSON),
+               jsonPath("$.documentId").isNotEmpty(),
+               jsonPath("$.author.userId").value(author.getUserId()),
+               jsonPath("$.version").value(1L),
+               jsonPath("$.name").value(firstFile.getOriginalFilename()),
+               jsonPath("$.type").value(MediaType.TEXT_PLAIN_VALUE),
+               jsonPath("$.path").value("/home")
            );
     }
 

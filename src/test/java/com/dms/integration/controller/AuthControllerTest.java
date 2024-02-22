@@ -3,6 +3,7 @@ package com.dms.integration.controller;
 import com.dms.entity.User;
 import com.dms.service.UserService;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,14 +27,19 @@ class AuthControllerTest {
     @Autowired
     private UserService userService;
 
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        user = User.builder()
+                   .name("james")
+                   .email("james@gmail.com")
+                   .password("secret123!")
+                   .build();
+    }
+
     @Test
     void shouldReturnToken() throws Exception {
-        User user = User.builder()
-                        .name("james")
-                        .email("james@gmail.com")
-                        .password("secret123!")
-                        .build();
-
         userService.createUser(user);
 
         mvc.perform(post("/oauth2/token")
@@ -53,12 +59,6 @@ class AuthControllerTest {
 
     @Test
     void shouldNotReturnTokenWhenCredentialsDoesNotMatch() throws Exception {
-        User user = User.builder()
-                        .name("james")
-                        .email("james@gmail.com")
-                        .password("secret123!")
-                        .build();
-
         userService.createUser(user);
 
         mvc.perform(post("/oauth2/token")

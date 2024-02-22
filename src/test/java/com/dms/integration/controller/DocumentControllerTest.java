@@ -1,5 +1,6 @@
 package com.dms.integration.controller;
 
+import com.dms.config.BlobStorageProperties;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
@@ -7,6 +8,7 @@ import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
 import com.dms.repository.UserRepository;
 import com.dms.service.BlobStorageService;
+import com.dms.util.DirectoryCleaner;
 import com.dms.util.JwtManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
@@ -59,6 +61,9 @@ class DocumentControllerTest {
 
     @Autowired
     private BlobStorageService blobStorageService;
+
+    @Autowired
+    private BlobStorageProperties blobStorageProperties;
 
     private MockMultipartFile firstFile;
     private MockMultipartFile secondFile;
@@ -155,10 +160,8 @@ class DocumentControllerTest {
     }
 
     @AfterEach
-    void tearDown() {
-        blobStorageService.deleteBlob(firstHash);
-        blobStorageService.deleteBlob(secondHash);
-        blobStorageService.deleteBlob(thirdHash);
+    void tearDown() throws Exception {
+        DirectoryCleaner.cleanDirectory(blobStorageProperties.getPath());
     }
 
     @Test
@@ -679,20 +682,20 @@ class DocumentControllerTest {
         MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/test\"}".getBytes());
 
         mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
-            .file(file)
-            .file(destination)
-            .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
-            .contentType(MediaType.MULTIPART_FORM_DATA))
-            .andExpectAll(
-                status().isCreated(),
-                content().contentType(MediaType.APPLICATION_JSON),
-                jsonPath("$.documentId").value(document.getDocumentId()),
-                jsonPath("$.author.userId").value(author.getUserId()),
-                jsonPath("$.version").value(4L),
-                jsonPath("$.name").value(thirdFile.getOriginalFilename()),
-                jsonPath("$.type").value(MediaType.TEXT_PLAIN_VALUE),
-                jsonPath("$.path").value("/test")
-            );
+               .file(file)
+               .file(destination)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isCreated(),
+               content().contentType(MediaType.APPLICATION_JSON),
+               jsonPath("$.documentId").value(document.getDocumentId()),
+               jsonPath("$.author.userId").value(author.getUserId()),
+               jsonPath("$.version").value(4L),
+               jsonPath("$.name").value(thirdFile.getOriginalFilename()),
+               jsonPath("$.type").value(MediaType.TEXT_PLAIN_VALUE),
+               jsonPath("$.path").value("/test")
+           );
     }
 
     @Test

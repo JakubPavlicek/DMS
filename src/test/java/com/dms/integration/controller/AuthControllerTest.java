@@ -52,6 +52,31 @@ class AuthControllerTest {
     }
 
     @Test
+    void shouldNotReturnTokenWhenCredentialsDoesNotMatch() throws Exception {
+        User user = User.builder()
+                        .name("james")
+                        .email("james@gmail.com")
+                        .password("secret123!")
+                        .build();
+
+        userService.createUser(user);
+
+        mvc.perform(post("/oauth2/token")
+               .contentType(MediaType.APPLICATION_JSON)
+               .content("""
+                        {
+                        	"email": "james@gmail.com",
+                            "password": "secret12345!"
+                        }
+                        """))
+           .andExpectAll(
+               status().isBadRequest(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value("Bad credentials")
+           );
+    }
+
+    @Test
     void shouldNotReturnTokenWhenEmailIsNotProvided() throws Exception {
         mvc.perform(post("/oauth2/token")
                .contentType(MediaType.APPLICATION_JSON)

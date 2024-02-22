@@ -226,6 +226,19 @@ class DocumentControllerTest {
     }
 
     @Test
+    void shouldNotDownloadDocumentWhenBlobDoesNotExists() throws Exception {
+        blobStorageService.deleteBlob(firstHash);
+
+        mvc.perform(get("/documents/{documentId}/download", document.getDocumentId())
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+           .andExpectAll(
+               status().isInternalServerError(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value("File could not be resolved")
+           );
+    }
+
+    @Test
     void shouldReturnDocument() throws Exception {
         mvc.perform(get("/documents/{documentId}", document.getDocumentId())
                .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
@@ -580,10 +593,13 @@ class DocumentControllerTest {
         documentRepository.deleteAll();
         revisionRepository.deleteAll();
 
+        MockMultipartFile file = new MockMultipartFile("file", firstFile.getOriginalFilename(), firstFile.getContentType(), firstFile.getBytes());
+        MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/home\"}".getBytes());
+
         mvc.perform(multipart(HttpMethod.POST, "/documents/upload")
-               .file(firstFile)
+               .file(file)
+               .file(destination)
                .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
-               .param("destination", "{\"path\":\"/home\"}")
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isCreated(),
@@ -594,6 +610,202 @@ class DocumentControllerTest {
                jsonPath("$.name").value(firstFile.getOriginalFilename()),
                jsonPath("$.type").value(MediaType.TEXT_PLAIN_VALUE),
                jsonPath("$.path").value("/home")
+           );
+
+        List<Document> documents = documentRepository.findAll();
+
+        assertThat(documents).hasSize(1);
+    }
+
+    @Test
+    void shouldNotUploadDocumentWhenFileIsMissing() throws Exception {
+        MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/home\"}".getBytes());
+
+        mvc.perform(multipart(HttpMethod.POST, "/documents/upload")
+               .file(destination)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isBadRequest(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("file")),
+               jsonPath("$.detail").value(containsString("is not present"))
+           );
+    }
+
+    @Test
+    void shouldNotUploadDocumentWhenDestinationIsMissing() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", secondFile.getOriginalFilename(), secondFile.getContentType(), secondFile.getBytes());
+
+        mvc.perform(multipart(HttpMethod.POST, "/documents/upload")
+               .file(file)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isBadRequest(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("destination")),
+               jsonPath("$.detail").value(containsString("is not present"))
+           );
+    }
+
+    @Test
+    void shouldNotUploadDocumentWhenUserIsNotAuthenticated() throws Exception {
+        mvc.perform(multipart(HttpMethod.POST, "/documents/upload"))
+           .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldNotUploadDocumentWhenDocumentWithPathAlreadyExists() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", firstFile.getOriginalFilename(), firstFile.getContentType(), firstFile.getBytes());
+        MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/\"}".getBytes());
+
+        mvc.perform(multipart(HttpMethod.POST, "/documents/upload")
+               .file(file)
+               .file(destination)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isConflict(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("path")),
+               jsonPath("$.detail").value(containsString("already exists"))
+           );
+    }
+
+    @Test
+    void shouldUploadNewDocumentVersion() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", thirdFile.getOriginalFilename(), thirdFile.getContentType(), thirdFile.getBytes());
+        MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/test\"}".getBytes());
+
+        mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
+            .file(file)
+            .file(destination)
+            .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpectAll(
+                status().isCreated(),
+                content().contentType(MediaType.APPLICATION_JSON),
+                jsonPath("$.documentId").value(document.getDocumentId()),
+                jsonPath("$.author.userId").value(author.getUserId()),
+                jsonPath("$.version").value(4L),
+                jsonPath("$.name").value(thirdFile.getOriginalFilename()),
+                jsonPath("$.type").value(MediaType.TEXT_PLAIN_VALUE),
+                jsonPath("$.path").value("/test")
+            );
+    }
+
+    @Test
+    void shouldUploadNewDocumentVersionWithNullDestination() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", thirdFile.getOriginalFilename(), thirdFile.getContentType(), thirdFile.getBytes());
+
+        mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
+               .file(file)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isCreated(),
+               content().contentType(MediaType.APPLICATION_JSON),
+               jsonPath("$.documentId").value(document.getDocumentId()),
+               jsonPath("$.author.userId").value(author.getUserId()),
+               jsonPath("$.version").value(4L),
+               jsonPath("$.name").value(thirdFile.getOriginalFilename()),
+               jsonPath("$.type").value(MediaType.TEXT_PLAIN_VALUE),
+               jsonPath("$.path").value(document.getPath())
+           );
+    }
+
+    @Test
+    void shouldNotUploadNewDocumentVersionWhenFileIsMissing() throws Exception {
+        mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isBadRequest(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("file")),
+               jsonPath("$.detail").value(containsString("is not present"))
+           );
+    }
+
+    @Test
+    void shouldNotUploadNewDocumentVersionWhenDestinationIsInvalid() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", thirdFile.getOriginalFilename(), thirdFile.getContentType(), thirdFile.getBytes());
+        MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/!!!\"}".getBytes());
+
+        mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
+               .file(file)
+               .file(destination)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isBadRequest(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value("Provided data are not valid")
+           );
+    }
+
+    @Test
+    void shouldNotUploadNewDocumentVersionWhenUserIsNotAuthenticated() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", thirdFile.getOriginalFilename(), thirdFile.getContentType(), thirdFile.getBytes());
+        MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/home\"}".getBytes());
+
+        mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
+               .file(file)
+               .file(destination)
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldNotUploadNewDocumentVersionWhenDocumentIsNotFound() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", thirdFile.getOriginalFilename(), thirdFile.getContentType(), thirdFile.getBytes());
+        MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/home\"}".getBytes());
+
+        mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
+               .file(file)
+               .file(destination)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isNotFound(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("not found"))
+           );
+    }
+
+    @Test
+    void shouldNotUploadNewDocumentVersionWhenDocumentWithPathAlreadyExists() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", firstFile.getOriginalFilename(), firstFile.getContentType(), firstFile.getBytes());
+        MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/\"}".getBytes());
+
+        mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
+               .file(file)
+               .file(destination)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isConflict(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("path")),
+               jsonPath("$.detail").value(containsString("already exists"))
+           );
+    }
+
+    @Test
+    void shouldNotUploadNewDocumentVersionWhenFileIsNull() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", (byte[]) null);
+        MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/\"}".getBytes());
+
+        mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
+               .file(file)
+               .file(destination)
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .contentType(MediaType.MULTIPART_FORM_DATA))
+           .andExpectAll(
+               status().isBadRequest(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.context_info.messages[0]").value(containsString("file"))
            );
     }
 

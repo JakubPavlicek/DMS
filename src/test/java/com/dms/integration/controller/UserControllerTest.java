@@ -154,6 +154,24 @@ class UserControllerTest {
     }
 
     @Test
+    void shouldNotCreateUserWhenUsernameIsInvalid() throws Exception {
+        mvc.perform(post("/users")
+               .contentType(MediaType.APPLICATION_JSON)
+               .content("""
+                        {
+                            "name": "a",
+                        	"email": "james@gmail.com",
+                        	"password": "secret123!"
+                        }
+                        """))
+           .andExpectAll(
+               status().isBadRequest(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.context_info.messages[0]").value(containsString("name"))
+           );
+    }
+
+    @Test
     void shouldNotCreateUserWhenEmailIsInvalid() throws Exception {
         mvc.perform(post("/users")
                .contentType(MediaType.APPLICATION_JSON)
@@ -268,7 +286,7 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldNotChangePasswordWhenUnauthenticated() throws Exception {
+    void shouldNotChangePasswordWhenUserIsNotAuthenticated() throws Exception {
         mvc.perform(put("/users/password")
                .with(httpBasic("name", "password"))
                .contentType(MediaType.APPLICATION_JSON)
@@ -279,6 +297,14 @@ class UserControllerTest {
                         }
                         """))
            .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    void shouldNotChangePasswordWhenUserIsNotAuthorized() throws Exception {
+        mvc.perform(get("/users/password")
+               .with(jwt().jwt(JwtManager.createJwt(user.getEmail()))))
+           .andExpect(status().isForbidden());
     }
 
 }

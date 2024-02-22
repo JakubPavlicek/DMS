@@ -18,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -109,17 +108,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        log.error(LOG_MESSAGE, getRequestURI(request), ex);
-
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
-        problemDetail.setTitle("Missing Request Parameter");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/missing-request-parameter"));
-
-        return ResponseEntity.of(problemDetail).build();
-    }
-
-    @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(LOG_MESSAGE, getRequestURI(request), ex);
 
@@ -128,17 +116,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/resource-not-found"));
 
         return ResponseEntity.of(problemDetail).build();
-    }
-
-    @ExceptionHandler(UnauthorizedAccessException.class)
-    public ProblemDetail handleUnauthorizedAccessException(UnauthorizedAccessException exception, HttpServletRequest request) {
-        log.error(LOG_MESSAGE, request.getRequestURI(), exception);
-
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception.getMessage());
-        problemDetail.setTitle("Access Denied");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/unauthorized-access"));
-
-        return problemDetail;
     }
 
     @ExceptionHandler(BadCredentialsException.class)

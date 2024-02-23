@@ -307,4 +307,43 @@ class UserControllerTest {
            .andExpect(status().isForbidden());
     }
 
+    @Test
+    void shouldChangeLogLevel() throws Exception {
+        mvc.perform(post("/actuator/loggers/com.dms")
+               .with(httpBasic(securityUserProperties.getName(), securityUserProperties.getPassword()))
+               .contentType(MediaType.APPLICATION_JSON)
+               .content("""
+                        {
+                           "configuredLevel": "INFO"
+                        }
+                        """))
+           .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldNotChangeLogLevelWhenUserIsNotAuthenticated() throws Exception {
+        mvc.perform(post("/actuator/loggers/com.dms")
+               .with(httpBasic("john", "john123!"))
+               .contentType(MediaType.APPLICATION_JSON)
+               .content("""
+                        {
+                           "configuredLevel": "INFO"
+                        }
+                        """))
+           .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldNotChangeLogLevelWhenUserIsNotAuthorized() throws Exception {
+        mvc.perform(post("/actuator/loggers/com.dms")
+               .with(jwt().jwt(JwtManager.createJwt(user.getEmail())))
+               .contentType(MediaType.APPLICATION_JSON)
+               .content("""
+                        {
+                           "configuredLevel": "INFO"
+                        }
+                        """))
+           .andExpect(status().isForbidden());
+    }
+
 }

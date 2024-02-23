@@ -70,8 +70,6 @@ class DocumentControllerTest {
     private MockMultipartFile thirdFile;
 
     private String firstHash;
-    private String secondHash;
-    private String thirdHash;
 
     private User author;
     private Document document;
@@ -86,10 +84,10 @@ class DocumentControllerTest {
         firstHash = blobStorageService.storeBlob(firstFile);
 
         secondFile = new MockMultipartFile("second_file", "temp_document.txt", MediaType.TEXT_PLAIN_VALUE, "second".getBytes());
-        secondHash = blobStorageService.storeBlob(secondFile);
+        String secondHash = blobStorageService.storeBlob(secondFile);
 
         thirdFile = new MockMultipartFile("third_file", "final_document.txt", MediaType.TEXT_PLAIN_VALUE, "third".getBytes());
-        thirdHash = blobStorageService.storeBlob(thirdFile);
+        String thirdHash = blobStorageService.storeBlob(thirdFile);
 
         author = User.builder()
                      .email("james@gmail.com")
@@ -142,8 +140,6 @@ class DocumentControllerTest {
                                         .hash(thirdHash)
                                         .build();
 
-        author = userRepository.save(author);
-
         List<DocumentRevision> revisions = new ArrayList<>();
         revisions.add(firstRevision);
         revisions.add(secondRevision);
@@ -151,12 +147,13 @@ class DocumentControllerTest {
 
         document.setRevisions(revisions);
 
-        document = documentRepository.save(document);
-        secondDocument = documentRepository.save(secondDocument);
+        userRepository.save(author);
+        documentRepository.save(document);
+        documentRepository.save(secondDocument);
 
-        firstRevision = revisionRepository.save(firstRevision);
-        secondRevision = revisionRepository.save(secondRevision);
-        thirdRevision = revisionRepository.save(thirdRevision);
+        revisionRepository.save(firstRevision);
+        revisionRepository.save(secondRevision);
+        revisionRepository.save(thirdRevision);
     }
 
     @AfterEach

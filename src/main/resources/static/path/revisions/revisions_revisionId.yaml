@@ -15,8 +15,6 @@ get:
         application/json:
           schema:
             $ref: '../../schema/DocumentRevision.yaml'
-    400:
-      $ref: '../../response/400InvalidOrMissingParams.yaml'
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:
@@ -35,8 +33,6 @@ delete:
   responses:
     204:
       description: Successfully deleted a revision.
-    400:
-      $ref: '../../response/400InvalidOrMissingParams.yaml'
     401:
       $ref: '../../response/401Unathorized.yaml'
     404:

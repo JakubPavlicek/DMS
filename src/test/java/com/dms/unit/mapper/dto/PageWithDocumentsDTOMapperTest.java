@@ -25,7 +25,7 @@ class PageWithDocumentsDTOMapperTest {
                           .password("secret123!")
                           .build();
 
-        Document document = Document.builder()
+        Document firstDocument = Document.builder()
                                     .author(author)
                                     .documentId("277f6b39-ec44-4fbe-9605-8d0dee790518")
                                     .version(1L)
@@ -37,7 +37,7 @@ class PageWithDocumentsDTOMapperTest {
                                     .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .build();
 
-        Document document2 = Document.builder()
+        Document secondDocument = Document.builder()
                                      .author(author)
                                      .documentId("ce234e8d-a809-437b-8198-c5faa07f9ff1")
                                      .version(1L)
@@ -49,7 +49,7 @@ class PageWithDocumentsDTOMapperTest {
                                      .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                      .build();
 
-        List<Document> documentList = List.of(document, document2);
+        List<Document> documentList = List.of(firstDocument, secondDocument);
         Pageable pageable = Pageable.ofSize(documentList.size());
 
         Page<Document> documentPage = new PageImpl<>(documentList, pageable, documentList.size());

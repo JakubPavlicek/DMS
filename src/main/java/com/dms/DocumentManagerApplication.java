@@ -11,7 +11,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({ServerProperties.class, BlobStorageProperties.class, HashProperties.class, KeyProperties.class, SecurityUserProperties.class, TokenProperties.class})
+@EnableConfigurationProperties(
+    {
+        ServerProperties.class,
+        BlobStorageProperties.class,
+        HashProperties.class,
+        TokenProperties.class,
+        KeyProperties.class,
+        SecurityUserProperties.class
+    }
+)
 public class DocumentManagerApplication {
 
     public static void main(String[] args) {

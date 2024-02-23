@@ -160,7 +160,8 @@ class DocumentRevisionRepositoryTest {
 
         revisionRepository.save(anotherRevision);
 
-        int revisionCount = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(revision.getDocument()).size();
+        int revisionCount = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(revision.getDocument())
+                                              .size();
 
         assertThat(revisionCount).isEqualTo(2);
     }
@@ -175,14 +176,16 @@ class DocumentRevisionRepositoryTest {
                                                            .name("dog.jpeg")
                                                            .type("image/jpeg")
                                                            .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
-                                                           .createdAt(LocalDateTime.parse("2023-11-14T08:30:00").minusHours(1))
+                                                           .createdAt(LocalDateTime.parse("2023-11-14T08:30:00")
+                                                                                   .minusHours(1))
                                                            .build();
 
         revisionRepository.save(anotherRevision);
 
         List<DocumentRevision> revisions = revisionRepository.findAllByDocumentOrderByCreatedAtAsc(revision.getDocument());
 
-        assertThat(revisions).extracting(DocumentRevision::getCreatedAt).isSortedAccordingTo(Comparator.naturalOrder());
+        assertThat(revisions).extracting(DocumentRevision::getCreatedAt)
+                             .isSortedAccordingTo(Comparator.naturalOrder());
     }
 
     @Test

@@ -35,15 +35,15 @@ class DocumentRevisionDTOMapperTest {
                                     .build();
 
         DocumentRevision revision = DocumentRevision.builder()
-                                   .revisionId("95f6dbc2-b919-4b04-94b6-e857a92677d4")
-                                   .author(author)
-                                   .document(document)
-                                   .version(1L)
-                                   .name("dog.jpeg")
-                                   .type("image/jpeg")
-                                   .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
-                                   .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
-                                   .build();
+                                                    .revisionId("95f6dbc2-b919-4b04-94b6-e857a92677d4")
+                                                    .author(author)
+                                                    .document(document)
+                                                    .version(1L)
+                                                    .name("dog.jpeg")
+                                                    .type("image/jpeg")
+                                                    .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                                    .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
+                                                    .build();
 
         DocumentRevisionDTO revisionDTO = DocumentRevisionDTOMapper.map(revision);
 

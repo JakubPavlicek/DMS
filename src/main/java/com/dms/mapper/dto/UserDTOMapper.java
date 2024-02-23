@@ -6,8 +6,7 @@ import com.dms.entity.User;
 
 public class UserDTOMapper {
 
-    private UserDTOMapper()
-    {
+    private UserDTOMapper() {
     }
 
     public static UserDTO mapToUserDTO(User user) {

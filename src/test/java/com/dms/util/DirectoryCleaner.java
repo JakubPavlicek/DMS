@@ -7,8 +7,7 @@ import java.util.Comparator;
 
 public class DirectoryCleaner {
 
-    private DirectoryCleaner()
-    {
+    private DirectoryCleaner() {
     }
 
     public static void cleanDirectory(String directory) throws IOException {
@@ -25,4 +24,5 @@ public class DirectoryCleaner {
                  }
              });
     }
+
 }

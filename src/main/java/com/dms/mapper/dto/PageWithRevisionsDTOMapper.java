@@ -10,8 +10,7 @@ import java.util.List;
 
 public class PageWithRevisionsDTOMapper {
 
-    private PageWithRevisionsDTOMapper()
-    {
+    private PageWithRevisionsDTOMapper() {
     }
 
     public static PageWithRevisionsDTO map(Page<DocumentRevision> revisionPage) {

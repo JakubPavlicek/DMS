@@ -5,8 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 public class PageableDTOMapper {
 
-    private PageableDTOMapper()
-    {
+    private PageableDTOMapper() {
     }
 
     public static PageableDTO map(Pageable pageable) {

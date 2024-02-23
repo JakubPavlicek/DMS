@@ -38,29 +38,29 @@ class PageWithRevisionsDTOMapperTest {
                                     .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .build();
 
-        DocumentRevision revision = DocumentRevision.builder()
-                                   .revisionId("95f6dbc2-b919-4b04-94b6-e857a92677d4")
-                                   .author(author)
-                                   .document(document)
-                                   .version(1L)
-                                   .name("dog.jpeg")
-                                   .type("image/jpeg")
-                                   .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
-                                   .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
-                                   .build();
-
-        DocumentRevision revision2 = DocumentRevision.builder()
-                                                    .revisionId("83bf9967-25f5-42a6-a84b-c6882992f15d")
+        DocumentRevision firstRevision = DocumentRevision.builder()
+                                                    .revisionId("95f6dbc2-b919-4b04-94b6-e857a92677d4")
                                                     .author(author)
                                                     .document(document)
-                                                    .version(2L)
+                                                    .version(1L)
                                                     .name("dog.jpeg")
                                                     .type("image/jpeg")
                                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                     .build();
 
-        List<DocumentRevision> revisionList = List.of(revision, revision2);
+        DocumentRevision secondRevision = DocumentRevision.builder()
+                                                     .revisionId("83bf9967-25f5-42a6-a84b-c6882992f15d")
+                                                     .author(author)
+                                                     .document(document)
+                                                     .version(2L)
+                                                     .name("dog.jpeg")
+                                                     .type("image/jpeg")
+                                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
+                                                     .build();
+
+        List<DocumentRevision> revisionList = List.of(firstRevision, secondRevision);
         Pageable pageable = Pageable.ofSize(revisionList.size());
 
         Page<DocumentRevision> revisionPage = new PageImpl<>(revisionList, pageable, revisionList.size());

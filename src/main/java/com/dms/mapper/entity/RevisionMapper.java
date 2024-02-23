@@ -4,8 +4,7 @@ import com.dms.entity.DocumentRevision_;
 
 public class RevisionMapper {
 
-    private RevisionMapper()
-    {
+    private RevisionMapper() {
     }
 
     public enum Field {

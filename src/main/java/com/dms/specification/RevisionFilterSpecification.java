@@ -12,8 +12,7 @@ import java.util.Map;
 
 public class RevisionFilterSpecification {
 
-    private RevisionFilterSpecification()
-    {
+    private RevisionFilterSpecification() {
     }
 
     public static Specification<DocumentRevision> filter(Map<String, String> filters, User user) {

@@ -10,8 +10,7 @@ import java.util.List;
 
 public class PageWithDocumentsDTOMapper {
 
-    private PageWithDocumentsDTOMapper()
-    {
+    private PageWithDocumentsDTOMapper() {
     }
 
     public static PageWithDocumentsDTO map(Page<Document> documentPage) {

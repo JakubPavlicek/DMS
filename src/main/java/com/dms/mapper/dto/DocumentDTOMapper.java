@@ -5,8 +5,7 @@ import com.dms.entity.Document;
 
 public class DocumentDTOMapper {
 
-    private DocumentDTOMapper()
-    {
+    private DocumentDTOMapper() {
     }
 
     public static DocumentDTO map(Document document) {

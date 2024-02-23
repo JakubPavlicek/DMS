@@ -4,8 +4,7 @@ import com.dms.entity.Document_;
 
 public class DocumentMapper {
 
-    private DocumentMapper()
-    {
+    private DocumentMapper() {
     }
 
     public enum Field {

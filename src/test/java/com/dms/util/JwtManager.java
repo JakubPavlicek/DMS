@@ -6,8 +6,7 @@ import java.util.function.Consumer;
 
 public class JwtManager {
 
-    private JwtManager()
-    {
+    private JwtManager() {
     }
 
     public static Consumer<Jwt.Builder> createJwt(String email) {

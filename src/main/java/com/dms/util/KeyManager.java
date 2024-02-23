@@ -83,7 +83,7 @@ public class KeyManager {
             byte[] keyBytes = Files.readAllBytes(keyPath);
 
             String encodedKey = new String(keyBytes)
-                .replaceAll("\\n", "")
+                .replace("\n", "")
                 .replace(KEY_BEGIN + keyType + KEY_SUFFIX, "")
                 .replace(KEY_END + keyType + KEY_SUFFIX, "");
 
@@ -91,13 +91,11 @@ public class KeyManager {
 
             KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
 
-            if (keyType.equals(PRIVATE_KEY))
-            {
+            if (keyType.equals(PRIVATE_KEY)) {
                 PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
                 return keyFactory.generatePrivate(keySpec);
             }
-            else
-            {
+            else {
                 X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
                 return keyFactory.generatePublic(keySpec);
             }
@@ -112,8 +110,7 @@ public class KeyManager {
         byte[] keyBytes = key.getEncoded();
         String encodedKey = Base64.getEncoder().encodeToString(keyBytes);
 
-        try(FileWriter fileWriter = new FileWriter(filepath))
-        {
+        try (FileWriter fileWriter = new FileWriter(filepath)) {
             fileWriter.write(KEY_BEGIN + keyType + KEY_SUFFIX);
             fileWriter.write("\n");
             fileWriter.write(encodedKey);
@@ -122,7 +119,7 @@ public class KeyManager {
         } catch (IOException exception) {
             String message = "Failed to save " + keyType + " key";
             log.error(message, exception);
-            throw new KeyException(exception);
+            throw new KeyException(message);
         }
 
         log.info("Successfully saved {} key to file {}", keyType, filepath);

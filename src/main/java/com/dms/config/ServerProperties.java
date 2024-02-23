@@ -9,7 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @ConfigurationProperties(prefix = "server")
 public class ServerProperties {
 
-    @Value("${server.error.path}")
+    @Value("${server.error.path:#{'/errors'}}")
     private String errorPath;
 
     public String getErrorUrl() {

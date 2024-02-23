@@ -5,6 +5,10 @@ storage:
 hash:
   algorithm: SHA-256
 
+token:
+  expiration:
+    time: 1 # in hours
+
 rsa:
   private-key: src/main/resources/certs/private.pem
   public-key: src/main/resources/certs/public.pem

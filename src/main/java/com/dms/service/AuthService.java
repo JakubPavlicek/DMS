@@ -1,5 +1,6 @@
 package com.dms.service;
 
+import com.dms.config.TokenProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,8 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtEncoder jwtEncoder;
 
+    private final TokenProperties tokenProperties;
+
     public String token(String email, String password) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         log.info("User authenticated successfully");
@@ -33,7 +36,7 @@ public class AuthService {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                                           .subject(authentication.getName())
                                           .issuedAt(now)
-                                          .expiresAt(now.plus(1, ChronoUnit.HOURS))
+                                          .expiresAt(now.plus(tokenProperties.getExpirationTime(), ChronoUnit.HOURS))
                                           .build();
 
         String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

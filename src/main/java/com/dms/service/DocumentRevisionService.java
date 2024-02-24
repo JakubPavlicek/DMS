@@ -92,7 +92,7 @@ public class DocumentRevisionService {
             replaceDocumentWithAdjacentRevision(document);
         }
 
-        documentCommonService.deleteBlobIfHashIsNotADuplicate(revision.getHash());
+        documentCommonService.safelyDeleteBlob(revision.getHash());
         revisionRepository.deleteByRevisionId(revisionId);
 
         documentCommonService.updateRevisionVersionsForDocument(document);

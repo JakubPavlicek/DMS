@@ -87,6 +87,9 @@ public class Document {
     )
     private String hash;
 
+    @Column(nullable = false)
+    private Boolean isArchived;
+
     @CreationTimestamp
     @Column(
         nullable = false,
@@ -97,6 +100,9 @@ public class Document {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column
+    private LocalDateTime deleteAt;
 
     @PrePersist
     private void generateId() {

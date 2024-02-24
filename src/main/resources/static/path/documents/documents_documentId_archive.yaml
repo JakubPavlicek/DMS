@@ -1,0 +1,17 @@
+put:
+  summary: Archive document
+  description: Marks the given document as archived.
+  operationId: archiveDocument
+  tags:
+    - documents
+  security:
+    - bearerAuth: []
+  parameters:
+    - $ref: '../../parameter/DocumentId.yaml'
+  responses:
+    204:
+      description: Successfully marked document as archived.
+    401:
+      $ref: '../../response/401Unathorized.yaml'
+    404:
+      $ref: '../../response/404DocumentNotFound.yaml'

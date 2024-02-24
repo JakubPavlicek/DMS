@@ -7,6 +7,9 @@ storage:
 hash:
   algorithm: SHA-256
 
+archive:
+  retention-period-days: 60 # define for how many days the document will be retained in the archive
+
 # time till the JWT token expires
 token:
   expiration:

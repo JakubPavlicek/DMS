@@ -1,5 +1,6 @@
 package com.dms.service;
 
+import com.dms.config.ArchiveProperties;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.User;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,6 +39,8 @@ public class DocumentService {
 
     private final DocumentCommonService documentCommonService;
     private final UserService userService;
+
+    private final ArchiveProperties archiveProperties;
 
     private Document getAuthenticatedUserDocument(String documentId) {
         log.debug("Getting document: documentId={}", documentId);
@@ -69,6 +73,7 @@ public class DocumentService {
                        .path(path)
                        .hash(hash)
                        .version(1L)
+                       .isArchived(false)
                        .author(author)
                        .build();
     }
@@ -166,7 +171,7 @@ public class DocumentService {
         Document document = getAuthenticatedUserDocument(documentId);
 
         List<DocumentRevision> documentRevisions = document.getRevisions();
-        documentRevisions.forEach(revision -> documentCommonService.deleteBlobIfHashIsNotADuplicate(revision.getHash()));
+        documentRevisions.forEach(revision -> documentCommonService.safelyDeleteBlob(revision.getHash()));
 
         documentRepository.delete(document);
 
@@ -198,7 +203,7 @@ public class DocumentService {
         Map<String, String> filters = documentCommonService.getDocumentFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<Document> specification = DocumentFilterSpecification.filter(filters, user);
+        Specification<Document> specification = DocumentFilterSpecification.filterByUser(filters, user);
 
         Page<Document> documents = documentRepository.findAll(specification, pageable);
 
@@ -241,6 +246,35 @@ public class DocumentService {
         log.info("Document {} moved successfully to path {}", documentId, path);
 
         return savedDocument;
+    }
+
+    @Transactional
+    public void archiveDocument(String documentId) {
+        log.debug("Request - Archiving document: documentId={}", documentId);
+
+        Document document = getAuthenticatedUserDocument(documentId);
+        int retentionDays = archiveProperties.getRetentionPeriodInDays();
+
+        document.setIsArchived(true);
+        document.setDeleteAt(LocalDateTime.now().plusDays(retentionDays));
+        documentRepository.save(document);
+
+        log.info("Document {} archived successfully", documentId);
+    }
+
+    @Transactional
+    public Document restoreDocument(String documentId) {
+        log.debug("Request - Restoring document: documentId={}", documentId);
+
+        Document document = getAuthenticatedUserDocument(documentId);
+
+        document.setIsArchived(false);
+        document.setDeleteAt(null);
+        Document restoredDocument = documentRepository.save(document);
+
+        log.info("Document {} restored successfully", documentId);
+
+        return restoredDocument;
     }
 
 }

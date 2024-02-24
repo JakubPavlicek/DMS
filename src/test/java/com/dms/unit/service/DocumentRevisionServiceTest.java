@@ -144,7 +144,7 @@ class DocumentRevisionServiceTest {
 
         verify(revisionRepository, times(1)).findPreviousByDocumentAndVersion(document, document.getVersion());
         verify(documentCommonService, times(1)).updateDocumentToRevision(document, previousRevision);
-        verify(documentCommonService, times(1)).deleteBlobIfHashIsNotADuplicate(revision.getHash());
+        verify(documentCommonService, times(1)).safelyDeleteBlob(revision.getHash());
         verify(revisionRepository, times(1)).deleteByRevisionId(revision.getRevisionId());
         verify(documentCommonService, times(1)).updateRevisionVersionsForDocument(document);
         verify(documentCommonService, never()).saveDocument(document);
@@ -173,7 +173,7 @@ class DocumentRevisionServiceTest {
         verify(revisionRepository, times(1)).findPreviousByDocumentAndVersion(document, document.getVersion());
         verify(revisionRepository, times(1)).findNextByDocumentAndVersion(document, document.getVersion());
         verify(documentCommonService, times(1)).updateDocumentToRevision(document, nextRevision);
-        verify(documentCommonService, times(1)).deleteBlobIfHashIsNotADuplicate(revision.getHash());
+        verify(documentCommonService, times(1)).safelyDeleteBlob(revision.getHash());
         verify(revisionRepository, times(1)).deleteByRevisionId(revision.getRevisionId());
         verify(documentCommonService, times(1)).updateRevisionVersionsForDocument(document);
         verify(documentCommonService, never()).saveDocument(any(Document.class));
@@ -200,7 +200,7 @@ class DocumentRevisionServiceTest {
         verify(revisionRepository, times(1)).findPreviousByDocumentAndVersion(document, document.getVersion());
         verify(revisionRepository, times(1)).findNextByDocumentAndVersion(document, document.getVersion());
         verify(documentCommonService, never()).updateDocumentToRevision(any(Document.class), any(DocumentRevision.class));
-        verify(documentCommonService, never()).deleteBlobIfHashIsNotADuplicate(anyString());
+        verify(documentCommonService, never()).safelyDeleteBlob(anyString());
         verify(revisionRepository, never()).deleteByRevisionId(anyString());
         verify(documentCommonService, never()).updateRevisionVersionsForDocument(any(Document.class));
         verify(documentCommonService, never()).saveDocument(any(Document.class));
@@ -222,7 +222,7 @@ class DocumentRevisionServiceTest {
 
         verify(revisionRepository, never()).findPreviousByDocumentAndVersion(any(Document.class), anyLong());
         verify(documentCommonService, never()).updateDocumentToRevision(any(Document.class), any(DocumentRevision.class));
-        verify(documentCommonService, times(1)).deleteBlobIfHashIsNotADuplicate(revision.getHash());
+        verify(documentCommonService, times(1)).safelyDeleteBlob(revision.getHash());
         verify(revisionRepository, times(1)).deleteByRevisionId(revision.getRevisionId());
         verify(documentCommonService, times(1)).updateRevisionVersionsForDocument(document);
         verify(documentCommonService, times(1)).saveDocument(document);

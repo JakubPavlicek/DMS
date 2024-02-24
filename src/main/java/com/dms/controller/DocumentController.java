@@ -26,6 +26,12 @@ public class DocumentController implements DocumentsApi {
     private final DocumentService documentService;
 
     @Override
+    public ResponseEntity<Void> archiveDocument(String documentId) {
+        documentService.archiveDocument(documentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     public ResponseEntity<Void> deleteDocumentWithRevisions(String documentId) {
         documentService.deleteDocumentWithRevisions(documentId);
         return ResponseEntity.noContent().build();
@@ -63,6 +69,14 @@ public class DocumentController implements DocumentsApi {
     @Override
     public ResponseEntity<DocumentDTO> moveDocument(String documentId, DestinationDTO destination) {
         Document document = documentService.moveDocument(documentId, destination.getPath());
+        DocumentDTO documentDTO = DocumentDTOMapper.map(document);
+
+        return ResponseEntity.ok(documentDTO);
+    }
+
+    @Override
+    public ResponseEntity<DocumentDTO> restoreDocument(String documentId) {
+        Document document = documentService.restoreDocument(documentId);
         DocumentDTO documentDTO = DocumentDTOMapper.map(document);
 
         return ResponseEntity.ok(documentDTO);

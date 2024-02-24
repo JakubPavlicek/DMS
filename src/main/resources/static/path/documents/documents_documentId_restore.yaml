@@ -1,0 +1,21 @@
+put:
+  summary: Restore document
+  description: Restores a given document from the archive.
+  operationId: restoreDocument
+  tags:
+    - documents
+  security:
+    - bearerAuth: []
+  parameters:
+    - $ref: '../../parameter/DocumentId.yaml'
+  responses:
+    200:
+      description: Successfully restored document from archive.
+      content:
+        application/json:
+          schema:
+            $ref: '../../schema/Document.yaml'
+    401:
+      $ref: '../../response/401Unathorized.yaml'
+    404:
+      $ref: '../../response/404DocumentNotFound.yaml'

@@ -26,6 +26,10 @@ properties:
     pattern: /$|(/[\w\-]+)+
     description: "The user-defined path of the document"
     example: /home
+  isArchived:
+    type: boolean
+    description: "If the document is archived or not"
+    example: false
   createdAt:
     type: string
     format: date-time

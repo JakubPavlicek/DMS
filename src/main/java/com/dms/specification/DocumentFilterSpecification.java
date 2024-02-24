@@ -14,12 +14,20 @@ public class DocumentFilterSpecification {
     private DocumentFilterSpecification() {
     }
 
-    public static Specification<Document> filter(Map<String, String> filters, User user) {
+    public static Specification<Document> filterByUser(Map<String, String> filters, User user) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = FilterPredicateGenerator.getLikePredicates(filters, root, criteriaBuilder);
 
             Predicate userPredicate = criteriaBuilder.equal(root.get(Document_.AUTHOR), user);
             predicates.add(userPredicate);
+
+            return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
+        };
+    }
+
+    public static Specification<Document> filter(Map<String, String> filters) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = FilterPredicateGenerator.getLikePredicates(filters, root, criteriaBuilder);
 
             return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
         };

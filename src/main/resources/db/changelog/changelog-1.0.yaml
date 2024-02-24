@@ -101,6 +101,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: is_archived
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
                   name: created_at
                   type: timestamp
                   constraints:
@@ -110,6 +115,11 @@ databaseChangeLog:
                   type: timestamp
                   constraints:
                     nullable: false
+              - column:
+                  name: delete_at
+                  type: timestamp
+                  constraints:
+                    nullable: true
 
         - createTable:
             tableName: document_revision

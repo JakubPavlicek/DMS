@@ -364,7 +364,7 @@ class DocumentCommonServiceTest {
         when(documentRepository.duplicateHashExists(hash)).thenReturn(false);
         when(revisionRepository.duplicateHashExists(hash)).thenReturn(false);
 
-        documentCommonService.deleteBlobIfHashIsNotADuplicate(hash);
+        documentCommonService.safelyDeleteBlob(hash);
 
         verify(blobStorageService, times(1)).deleteBlob(hash);
     }
@@ -375,7 +375,7 @@ class DocumentCommonServiceTest {
 
         when(documentRepository.duplicateHashExists(hash)).thenReturn(true);
 
-        documentCommonService.deleteBlobIfHashIsNotADuplicate(hash);
+        documentCommonService.safelyDeleteBlob(hash);
 
         verify(blobStorageService, never()).deleteBlob(hash);
     }
@@ -387,7 +387,7 @@ class DocumentCommonServiceTest {
         when(documentRepository.duplicateHashExists(hash)).thenReturn(false);
         when(revisionRepository.duplicateHashExists(hash)).thenReturn(true);
 
-        documentCommonService.deleteBlobIfHashIsNotADuplicate(hash);
+        documentCommonService.safelyDeleteBlob(hash);
 
         verify(blobStorageService, never()).deleteBlob(hash);
     }

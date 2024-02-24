@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class DocumentCommonService {
 
-    private static final String DOCUMENT_FILTER_REGEX = "(name|type|path):\"([\\w\\s]*)\"(?:,|$)";
+    private static final String DOCUMENT_FILTER_REGEX = "(name|type|path|is_archived):\"([\\w\\s]*)\"(?:,|$)";
     private static final String REVISION_FILTER_REGEX = "(name|type):\"([\\w\\s]*)\"(?:,|$)";
 
     private static final String DOCUMENT_SORT_REGEX = "(document_id|name|type|path|version|created_at|updated_at):(asc|desc)(?:,|$)";
@@ -189,7 +189,7 @@ public class DocumentCommonService {
         }
     }
 
-    public void deleteBlobIfHashIsNotADuplicate(String hash) {
+    public void safelyDeleteBlob(String hash) {
         if (!isHashDuplicate(hash)) {
             blobStorageService.deleteBlob(hash);
         }

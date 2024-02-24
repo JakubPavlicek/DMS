@@ -17,6 +17,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSp
 
     List<Document> findAllByAuthor(User author);
 
+    Integer countAllByIsArchived(Boolean isArchived);
+
     @Query("SELECT COUNT(document.hash) > 1 FROM Document document WHERE document.hash = :hash")
     boolean duplicateHashExists(String hash);
 

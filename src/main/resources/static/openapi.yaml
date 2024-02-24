@@ -52,6 +52,12 @@ paths:
   /documents/{documentId}:
     $ref: './path/documents/documents_documentId.yaml'
 
+  /documents/{documentId}/archive:
+    $ref: './path/documents/documents_documentId_archive.yaml'
+
+  /documents/{documentId}/restore:
+    $ref: './path/documents/documents_documentId_restore.yaml'
+
   /documents/{documentId}/download:
     $ref: './path/documents/documents_documentId_download.yaml'
 

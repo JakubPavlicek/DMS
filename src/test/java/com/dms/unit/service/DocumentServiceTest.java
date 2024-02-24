@@ -276,7 +276,7 @@ class DocumentServiceTest {
 
         documentService.deleteDocumentWithRevisions(document.getDocumentId());
 
-        verify(documentCommonService, times(2)).deleteBlobIfHashIsNotADuplicate(any());
+        verify(documentCommonService, times(2)).safelyDeleteBlob(any());
         verify(documentRepository, times(1)).delete(any(Document.class));
     }
 
@@ -314,10 +314,10 @@ class DocumentServiceTest {
         filters.put(Document_.TYPE, "app");
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<Document> specification = DocumentFilterSpecification.filter(filters, author);
+        Specification<Document> specification = DocumentFilterSpecification.filterByUser(filters, author);
 
         MockedStatic<DocumentFilterSpecification> mockSpecification = mockStatic(DocumentFilterSpecification.class);
-        mockSpecification.when(() -> DocumentFilterSpecification.filter(filters, author)).thenReturn(specification);
+        mockSpecification.when(() -> DocumentFilterSpecification.filterByUser(filters, author)).thenReturn(specification);
 
         List<Document> documentList = List.of(document);
         Page<Document> documentPage = new PageImpl<>(documentList, pageable, documentList.size());

@@ -1,5 +1,6 @@
 package com.dms.specification;
 
+import com.dms.entity.Document_;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -20,6 +21,13 @@ public class FilterPredicateGenerator {
         for (Map.Entry<String, String> filter : filters.entrySet()) {
             String field = filter.getKey();
             String value = filter.getValue();
+
+            // special case when we need to parse boolean from string
+            if (field.equals(Document_.IS_ARCHIVED)) {
+                Predicate predicate = criteriaBuilder.equal(root.get(field), Boolean.parseBoolean(value));
+                predicates.add(predicate);
+                continue;
+            }
 
             String pattern = "%" + Normalizer.normalize(value, Normalizer.Form.NFKD) + "%";
             Predicate predicate = criteriaBuilder.like(root.get(field), pattern);

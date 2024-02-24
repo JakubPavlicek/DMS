@@ -28,7 +28,7 @@ public class ArchiveCleanupService {
     private final DocumentRepository documentRepository;
     private final DocumentCommonService documentCommonService;
 
-    // Run at midnight every day
+    // run at midnight every day
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void cleanupArchive() {

@@ -46,6 +46,7 @@ class DocumentRepositoryTest {
                            .type("image/jpeg")
                            .path("/test")
                            .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                           .isArchived(false)
                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                            .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                            .build();
@@ -93,6 +94,7 @@ class DocumentRepositoryTest {
                                            .type("image/jpeg")
                                            .path("/test")
                                            .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                           .isArchived(false)
                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                            .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                            .build();
@@ -121,6 +123,28 @@ class DocumentRepositoryTest {
     }
 
     @Test
+    void shouldReturnArchivedDocumentCount() {
+        Document anotherDocument = Document.builder()
+                                           .author(author)
+                                           .documentId("de5bebab-dc1c-4bc2-bf41-8039c076b63e")
+                                           .version(1L)
+                                           .name("dog.jpeg")
+                                           .type("image/jpeg")
+                                           .path("/test")
+                                           .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                           .isArchived(true)
+                                           .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
+                                           .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
+                                           .build();
+
+        documentRepository.save(anotherDocument);
+
+        Integer archivedDocumentCount = documentRepository.countAllByIsArchived(true);
+
+        assertThat(archivedDocumentCount).isEqualTo(1);
+    }
+
+    @Test
     void shouldReturnTrueWhenTwoEqualHashesExist() {
         Document anotherDocument = Document.builder()
                                            .author(author)
@@ -130,6 +154,7 @@ class DocumentRepositoryTest {
                                            .type("image/jpeg")
                                            .path("/test")
                                            .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                           .isArchived(false)
                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                            .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                            .build();
@@ -151,6 +176,7 @@ class DocumentRepositoryTest {
                                            .type("image/jpeg")
                                            .path("/test")
                                            .hash("04cda4ddf5773cbc4f80452696112091f60380015b17973aae8a11f3d92e7c7d")
+                                           .isArchived(false)
                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                            .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                            .build();

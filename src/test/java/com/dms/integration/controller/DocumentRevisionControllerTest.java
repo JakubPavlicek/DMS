@@ -97,6 +97,7 @@ class DocumentRevisionControllerTest {
                            .type(firstFile.getContentType())
                            .path("/")
                            .hash(firstHash)
+                           .isArchived(false)
                            .build();
     }
 

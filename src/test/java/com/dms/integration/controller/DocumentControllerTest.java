@@ -102,6 +102,7 @@ class DocumentControllerTest {
                            .type(firstFile.getContentType())
                            .path("/")
                            .hash(firstHash)
+                           .isArchived(false)
                            .build();
 
         secondDocument = Document.builder()
@@ -111,6 +112,7 @@ class DocumentControllerTest {
                                  .type(secondFile.getContentType())
                                  .path("/home")
                                  .hash(secondHash)
+                                 .isArchived(false)
                                  .build();
 
         firstRevision = DocumentRevision.builder()
@@ -159,6 +161,36 @@ class DocumentControllerTest {
     @AfterEach
     void tearDown() throws Exception {
         DirectoryCleaner.cleanDirectory(blobStorageProperties.getPath());
+    }
+
+    @Test
+    void shouldArchiveDocument() throws Exception {
+        mvc.perform(put("/documents/{documentId}/archive", document.getDocumentId())
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+           .andExpect(status().isNoContent());
+
+        Optional<Document> archivedDocument = documentRepository.findById(document.getId());
+
+        assertThat(archivedDocument).isPresent();
+        assertThat(archivedDocument.get().getIsArchived()).isTrue();
+        assertThat(archivedDocument.get().getDeleteAt()).isNotNull();
+    }
+
+    @Test
+    void shouldNotArchiveDocumentWhenUserIsNotAuthenticated() throws Exception {
+        mvc.perform(put("/documents/{documentId}/archive", document.getDocumentId()))
+           .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldNotArchiveDocumentWhenDocumentIsNotFound() throws Exception {
+        mvc.perform(put("/documents/{documentId}/archive", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+           .andExpectAll(
+               status().isNotFound(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("not found"))
+           );
     }
 
     @Test
@@ -378,7 +410,7 @@ class DocumentControllerTest {
                .param("page", "0")
                .param("limit", "2")
                .param("sort", "name:desc,type:asc")
-               .param("filter", "name:\"doc\",type:\"text\""))
+               .param("filter", "name:\"doc\",type:\"text\",is_archived:\"false\""))
            .andExpectAll(
                status().isOk(),
                content().contentType(MediaType.APPLICATION_JSON),
@@ -416,7 +448,8 @@ class DocumentControllerTest {
         {
             "name, value",
             "type, value",
-            "path, value"
+            "path, value",
+            "is_archived, value"
         }
     )
     void shouldReturnFilteredDocuments(String field, String value) throws Exception {
@@ -535,6 +568,40 @@ class DocumentControllerTest {
            .andExpectAll(
                status().isUnsupportedMediaType(),
                jsonPath("$.context_info.messages[0]").value("Request must contain data")
+           );
+    }
+
+    @Test
+    void shouldRestoreDocument() throws Exception {
+        mvc.perform(put("/documents/{documentId}/restore", document.getDocumentId())
+            .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+            .andExpectAll(
+                status().isOk(),
+                content().contentType(MediaType.APPLICATION_JSON),
+                jsonPath("$.documentId").value(document.getDocumentId()),
+                jsonPath("$.isArchived").value("false")
+            );
+
+        Optional<Document> restoredDocument = documentRepository.findById(document.getId());
+
+        assertThat(restoredDocument).isPresent();
+        assertThat(restoredDocument.get().getDeleteAt()).isNull();
+    }
+
+    @Test
+    void shouldNotRestoreDocumentWhenUserIsNotAuthenticated() throws Exception {
+        mvc.perform(put("/documents/{documentId}/restore", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed"))
+           .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldNotRestoreDocumentWhenDocumentIsNotFound() throws Exception {
+        mvc.perform(put("/documents/{documentId}/restore", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
+               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+           .andExpectAll(
+               status().isNotFound(),
+               content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
+               jsonPath("$.detail").value(containsString("not found"))
            );
     }
 

@@ -51,6 +51,7 @@ class DocumentRevisionRepositoryTest {
                                     .type("image/jpeg")
                                     .path("/test")
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                    .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .build();
@@ -134,6 +135,7 @@ class DocumentRevisionRepositoryTest {
                                     .type("image/jpeg")
                                     .path("/test")
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                    .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .build();
@@ -276,6 +278,7 @@ class DocumentRevisionRepositoryTest {
                                     .type("image/jpeg")
                                     .path("/test")
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                    .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .build();
@@ -324,6 +327,7 @@ class DocumentRevisionRepositoryTest {
                                     .type("image/jpeg")
                                     .path("/test")
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                    .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .build();
@@ -352,7 +356,7 @@ class DocumentRevisionRepositoryTest {
 
     @Test
     void shouldFindLastRevisionVersionEqualToThreeWhenThreeRevisionsExist() {
-        DocumentRevision anotherRevision = DocumentRevision.builder()
+        DocumentRevision firstRevision = DocumentRevision.builder()
                                                            .revisionId("57c00a2f-8435-4ea4-91d9-e195680dea37")
                                                            .author(revision.getAuthor())
                                                            .document(revision.getDocument())
@@ -363,7 +367,7 @@ class DocumentRevisionRepositoryTest {
                                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                            .build();
 
-        DocumentRevision anotherRevision2 = DocumentRevision.builder()
+        DocumentRevision secondRevision = DocumentRevision.builder()
                                                             .revisionId("8d118708-9e09-4053-883d-8c2079f5c0a3")
                                                             .author(revision.getAuthor())
                                                             .document(revision.getDocument())
@@ -374,8 +378,8 @@ class DocumentRevisionRepositoryTest {
                                                             .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                             .build();
 
-        revisionRepository.save(anotherRevision);
-        revisionRepository.save(anotherRevision2);
+        revisionRepository.save(firstRevision);
+        revisionRepository.save(secondRevision);
 
         Optional<Long> revisionVersion = revisionRepository.findLastRevisionVersionByDocument(revision.getDocument());
 
@@ -393,6 +397,7 @@ class DocumentRevisionRepositoryTest {
                                     .type("image/jpeg")
                                     .path("/test")
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
+                                    .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .build();

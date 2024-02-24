@@ -1,5 +1,6 @@
 package com.dms.unit.service;
 
+import com.dms.config.ArchiveProperties;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
 import com.dms.entity.Document_;
@@ -32,6 +33,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +62,9 @@ class DocumentServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private ArchiveProperties archiveProperties;
+
     @InjectMocks
     private DocumentService documentService;
 
@@ -84,6 +89,7 @@ class DocumentServiceTest {
                            .type("text/plain")
                            .path("/")
                            .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
+                           .isArchived(false)
                            .build();
     }
 
@@ -102,7 +108,7 @@ class DocumentServiceTest {
     }
 
     @Test
-    void shouldThrowDocumentNotFoundExceptionWhenDocumentDoesNotExist() {
+    void shouldNotReturnDocumentWhenDocumentIsNotFound() {
         String documentId = "d1246d35-3f46-4c57-b037-f9466c313ec3";
 
         when(userService.getAuthenticatedUser()).thenReturn(author);
@@ -122,6 +128,7 @@ class DocumentServiceTest {
                                          .type("text/plain")
                                          .path("/home")
                                          .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
+                                         .isArchived(false)
                                          .build();
 
         MockMultipartFile file = new MockMultipartFile("document.txt", "some text".getBytes());
@@ -171,6 +178,7 @@ class DocumentServiceTest {
                                          .type("text/plain")
                                          .path("/home")
                                          .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
+                                         .isArchived(false)
                                          .build();
 
         MockMultipartFile file = new MockMultipartFile("document.txt", "some text".getBytes());
@@ -205,6 +213,7 @@ class DocumentServiceTest {
                                          .type("text/plain")
                                          .path("/old_path")
                                          .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
+                                         .isArchived(false)
                                          .build();
 
         MockMultipartFile file = new MockMultipartFile("document.txt", "some text".getBytes());
@@ -248,6 +257,7 @@ class DocumentServiceTest {
                                          .type(revision.getType())
                                          .path(document.getPath())
                                          .hash(revision.getHash())
+                                         .isArchived(document.getIsArchived())
                                          .build();
 
         when(userService.getAuthenticatedUser()).thenReturn(author);
@@ -262,6 +272,7 @@ class DocumentServiceTest {
         assertThat(actualDocument.getName()).isEqualTo(savedDocument.getName());
         assertThat(actualDocument.getType()).isEqualTo(savedDocument.getType());
         assertThat(actualDocument.getPath()).isEqualTo(savedDocument.getPath());
+        assertThat(actualDocument.getIsArchived()).isEqualTo(savedDocument.getIsArchived());
 
         verify(documentCommonService, times(1)).updateDocumentToRevision(any(Document.class), any(DocumentRevision.class));
     }
@@ -401,6 +412,7 @@ class DocumentServiceTest {
                                          .type("text/plain")
                                          .path(path)
                                          .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
+                                         .isArchived(false)
                                          .build();
 
         when(userService.getAuthenticatedUser()).thenReturn(author);
@@ -427,6 +439,67 @@ class DocumentServiceTest {
         when(documentRepository.documentWithPathAlreadyExists(anyString(), anyString(), any(User.class))).thenReturn(true);
 
         assertThatThrownBy(() -> documentService.moveDocument(documentId, path)).isInstanceOf(FileWithPathAlreadyExistsException.class);
+    }
+
+    @Test
+    void shouldArchiveDocument() {
+        Document savedDocument = Document.builder()
+                                         .documentId("5d04e268-9c59-445f-a94b-a4f579fa12a3")
+                                         .isArchived(true)
+                                         .deleteAt(LocalDateTime.parse("2024-02-24T10:15:30"))
+                                         .build();
+
+        when(userService.getAuthenticatedUser()).thenReturn(author);
+        when(documentRepository.findByDocumentIdAndAuthor(document.getDocumentId(), author)).thenReturn(Optional.of(document));
+        when(archiveProperties.getRetentionPeriodInDays()).thenReturn(60);
+        when(documentRepository.save(document)).thenReturn(savedDocument);
+
+        documentService.archiveDocument(document.getDocumentId());
+
+        verify(archiveProperties, times(1)).getRetentionPeriodInDays();
+        verify(documentRepository, times(1)).save(any(Document.class));
+    }
+
+    @Test
+    void shouldNotArchiveDocumentWhenDocumentIdIsInvalid() {
+        String documentId = document.getDocumentId();
+
+        when(userService.getAuthenticatedUser()).thenReturn(author);
+        when(documentRepository.findByDocumentIdAndAuthor(documentId, author)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> documentService.archiveDocument(documentId)).isInstanceOf(DocumentNotFoundException.class);
+
+        verify(archiveProperties, never()).getRetentionPeriodInDays();
+        verify(documentRepository, never()).save(any(Document.class));
+    }
+
+    @Test
+    void shouldRestoreDocument() {
+        Document savedDocument = Document.builder()
+                                         .documentId("5d04e268-9c59-445f-a94b-a4f579fa12a3")
+                                         .isArchived(false)
+                                         .deleteAt(LocalDateTime.parse("2024-02-24T10:15:30"))
+                                         .build();
+
+        when(userService.getAuthenticatedUser()).thenReturn(author);
+        when(documentRepository.findByDocumentIdAndAuthor(document.getDocumentId(), author)).thenReturn(Optional.of(document));
+        when(documentRepository.save(document)).thenReturn(savedDocument);
+
+        documentService.restoreDocument(document.getDocumentId());
+
+        verify(documentRepository, times(1)).save(any(Document.class));
+    }
+
+    @Test
+    void shouldNotRestoreDocumentWhenDocumentIsNotFound() {
+        String documentId = document.getDocumentId();
+
+        when(userService.getAuthenticatedUser()).thenReturn(author);
+        when(documentRepository.findByDocumentIdAndAuthor(documentId, author)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> documentService.restoreDocument(documentId)).isInstanceOf(DocumentNotFoundException.class);
+
+        verify(documentRepository, never()).save(any(Document.class));
     }
 
 }

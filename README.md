@@ -133,11 +133,17 @@ Requirements for the software and other tools to build
         - **storage.path**: Local directory for file storage.
         - **storage.directory-prefix-length**: Directory prefix length.
         - **hash.algorithm**: Hashing algorithm (optional).
+        - **rsa.private-key**: Local directory for priave key.
+        - **rsa.public-key**: Local directory for public key.
+        - **server.error.path**: Suffix in URL for errors (optional).
+        - **spring.security.user.name**: Name of the ADMIN user.
+        - **spring.security.user.password**: Password of the ADMIN user.
         - **spring.profiles.active**: Choose your database:
+            - **h2** for H2.
             - **postgresql** for PostgreSQL.
             - **oracle** for Oracle.
             - **mssql** for MS SQL.
-        - Update database settings:
+        - Update database settings in chosen profile:
             - **spring.datasource.url**: Database URL.
             - **spring.datasource.username**: Database username.
             - **spring.datasource.password**: Database password.

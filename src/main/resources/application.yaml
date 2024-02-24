@@ -1,31 +1,35 @@
+# local directory path for blob storage and length for the name of each subdirectory within the blob storage
 storage:
   path: /Users/kuba/Downloads/blob_storage
   directory-prefix-length: 2
 
+# hash algorithm used in blob storage
 hash:
   algorithm: SHA-256
 
+# time till the JWT token expires
 token:
   expiration:
     time: 1 # in hours
 
+# paths to keys
 rsa:
   private-key: src/main/resources/certs/private.pem
   public-key: src/main/resources/certs/public.pem
 
 server:
   error:
-    path: /errors
+    path: /errors # suffix in URL for errors which occur during requests
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
+jasypt:
+  encryptor:
+    password: secret # define a secret for hashing configuration passwords
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
 
 spring:
   profiles:
-    active: postgresql # set db that you want to use
+    active: postgresql # set database that you want to use
   servlet:
     multipart:
       enabled: true
@@ -44,8 +48,8 @@ spring:
     log-startup-info: false
   security:
     user:
-      name: admin
-      password: admin123
+      name: admin # set name for the admin
+      password: ENC(MWEieGtlOEAsU2n5MM7gqOi9jHmi9H3Z) # set password for the admin - encrypted using jasypt
       roles: ADMIN
 
 springdoc:
@@ -53,6 +57,12 @@ springdoc:
     enabled: false
   swagger-ui:
     url: /openapi.yaml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 ---
 
@@ -65,8 +75,8 @@ spring:
   datasource:
     url: jdbc:h2:mem:dms:DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
-    username: sa
-    password: sa
+    username: sa # set username
+    password: ENC(A4vM9z16ydTrAzRcK5wFHA==) # set password - encrypted using jasypt
   jpa:
     properties:
       hibernate:
@@ -83,8 +93,8 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/dms
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    username: postgres # set username
+    password: ENC(No2GtUHq7YYu6RsZHN0Dzprk681eaCEi) # set password - encrypted using jasypt
   jpa:
     properties:
       hibernate:
@@ -101,8 +111,8 @@ spring:
   datasource:
     url: jdbc:oracle:thin:@localhost:1521:ORCLCDB
     driver-class-name: oracle.jdbc.OracleDriver
-    username: SYSTEM
-    password: admin123
+    username: SYSTEM # set username
+    password: ENC(D4yla+9MIpCZradWP43RFb9jRTDp4Mlw) # set password - encrypted using jasypt
   jpa:
     properties:
       hibernate:
@@ -119,8 +129,8 @@ spring:
   datasource:
     url: jdbc:sqlserver://localhost:1433;databaseName=dms;encrypt=true;trustServerCertificate=true;
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    username: sa
-    password: Admin123
+    username: sa # set username
+    password: ENC(cvRJOx80N7kzIs/X17PafTs1HMobcE04) # set password - encrypted using jasypt
   jpa:
     properties:
       hibernate:

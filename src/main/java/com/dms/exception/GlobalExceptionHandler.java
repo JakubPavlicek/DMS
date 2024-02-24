@@ -277,7 +277,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleGenericException(Exception exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error");
         problemDetail.setTitle("Unexpected Error Occurred");
         problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/unexpected"));
 

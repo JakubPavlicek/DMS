@@ -48,7 +48,7 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: password
+                  name: password_hash
                   type: varchar(255)
                   constraints:
                     nullable: false

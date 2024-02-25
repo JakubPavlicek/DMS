@@ -80,6 +80,12 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 - `PUT` : Upload new document version
 - `DELETE` : Delete document
 
+#### /documents/{documentId}/archive
+- `PUT` : Archive document
+
+#### /documents/{documentId}/restore
+- `PUT` : Restore document
+
 #### /documents/{documentId}/download
 - `GET` : Download document
 

@@ -1,13 +1,13 @@
 storage:
-  path: src/test/resources/file
+  path: src/test/resources/test_storage
   directory-prefix-length: 2
 
 hash:
   algorithm: SHA-256
 
 rsa:
-  private-key: src/main/resources/certs/private.pem
-  public-key: src/main/resources/certs/public.pem
+  private-key: src/test/resources/certs/private.pem
+  public-key: src/test/resources/certs/public.pem
 
 server:
   error:
@@ -19,12 +19,18 @@ management:
       exposure:
         include: "*"
 
+jasypt:
+  encryptor:
+    password: secret
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+
 spring:
   datasource:
     url: jdbc:h2:mem:dms:DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
-    password: sa
+    password: ENC(A4vM9z16ydTrAzRcK5wFHA==)
   jpa:
     open-in-view: false
   servlet:
@@ -39,12 +45,10 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/changelog-master.yaml
-  main:
-    log-startup-info: false
   security:
     user:
       name: admin
-      password: admin123
+      password: ENC(MWEieGtlOEAsU2n5MM7gqOi9jHmi9H3Z)
       roles: ADMIN
 
 springdoc:

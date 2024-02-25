@@ -1,4 +1,4 @@
-# Document Management System ![Static Badge](https://img.shields.io/badge/coverage-88%25-green?label=coverage)
+# Document Management System ![Static Badge](https://img.shields.io/badge/coverage-90%25-green?label=coverage)
 
 Centralized document storage for developers and teams to efficiently manage project-related files.
 Designed with simplicity and accessibility in mind, this Software as a Service (SaaS) offers centralized document storage with seamless access through a RESTful API.

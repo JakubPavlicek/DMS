@@ -170,8 +170,17 @@ public class DocumentService {
 
         Document document = getAuthenticatedUserDocument(documentId);
 
-        List<DocumentRevision> documentRevisions = document.getRevisions();
-        documentRevisions.forEach(revision -> documentCommonService.safelyDeleteBlob(revision.getHash()));
+        Integer revisionCount = documentCommonService.getRevisionCountForDocument(document);
+
+        int pageSize = 10;
+        int pageCount = (int) Math.ceil((double) revisionCount / pageSize);
+
+        for (int i = 0; i < pageCount; i++) {
+            Pageable pageable = PageRequest.of(i, pageSize);
+            Page<DocumentRevision> revisions = documentCommonService.findAllRevisionsByDocument(document, pageable);
+
+            revisions.forEach(revision -> documentCommonService.safelyDeleteBlob(revision.getHash()));
+        }
 
         documentRepository.delete(document);
 

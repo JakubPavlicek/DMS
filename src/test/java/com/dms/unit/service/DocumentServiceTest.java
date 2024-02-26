@@ -282,8 +282,13 @@ class DocumentServiceTest {
         List<DocumentRevision> revisions = List.of(new DocumentRevision(), new DocumentRevision());
         document.setRevisions(revisions);
 
+        Pageable pageable = PageRequest.of(0, 3);
+        Page<DocumentRevision> revisionPage = new PageImpl<>(revisions, pageable, revisions.size());
+
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(documentRepository.findByDocumentIdAndAuthor(document.getDocumentId(), author)).thenReturn(Optional.of(document));
+        when(documentCommonService.getRevisionCountForDocument(document)).thenReturn(revisions.size());
+        when(documentCommonService.findAllRevisionsByDocument(any(Document.class), any(Pageable.class))).thenReturn(revisionPage);
 
         documentService.deleteDocumentWithRevisions(document.getDocumentId());
 

@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -206,6 +208,21 @@ class DocumentRevisionRepositoryTest {
         Optional<DocumentRevision> foundRevision = revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), revision.getAuthor());
 
         assertThat(foundRevision).isPresent();
+    }
+
+    @Test
+    void shouldReturnRevisionCountForDocument() {
+        Integer revisionCount = revisionRepository.countAllByDocument(revision.getDocument());
+
+        assertThat(revisionCount).isEqualTo(1);
+    }
+
+    @Test
+    void shouldReturnPagedRevisionsForDocument() {
+        Page<DocumentRevision> revisions = revisionRepository.findAllByDocument(revision.getDocument(), PageRequest.of(0, 2));
+
+        assertThat(revisions).isNotEmpty();
+        assertThat(revisions.getTotalElements()).isEqualTo(1);
     }
 
     @Test

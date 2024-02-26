@@ -92,6 +92,14 @@ public class DocumentCommonService {
                                  .orElse(0L);
     }
 
+    public Integer getRevisionCountForDocument(Document document) {
+        return revisionRepository.countAllByDocument(document);
+    }
+
+    public Page<DocumentRevision> findAllRevisionsByDocument(Document document, Pageable pageable) {
+        return revisionRepository.findAllByDocument(document, pageable);
+    }
+
     public void updateRevisionVersionsForDocument(Document document) {
         log.debug("Updating revision versions for document: document={}", document);
 

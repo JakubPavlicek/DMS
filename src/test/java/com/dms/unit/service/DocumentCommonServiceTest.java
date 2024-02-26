@@ -22,6 +22,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -197,6 +198,28 @@ class DocumentCommonServiceTest {
         Long actualVersion = documentCommonService.getLastRevisionVersion(document);
 
         assertThat(actualVersion).isEqualTo(expectedVersion);
+    }
+
+    @Test
+    void shouldReturnRevisionCountForDocument() {
+        when(revisionRepository.countAllByDocument(document)).thenReturn(1);
+
+        Integer revisionCount = documentCommonService.getRevisionCountForDocument(document);
+
+        assertThat(revisionCount).isEqualTo(1);
+    }
+
+    @Test
+    void shouldReturnRevisionsForDocument() {
+        Pageable pageable = PageRequest.of(0, 3);
+        Page<DocumentRevision> revisions = new PageImpl<>(List.of(revision), pageable, 1);
+
+        when(revisionRepository.findAllByDocument(document, pageable)).thenReturn(revisions);
+
+        Page<DocumentRevision> foundRevisions = documentCommonService.findAllRevisionsByDocument(document, pageable);
+
+        assertThat(foundRevisions).isNotEmpty();
+        assertThat(foundRevisions.getTotalElements()).isEqualTo(1);
     }
 
     @Test

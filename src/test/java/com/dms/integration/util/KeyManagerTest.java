@@ -2,6 +2,7 @@ package com.dms.integration.util;
 
 import com.dms.config.KeyProperties;
 import com.dms.util.KeyManager;
+import com.nimbusds.jose.jwk.RSAKey;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,16 @@ class KeyManagerTest {
         assertThat(publicKeyExists).isTrue();
         assertThat(publicKeyPath.toFile()).isFile();
         assertThat(publicKeyPath.getFileName().toString()).endsWith(".pem");
+    }
+
+    @Test
+    void shouldLoadRsaKeyWhenKeyAlreadyExists() throws KeyException {
+        RSAKey generatedRsaKey = keyManager.getRsaKey();
+        RSAKey loadedRsaKey = keyManager.getRsaKey();
+
+        assertThat(generatedRsaKey).isNotNull();
+        assertThat(loadedRsaKey).isNotNull();
+        assertThat(loadedRsaKey.getKeyID()).isEqualTo(generatedRsaKey.getKeyID());
     }
 
     private void deleteKeys() throws IOException {

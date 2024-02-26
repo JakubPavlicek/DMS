@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +80,9 @@ class DocumentControllerTest {
     private DocumentRevision thirdRevision;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
+        DirectoryCleaner.cleanDirectory(blobStorageProperties.getPath());
+
         firstFile = new MockMultipartFile("first_file", "document.txt", MediaType.TEXT_PLAIN_VALUE, "first".getBytes());
         firstHash = blobStorageService.storeBlob(firstFile);
 

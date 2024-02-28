@@ -117,6 +117,14 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 #### /users/password
 - `PUT` : Change user password
 
+## First steps
+
+At first, you need to create the user. This is done by providing the name, email, and password to the /users endpoint.
+Secondly, you need to obtain the access token so that you can use the API.
+After obtaining the access token, you will need to provide it in the header of each subsequent request.
+
+![First steps](API_first_steps.svg)
+
 ## Getting Started
 
 ### Prerequisites

@@ -137,7 +137,7 @@ Requirements for the software and other tools to build
 
 - git
 - Java 17+
-- Maven
+- Maven 3.9.6+
 - PostgreSQL / Oracle / MS SQL
 
 ### Installation

@@ -1,6 +1,7 @@
 package com.dms.integration.util;
 
 import com.dms.config.KeyProperties;
+import com.dms.exception.KeyException;
 import com.dms.util.KeyManager;
 import com.nimbusds.jose.jwk.RSAKey;
 import org.junit.jupiter.api.AfterEach;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

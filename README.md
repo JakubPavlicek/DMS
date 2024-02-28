@@ -119,9 +119,11 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 
 ## First steps
 
-At first, you need to create the user. This is done by providing the name, email, and password to the /users endpoint.
-Secondly, you need to obtain the access token so that you can use the API.
-After obtaining the access token, you will need to provide it in the header of each subsequent request.
+1. Create the user.
+   - This is achieved by providing the name, email, and password to the /users endpoint.
+2. Obtain the access token so that you can use the API.
+   - This is achieved by providing the email and password to the /oauth2/token endpoint.
+3. After obtaining the access token, you will need to provide it in the header of each subsequent request.
 
 ![First steps](API_first_steps.svg)
 

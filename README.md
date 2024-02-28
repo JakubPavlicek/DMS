@@ -127,6 +127,8 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 
 ![First steps](API_first_steps.svg)
 
+After starting the application, you can access the API specification at http://localhost:8080/swagger-ui/index.html.
+
 ## Getting Started
 
 ### Prerequisites

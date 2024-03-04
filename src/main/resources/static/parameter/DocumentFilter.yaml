@@ -11,3 +11,4 @@ description: |
 schema:
   type: string
   default: 'name:""'
+  maxLength: 200

@@ -9,3 +9,4 @@ description: |
 schema:
   type: string
   default: "name:asc"
+  maxLength: 200

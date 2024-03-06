@@ -71,6 +71,10 @@ public class DocumentCommonService {
         return updatedDocument;
     }
 
+    public void deleteRevision(DocumentRevision revision) {
+        revisionRepository.delete(revision);
+    }
+
     public void saveRevisionFromDocument(Document document) {
         log.debug("Saving revision from document: document={}", document);
 

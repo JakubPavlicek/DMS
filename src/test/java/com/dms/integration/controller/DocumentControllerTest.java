@@ -669,8 +669,8 @@ class DocumentControllerTest {
 
     @Test
     void shouldUploadDocument() throws Exception {
-        documentRepository.deleteAll();
         revisionRepository.deleteAll();
+        documentRepository.deleteAll();
 
         MockMultipartFile file = new MockMultipartFile("file", firstFile.getOriginalFilename(), firstFile.getContentType(), firstFile.getBytes());
         MockMultipartFile destination = new MockMultipartFile("destination", "", MediaType.APPLICATION_JSON_VALUE, "{\"path\":\"/home\"}".getBytes());

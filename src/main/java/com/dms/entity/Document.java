@@ -1,6 +1,5 @@
 package com.dms.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -57,7 +56,6 @@ public class Document {
 
     @OneToMany(
         fetch = FetchType.LAZY,
-        cascade = CascadeType.REMOVE,
         mappedBy = "document"
     )
     @ToString.Exclude

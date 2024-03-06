@@ -181,7 +181,10 @@ public class DocumentService {
             Pageable pageable = PageRequest.of(i, pageSize);
             Page<DocumentRevision> revisions = documentCommonService.findAllRevisionsByDocument(document, pageable);
 
-            revisions.forEach(revision -> documentCommonService.safelyDeleteBlob(revision.getHash()));
+            revisions.forEach(revision -> {
+                documentCommonService.safelyDeleteBlob(revision.getHash());
+                documentCommonService.deleteRevision(revision);
+            });
         }
 
         documentRepository.delete(document);

@@ -1,6 +1,6 @@
 type: object
 title: Client Error
-description: A generic error.
+description: "A generic error."
 properties:
   type:
     type: string
@@ -24,7 +24,7 @@ properties:
     example: "/documents/11ae56ed-240e-4d4d-8d3c-f135d9394ab3"
   contextInfo:
     type: object
-    description: A free-form based object that contains additional context about the error.
+    description: "A free-form based object that contains additional context about the error."
     properties:
       messages:
         type: array

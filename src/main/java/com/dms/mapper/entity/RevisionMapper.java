@@ -11,6 +11,7 @@ public class RevisionMapper {
         REVISION_ID,
         NAME,
         TYPE,
+        SIZE,
         HASH,
         CREATED_AT,
         VERSION
@@ -23,6 +24,7 @@ public class RevisionMapper {
             case REVISION_ID -> DocumentRevision_.REVISION_ID;
             case NAME -> DocumentRevision_.NAME;
             case TYPE -> DocumentRevision_.TYPE;
+            case SIZE -> DocumentRevision_.SIZE;
             case HASH -> DocumentRevision_.HASH;
             case CREATED_AT -> DocumentRevision_.CREATED_AT;
             case VERSION -> DocumentRevision_.VERSION;

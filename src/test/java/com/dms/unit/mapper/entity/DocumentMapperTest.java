@@ -20,11 +20,13 @@ class DocumentMapperTest {
             Arguments.of(DocumentMapper.Field.NAME, Document_.NAME),
             Arguments.of(DocumentMapper.Field.TYPE, Document_.TYPE),
             Arguments.of(DocumentMapper.Field.PATH, Document_.PATH),
+            Arguments.of(DocumentMapper.Field.SIZE, Document_.SIZE),
             Arguments.of(DocumentMapper.Field.HASH, Document_.HASH),
             Arguments.of(DocumentMapper.Field.VERSION, Document_.VERSION),
             Arguments.of(DocumentMapper.Field.IS_ARCHIVED, Document_.IS_ARCHIVED),
             Arguments.of(DocumentMapper.Field.CREATED_AT, Document_.CREATED_AT),
-            Arguments.of(DocumentMapper.Field.UPDATED_AT, Document_.UPDATED_AT)
+            Arguments.of(DocumentMapper.Field.UPDATED_AT, Document_.UPDATED_AT),
+            Arguments.of(DocumentMapper.Field.DELETE_AT, Document_.DELETE_AT)
         );
     }
 

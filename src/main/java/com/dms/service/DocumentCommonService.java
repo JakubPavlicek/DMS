@@ -36,8 +36,8 @@ public class DocumentCommonService {
     private static final String DOCUMENT_FILTER_REGEX = "(name|type|path|is_archived):\"([\\w\\s]*)\"(?:,|$)";
     private static final String REVISION_FILTER_REGEX = "(name|type):\"([\\w\\s]*)\"(?:,|$)";
 
-    private static final String DOCUMENT_SORT_REGEX = "(document_id|name|type|path|version|created_at|updated_at):(asc|desc)(?:,|$)";
-    private static final String REVISION_SORT_REGEX = "(revision_id|name|type|version|created_at):(asc|desc)(?:,|$)";
+    private static final String DOCUMENT_SORT_REGEX = "(document_id|name|type|path|size|version|created_at|updated_at):(asc|desc)(?:,|$)";
+    private static final String REVISION_SORT_REGEX = "(revision_id|name|type|size|version|created_at):(asc|desc)(?:,|$)";
 
     private final DocumentRepository documentRepository;
     private final DocumentRevisionRepository revisionRepository;
@@ -60,6 +60,7 @@ public class DocumentCommonService {
 
         document.setName(revision.getName());
         document.setType(revision.getType());
+        document.setSize(revision.getSize());
         document.setHash(revision.getHash());
         document.setVersion(revision.getVersion());
 
@@ -78,6 +79,7 @@ public class DocumentCommonService {
                                                             .version(getLastRevisionVersion(document) + 1)
                                                             .name(document.getName())
                                                             .type(document.getType())
+                                                            .size(document.getSize())
                                                             .author(document.getAuthor())
                                                             .hash(document.getHash())
                                                             .build();

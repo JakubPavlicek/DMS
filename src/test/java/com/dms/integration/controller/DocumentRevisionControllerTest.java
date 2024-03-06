@@ -99,6 +99,7 @@ class DocumentRevisionControllerTest {
                            .name(firstFile.getOriginalFilename())
                            .type(firstFile.getContentType())
                            .path("/")
+                           .size(firstFile.getSize())
                            .hash(firstHash)
                            .isArchived(false)
                            .build();
@@ -117,6 +118,7 @@ class DocumentRevisionControllerTest {
                                                          .version(1L)
                                                          .name(firstFile.getOriginalFilename())
                                                          .type(firstFile.getContentType())
+                                                         .size(firstFile.getSize())
                                                          .hash(firstHash)
                                                          .build();
 
@@ -126,6 +128,7 @@ class DocumentRevisionControllerTest {
                                                           .version(2L)
                                                           .name(secondFile.getOriginalFilename())
                                                           .type(secondFile.getContentType())
+                                                          .size(secondFile.getSize())
                                                           .hash(secondHash)
                                                           .build();
 
@@ -164,6 +167,7 @@ class DocumentRevisionControllerTest {
                                                     .version(1L)
                                                     .name(firstFile.getOriginalFilename())
                                                     .type(firstFile.getContentType())
+                                                    .size(firstFile.getSize())
                                                     .hash(firstHash)
                                                     .build();
 
@@ -221,6 +225,7 @@ class DocumentRevisionControllerTest {
                                                     .version(1L)
                                                     .name(firstFile.getOriginalFilename())
                                                     .type(firstFile.getContentType())
+                                                    .size(firstFile.getSize())
                                                     .hash(firstHash)
                                                     .build();
 
@@ -235,7 +240,7 @@ class DocumentRevisionControllerTest {
                header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("attachment")),
                header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("filename")),
                header().string(HttpHeaders.CONTENT_DISPOSITION, containsString(firstFile.getOriginalFilename())),
-               header().string(HttpHeaders.CONTENT_LENGTH, String.valueOf(firstFile.getBytes().length)),
+               header().string(HttpHeaders.CONTENT_LENGTH, String.valueOf(firstFile.getSize())),
                content().bytes(firstFile.getBytes())
            );
     }
@@ -265,6 +270,7 @@ class DocumentRevisionControllerTest {
                                                     .version(1L)
                                                     .name(firstFile.getOriginalFilename())
                                                     .type(firstFile.getContentType())
+                                                    .size(firstFile.getSize())
                                                     .hash("1ef8c63124992a0beba43fc38965eab99f4333cc4b7b11425d024667a53367d9")
                                                     .build();
 
@@ -289,6 +295,7 @@ class DocumentRevisionControllerTest {
                                                     .version(1L)
                                                     .name(firstFile.getOriginalFilename())
                                                     .type(firstFile.getContentType())
+                                                    .size(firstFile.getSize())
                                                     .hash(firstHash)
                                                     .build();
 
@@ -305,7 +312,8 @@ class DocumentRevisionControllerTest {
                jsonPath("$.author.userId").value(author.getUserId()),
                jsonPath("$.version").value(revision.getVersion()),
                jsonPath("$.name").value(revision.getName()),
-               jsonPath("$.type").value(revision.getType())
+               jsonPath("$.type").value(revision.getType()),
+               jsonPath("$.size").value(revision.getSize())
            );
     }
 
@@ -334,6 +342,7 @@ class DocumentRevisionControllerTest {
                                                          .version(1L)
                                                          .name(firstFile.getOriginalFilename())
                                                          .type(firstFile.getContentType())
+                                                         .size(firstFile.getSize())
                                                          .hash(firstHash)
                                                          .build();
 
@@ -343,6 +352,7 @@ class DocumentRevisionControllerTest {
                                                           .version(2L)
                                                           .name(secondFile.getOriginalFilename())
                                                           .type(secondFile.getContentType())
+                                                          .size(secondFile.getSize())
                                                           .hash(secondHash)
                                                           .build();
 
@@ -352,6 +362,7 @@ class DocumentRevisionControllerTest {
                                                          .version(3L)
                                                          .name(thirdFile.getOriginalFilename())
                                                          .type(thirdFile.getContentType())
+                                                         .size(thirdFile.getSize())
                                                          .hash(thirdHash)
                                                          .build();
 
@@ -396,6 +407,7 @@ class DocumentRevisionControllerTest {
             "revision_id, asc",
             "name, asc",
             "type, asc",
+            "size, asc",
             "version, asc",
             "created_at, asc"
         }
@@ -407,6 +419,7 @@ class DocumentRevisionControllerTest {
                                                          .version(1L)
                                                          .name(firstFile.getOriginalFilename())
                                                          .type(firstFile.getContentType())
+                                                         .size(firstFile.getSize())
                                                          .hash(firstHash)
                                                          .build();
 
@@ -439,6 +452,7 @@ class DocumentRevisionControllerTest {
                                                          .version(1L)
                                                          .name(firstFile.getOriginalFilename())
                                                          .type(firstFile.getContentType())
+                                                         .size(firstFile.getSize())
                                                          .hash(firstHash)
                                                          .build();
 
@@ -472,6 +486,7 @@ class DocumentRevisionControllerTest {
                                                          .version(1L)
                                                          .name(firstFile.getOriginalFilename())
                                                          .type(firstFile.getContentType())
+                                                         .size(firstFile.getSize())
                                                          .hash(firstHash)
                                                          .build();
 
@@ -504,6 +519,7 @@ class DocumentRevisionControllerTest {
                                                          .version(1L)
                                                          .name(firstFile.getOriginalFilename())
                                                          .type(firstFile.getContentType())
+                                                         .size(firstFile.getSize())
                                                          .hash(firstHash)
                                                          .build();
 

@@ -104,6 +104,7 @@ class DocumentControllerTest {
                            .name(firstFile.getOriginalFilename())
                            .type(firstFile.getContentType())
                            .path("/")
+                           .size(firstFile.getSize())
                            .hash(firstHash)
                            .isArchived(false)
                            .build();
@@ -114,6 +115,7 @@ class DocumentControllerTest {
                                  .name(secondFile.getOriginalFilename())
                                  .type(secondFile.getContentType())
                                  .path("/home")
+                                 .size(secondFile.getSize())
                                  .hash(secondHash)
                                  .isArchived(false)
                                  .build();
@@ -124,6 +126,7 @@ class DocumentControllerTest {
                                         .version(1L)
                                         .name(firstFile.getOriginalFilename())
                                         .type(firstFile.getContentType())
+                                        .size(firstFile.getSize())
                                         .hash(firstHash)
                                         .build();
 
@@ -133,6 +136,7 @@ class DocumentControllerTest {
                                          .version(2L)
                                          .name(secondFile.getOriginalFilename())
                                          .type(secondFile.getContentType())
+                                         .size(secondFile.getSize())
                                          .hash(secondHash)
                                          .build();
 
@@ -142,6 +146,7 @@ class DocumentControllerTest {
                                         .version(3L)
                                         .name(thirdFile.getOriginalFilename())
                                         .type(thirdFile.getContentType())
+                                        .size(thirdFile.getSize())
                                         .hash(thirdHash)
                                         .build();
 
@@ -286,6 +291,7 @@ class DocumentControllerTest {
                jsonPath("$.name").value(document.getName()),
                jsonPath("$.type").value(document.getType()),
                jsonPath("$.path").value(document.getPath()),
+               jsonPath("$.size").value(document.getSize()),
                jsonPath("$.createdAt").isNotEmpty(),
                jsonPath("$.updatedAt").isNotEmpty()
            );
@@ -336,6 +342,7 @@ class DocumentControllerTest {
             "revision_id, asc",
             "name, asc",
             "type, asc",
+            "size, asc",
             "version, asc",
             "created_at, asc"
         }
@@ -434,6 +441,7 @@ class DocumentControllerTest {
             "name, asc",
             "type, asc",
             "path, asc",
+            "size, asc",
             "version, asc",
             "created_at, asc",
             "updated_at, asc"
@@ -620,7 +628,8 @@ class DocumentControllerTest {
                jsonPath("$.version").value(secondRevision.getVersion()),
                jsonPath("$.name").value(secondRevision.getName()),
                jsonPath("$.type").value(secondRevision.getType()),
-               jsonPath("$.path").value(document.getPath())
+               jsonPath("$.path").value(document.getPath()),
+               jsonPath("$.size").value(document.getSize())
            );
 
         Optional<Document> documentById = documentRepository.findById(document.getId());
@@ -679,7 +688,8 @@ class DocumentControllerTest {
                jsonPath("$.version").value(1L),
                jsonPath("$.name").value(firstFile.getOriginalFilename()),
                jsonPath("$.type").value(MediaType.TEXT_PLAIN_VALUE),
-               jsonPath("$.path").value("/home")
+               jsonPath("$.path").value("/home"),
+               jsonPath("$.size").value(firstFile.getSize())
            );
 
         List<Document> documents = documentRepository.findAll();
@@ -761,7 +771,8 @@ class DocumentControllerTest {
                jsonPath("$.version").value(4L),
                jsonPath("$.name").value(thirdFile.getOriginalFilename()),
                jsonPath("$.type").value(MediaType.TEXT_PLAIN_VALUE),
-               jsonPath("$.path").value("/test")
+               jsonPath("$.path").value("/test"),
+               jsonPath("$.size").value(thirdFile.getSize())
            );
     }
 
@@ -781,7 +792,8 @@ class DocumentControllerTest {
                jsonPath("$.version").value(4L),
                jsonPath("$.name").value(thirdFile.getOriginalFilename()),
                jsonPath("$.type").value(MediaType.TEXT_PLAIN_VALUE),
-               jsonPath("$.path").value(document.getPath())
+               jsonPath("$.path").value(document.getPath()),
+               jsonPath("$.size").value(thirdFile.getSize())
            );
     }
 

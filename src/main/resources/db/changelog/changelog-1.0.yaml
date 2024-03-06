@@ -96,6 +96,11 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
+                  name: size
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
                   name: hash
                   type: varchar(64)
                   constraints:
@@ -162,6 +167,11 @@ databaseChangeLog:
               - column:
                   name: type
                   type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: size
+                  type: bigint
                   constraints:
                     nullable: false
               - column:

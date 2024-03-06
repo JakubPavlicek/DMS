@@ -12,11 +12,13 @@ public class DocumentMapper {
         NAME,
         TYPE,
         PATH,
+        SIZE,
         HASH,
         VERSION,
         IS_ARCHIVED,
         CREATED_AT,
-        UPDATED_AT
+        UPDATED_AT,
+        DELETE_AT
     }
 
     public static String getMappedDocumentField(String field) {
@@ -27,11 +29,13 @@ public class DocumentMapper {
             case NAME -> Document_.NAME;
             case TYPE -> Document_.TYPE;
             case PATH -> Document_.PATH;
+            case SIZE -> Document_.SIZE;
             case HASH -> Document_.HASH;
             case VERSION -> Document_.VERSION;
             case IS_ARCHIVED -> Document_.IS_ARCHIVED;
             case CREATED_AT -> Document_.CREATED_AT;
             case UPDATED_AT -> Document_.UPDATED_AT;
+            case DELETE_AT -> Document_.DELETE_AT;
         };
     }
 

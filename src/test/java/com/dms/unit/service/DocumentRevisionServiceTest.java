@@ -63,11 +63,14 @@ class DocumentRevisionServiceTest {
     @InjectMocks
     private DocumentRevisionService documentRevisionService;
 
+    private Resource resource;
     private User author;
     private DocumentRevision revision;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
+        resource = new ClassPathResource("example.txt");
+
         author = User.builder()
                      .id(1L)
                      .userId("2c75c2ee-1a38-44ab-a106-8dfca58fcc7b")
@@ -84,6 +87,7 @@ class DocumentRevisionServiceTest {
                                     .name("document.txt")
                                     .type("text/plain")
                                     .path("/")
+                                    .size(resource.contentLength())
                                     .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
                                     .build();
 
@@ -95,6 +99,7 @@ class DocumentRevisionServiceTest {
                                    .version(2L)
                                    .name("new_document.txt")
                                    .type("text/plain")
+                                   .size(resource.contentLength())
                                    .hash("5a49eb92b351b9c1812ade678bd12e1a38583772733ee41e8607d3d830426855")
                                    .build();
     }
@@ -231,7 +236,6 @@ class DocumentRevisionServiceTest {
     @Test
     void shouldDownloadRevision() throws IOException {
         revision.setName("example.txt");
-        Resource resource = new ClassPathResource("example.txt");
 
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(revisionRepository.findByRevisionIdAndAuthor(revision.getRevisionId(), author)).thenReturn(Optional.of(revision));

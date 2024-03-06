@@ -64,6 +64,7 @@ public class DocumentService {
 
         String name = getFilename(file);
         String type = file.getContentType();
+        Long size = file.getSize();
 
         log.info("Document {} successfully created (not persisted yet)", name);
 
@@ -71,6 +72,7 @@ public class DocumentService {
                        .name(name)
                        .type(type)
                        .path(path)
+                       .size(size)
                        .hash(hash)
                        .version(1L)
                        .isArchived(false)

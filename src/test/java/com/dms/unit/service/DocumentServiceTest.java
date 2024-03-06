@@ -68,11 +68,14 @@ class DocumentServiceTest {
     @InjectMocks
     private DocumentService documentService;
 
+    private Resource resource;
     private User author;
     private Document document;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
+        resource = new ClassPathResource("example.txt");
+
         author = User.builder()
                      .userId("d4d1ccb7-f5be-4a7a-8661-a4fbdc980364")
                      .email("james@gmail.com")
@@ -88,6 +91,7 @@ class DocumentServiceTest {
                            .name("document.txt")
                            .type("text/plain")
                            .path("/")
+                           .size(resource.contentLength())
                            .hash("185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969")
                            .isArchived(false)
                            .build();
@@ -298,7 +302,6 @@ class DocumentServiceTest {
 
     @Test
     void shouldDownloadDocument() throws IOException {
-        Resource resource = new ClassPathResource("example.txt");
         document.setName(resource.getFilename());
 
         when(userService.getAuthenticatedUser()).thenReturn(author);

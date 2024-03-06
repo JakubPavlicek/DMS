@@ -1,10 +1,10 @@
 type: object
 title: Page With Documents
-description: Represents a page of documents, including pagination and sorting information.
+description: "Represents a page of documents, including pagination and sorting information."
 properties:
   content:
     type: array
-    description: List of documents
+    description: "List of documents."
     items:
       $ref: './Document.yaml'
   pageable:
@@ -13,40 +13,40 @@ properties:
     type: boolean
     description: |
       A boolean value indicating whether this is the last page of data.
-      If `true`, it is the last page; otherwise, it's not the last page
+      If `true`, it is the last page; otherwise, it's not the last page.
     example: false
   totalElements:
     type: integer
     format: int64
-    description: The total number of documents
+    description: "The total number of documents."
     example: 4
   totalPages:
     type: integer
-    description: The total number of pages needed to display all the data based on the page size
+    description: "The total number of pages needed to display all the data based on the page size."
     example: 2
   first:
     type: boolean
     description: |
       A boolean value indicating whether this is the first page of data.
-      If `true`, it is the first page; otherwise, it's not the first page
+      If `true`, it is the first page; otherwise, it's not the first page.
     example: true
   size:
     type: integer
-    description: The maximum number of documents contained on each page
+    description: "The maximum number of documents contained on each page."
     example: 2
   number:
     type: integer
-    description: The page number for the current page
+    description: "The page number for the current page."
     example: 0
   sort:
     $ref: './Sort.yaml'
   numberOfElements:
     type: integer
-    description: The number of documents on the current page
+    description: "The number of documents on the current page."
     example: 2
   empty:
     type: boolean
     description: |
       A boolean value indicating whether the current page is empty.
-      If `true`, the page has no documents; otherwise, it has content
+      If `true`, the page has no documents; otherwise, it has content.
     example: false

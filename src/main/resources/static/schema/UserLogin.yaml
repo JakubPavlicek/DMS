@@ -1,6 +1,6 @@
 type: object
 title: User Login
-description: The login details of the user.
+description: "The login details of the user."
 required:
   - email
   - password
@@ -8,7 +8,7 @@ properties:
   email:
     type: string
     format: email
-    description: "The email of the user"
+    description: "The email of the user."
     minLength: 3
     maxLength: 255
     example: james@gmail.com
@@ -16,6 +16,6 @@ properties:
     type: string
     format: password
     pattern: ^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$
-    description: "The password of the user"
+    description: "The password of the user."
     minLength: 8
     maxLength: 255

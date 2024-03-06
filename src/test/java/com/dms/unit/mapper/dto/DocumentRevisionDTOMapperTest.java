@@ -29,9 +29,11 @@ class DocumentRevisionDTOMapperTest {
                                     .name("dog.jpeg")
                                     .type("image/jpeg")
                                     .path("/test")
+                                    .size(20207L)
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
-                                    .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
-                                    .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
+                                    .createdAt(LocalDateTime.parse("2023-10-14T08:30:00"))
+                                    .updatedAt(LocalDateTime.parse("2023-10-14T08:30:00"))
+                                    .deleteAt(LocalDateTime.parse("2023-12-14T08:30:00"))
                                     .build();
 
         DocumentRevision revision = DocumentRevision.builder()
@@ -41,6 +43,7 @@ class DocumentRevisionDTOMapperTest {
                                                     .version(1L)
                                                     .name("dog.jpeg")
                                                     .type("image/jpeg")
+                                                    .size(20207L)
                                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                     .build();
@@ -52,6 +55,7 @@ class DocumentRevisionDTOMapperTest {
         assertThat(revisionDTO.getVersion()).isEqualTo(revision.getVersion());
         assertThat(revisionDTO.getName()).isEqualTo(revision.getName());
         assertThat(revisionDTO.getType()).isEqualTo(revision.getType());
+        assertThat(revisionDTO.getSize()).isEqualTo(revision.getSize());
         assertThat(revisionDTO.getCreatedAt()).isEqualTo(revision.getCreatedAt());
     }
 

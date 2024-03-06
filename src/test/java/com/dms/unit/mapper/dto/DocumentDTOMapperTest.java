@@ -28,10 +28,12 @@ class DocumentDTOMapperTest {
                                     .name("dog.jpeg")
                                     .type("image/jpeg")
                                     .path("/test")
+                                    .size(20207L)
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                     .isArchived(false)
-                                    .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
-                                    .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
+                                    .createdAt(LocalDateTime.parse("2023-10-14T08:30:00"))
+                                    .updatedAt(LocalDateTime.parse("2023-10-14T08:30:00"))
+                                    .deleteAt(LocalDateTime.parse("2023-12-14T08:30:00"))
                                     .build();
 
         DocumentDTO documentDTO = DocumentDTOMapper.map(document);
@@ -42,9 +44,11 @@ class DocumentDTOMapperTest {
         assertThat(documentDTO.getName()).isEqualTo(document.getName());
         assertThat(documentDTO.getType()).isEqualTo(document.getType());
         assertThat(documentDTO.getPath()).isEqualTo(document.getPath());
+        assertThat(documentDTO.getSize()).isEqualTo(document.getSize());
         assertThat(documentDTO.getIsArchived()).isEqualTo(document.getIsArchived());
         assertThat(documentDTO.getCreatedAt()).isEqualTo(document.getCreatedAt());
         assertThat(documentDTO.getUpdatedAt()).isEqualTo(document.getUpdatedAt());
+        assertThat(documentDTO.getDeleteAt()).isEqualTo(document.getDeleteAt());
     }
 
 }

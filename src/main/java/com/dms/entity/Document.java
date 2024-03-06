@@ -81,6 +81,9 @@ public class Document {
     @Column(nullable = false)
     private String path;
 
+    @Column(nullable = false)
+    private Long size;
+
     @Column(
         length = 64,
         nullable = false

@@ -75,6 +75,9 @@ public class DocumentRevision {
     @Column(nullable = false)
     private String type;
 
+    @Column(nullable = false)
+    private Long size;
+
     @Column(
         length = 64,
         nullable = false

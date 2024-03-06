@@ -19,6 +19,7 @@ class RevisionMapperTest {
             Arguments.of(RevisionMapper.Field.REVISION_ID, DocumentRevision_.REVISION_ID),
             Arguments.of(RevisionMapper.Field.NAME, DocumentRevision_.NAME),
             Arguments.of(RevisionMapper.Field.TYPE, DocumentRevision_.TYPE),
+            Arguments.of(RevisionMapper.Field.SIZE, DocumentRevision_.SIZE),
             Arguments.of(RevisionMapper.Field.HASH, DocumentRevision_.HASH),
             Arguments.of(RevisionMapper.Field.CREATED_AT, DocumentRevision_.CREATED_AT),
             Arguments.of(RevisionMapper.Field.VERSION, DocumentRevision_.VERSION)

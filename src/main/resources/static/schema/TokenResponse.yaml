@@ -1,7 +1,7 @@
 type: object
 title: Token Response
-description: "Response with a JWT token"
+description: "Response with a JWT token."
 properties:
   token:
     type: string
-    description: "JWT token"
+    description: "JWT token."

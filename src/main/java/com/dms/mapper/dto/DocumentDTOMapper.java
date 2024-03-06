@@ -15,10 +15,12 @@ public class DocumentDTOMapper {
                           .version(document.getVersion())
                           .name(document.getName())
                           .type(document.getType())
+                          .size(document.getSize())
                           .path(document.getPath())
                           .isArchived(document.getIsArchived())
                           .createdAt(document.getCreatedAt())
                           .updatedAt(document.getUpdatedAt())
+                          .deleteAt(document.getDeleteAt())
                           .build();
     }
 

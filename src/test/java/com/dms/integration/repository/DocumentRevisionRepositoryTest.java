@@ -52,6 +52,7 @@ class DocumentRevisionRepositoryTest {
                                     .name("dog.jpeg")
                                     .type("image/jpeg")
                                     .path("/test")
+                                    .size(20207L)
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                     .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
@@ -67,6 +68,7 @@ class DocumentRevisionRepositoryTest {
                                    .version(1L)
                                    .name("dog.jpeg")
                                    .type("image/jpeg")
+                                   .size(20207L)
                                    .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                    .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                    .build();
@@ -136,6 +138,7 @@ class DocumentRevisionRepositoryTest {
                                     .name("dog.jpeg")
                                     .type("image/jpeg")
                                     .path("/test")
+                                    .size(20207L)
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                     .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
@@ -158,6 +161,7 @@ class DocumentRevisionRepositoryTest {
                                                            .version(1L)
                                                            .name("dog.jpeg")
                                                            .type("image/jpeg")
+                                                           .size(20207L)
                                                            .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                            .build();
@@ -179,6 +183,7 @@ class DocumentRevisionRepositoryTest {
                                                            .version(1L)
                                                            .name("dog.jpeg")
                                                            .type("image/jpeg")
+                                                           .size(20207L)
                                                            .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:00")
                                                                                    .minusHours(1))
@@ -234,6 +239,7 @@ class DocumentRevisionRepositoryTest {
                                                            .version(1L)
                                                            .name("dog.jpeg")
                                                            .type("image/jpeg")
+                                                           .size(20207L)
                                                            .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                            .build();
@@ -254,6 +260,7 @@ class DocumentRevisionRepositoryTest {
                                                            .version(1L)
                                                            .name("dog.jpeg")
                                                            .type("image/jpeg")
+                                                           .size(20207L)
                                                            .hash("04cda4ddf5773cbc4f80452696112091f60380015b17973aae8a11f3d92e7c7d")
                                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                            .build();
@@ -274,6 +281,7 @@ class DocumentRevisionRepositoryTest {
                                                            .version(2L)
                                                            .name("dog.jpeg")
                                                            .type("image/jpeg")
+                                                           .size(65656L)
                                                            .hash("04cda4ddf5773cbc4f80452696112091f60380015b17973aae8a11f3d92e7c7d")
                                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                            .build();
@@ -294,6 +302,7 @@ class DocumentRevisionRepositoryTest {
                                     .name("dog.jpeg")
                                     .type("image/jpeg")
                                     .path("/test")
+                                    .size(20207L)
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                     .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
@@ -323,6 +332,7 @@ class DocumentRevisionRepositoryTest {
                                                            .version(2L)
                                                            .name("dog.jpeg")
                                                            .type("image/jpeg")
+                                                           .size(65656L)
                                                            .hash("04cda4ddf5773cbc4f80452696112091f60380015b17973aae8a11f3d92e7c7d")
                                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                            .build();
@@ -343,6 +353,7 @@ class DocumentRevisionRepositoryTest {
                                     .name("dog.jpeg")
                                     .type("image/jpeg")
                                     .path("/test")
+                                    .size(20207L)
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                     .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
@@ -380,6 +391,7 @@ class DocumentRevisionRepositoryTest {
                                                            .version(2L)
                                                            .name("dog.jpeg")
                                                            .type("image/jpeg")
+                                                           .size(20207L)
                                                            .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                                            .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                            .build();
@@ -391,6 +403,7 @@ class DocumentRevisionRepositoryTest {
                                                             .version(3L)
                                                             .name("dog.jpeg")
                                                             .type("image/jpeg")
+                                                            .size(65656L)
                                                             .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                                             .createdAt(LocalDateTime.parse("2023-11-14T08:30:01"))
                                                             .build();
@@ -413,6 +426,7 @@ class DocumentRevisionRepositoryTest {
                                     .name("dog.jpeg")
                                     .type("image/jpeg")
                                     .path("/test")
+                                    .size(20207L)
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                     .isArchived(false)
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))

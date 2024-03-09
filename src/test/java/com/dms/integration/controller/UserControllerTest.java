@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -258,6 +259,7 @@ class UserControllerTest {
 
         mvc.perform(put("/users/password")
                .with(httpBasic(securityUserProperties.getName(), securityUserProperties.getPassword()))
+               .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -272,6 +274,7 @@ class UserControllerTest {
     void shouldNotChangePasswordWhenEmailIsNull() throws Exception {
         mvc.perform(put("/users/password")
                .with(httpBasic(securityUserProperties.getName(), securityUserProperties.getPassword()))
+               .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -289,6 +292,7 @@ class UserControllerTest {
     void shouldNotChangePasswordWhenUserIsNotAuthenticated() throws Exception {
         mvc.perform(put("/users/password")
                .with(httpBasic("name", "password"))
+               .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -311,6 +315,7 @@ class UserControllerTest {
     void shouldChangeLogLevel() throws Exception {
         mvc.perform(post("/actuator/loggers/com.dms")
                .with(httpBasic(securityUserProperties.getName(), securityUserProperties.getPassword()))
+               .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -324,6 +329,7 @@ class UserControllerTest {
     void shouldNotChangeLogLevelWhenUserIsNotAuthenticated() throws Exception {
         mvc.perform(post("/actuator/loggers/com.dms")
                .with(httpBasic("john", "john123!"))
+               .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {

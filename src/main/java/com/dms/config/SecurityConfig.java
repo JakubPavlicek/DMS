@@ -60,13 +60,13 @@ public class SecurityConfig {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
             .securityMatcher("/actuator/**", "/users/password")
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize.anyRequest()
                                                          .hasAuthority("ADMIN"))
-            .authenticationProvider(new ActuatorAuthenticationProvider(securityUserProperties))
+            .authenticationProvider(new AdminAuthenticationProvider(securityUserProperties))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .httpBasic(Customizer.withDefaults())
             .build();

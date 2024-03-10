@@ -12,21 +12,21 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ActuatorAuthenticationProvider implements AuthenticationProvider {
+public class AdminAuthenticationProvider implements AuthenticationProvider {
 
     private final SecurityUserProperties securityUserProperties;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String authName = authentication.getName();
-        String authPassword = authentication.getCredentials().toString();
+        String name = authentication.getName();
+        String password = authentication.getCredentials().toString();
         List<SimpleGrantedAuthority> authorities = securityUserProperties.getRoles()
                                                                          .stream()
                                                                          .map(SimpleGrantedAuthority::new)
                                                                          .toList();
 
-        if (authName.equals(securityUserProperties.getName()) && authPassword.equals(securityUserProperties.getPassword())) {
-            return new UsernamePasswordAuthenticationToken(authName, authPassword, authorities);
+        if (name.equals(securityUserProperties.getName()) && password.equals(securityUserProperties.getPassword())) {
+            return new UsernamePasswordAuthenticationToken(name, password, authorities);
         }
 
         return null;

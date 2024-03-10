@@ -8,6 +8,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 - [Build With](#built-with)
 - [Modules](#modules)
 - [API](#api)
+- [First Steps](#first-steps)
 - [Getting Started](#getting-started)
   - [Prerequisited](#prerequisites)
   - [Installation](#installation)
@@ -117,7 +118,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 #### /users/password
 - `PUT` : Change user password
 
-## First steps
+## First Steps
 
 1. Create the user.
    - This is achieved by providing the name, email, and password to the /users endpoint.

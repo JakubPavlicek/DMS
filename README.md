@@ -155,8 +155,9 @@ Requirements for the software and other tools to build
         - **rsa.private-key**: Local directory for priave key.
         - **rsa.public-key**: Local directory for public key.
         - **server.error.path**: Suffix in URL for errors (optional).
-        - **spring.security.user.name**: Name of the ADMIN user.
-        - **spring.security.user.password**: Password of the ADMIN user.
+        - **admin.name**: Name of the ADMIN user.
+        - **admin.email**: Email of the ADMIN user.
+        - **admin.password**: Password of the ADMIN user.
         - **spring.profiles.active**: Choose your database:
             - **h2** for H2.
             - **postgresql** for PostgreSQL.

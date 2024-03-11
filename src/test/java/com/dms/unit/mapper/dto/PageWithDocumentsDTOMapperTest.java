@@ -2,6 +2,7 @@ package com.dms.unit.mapper.dto;
 
 import com.dms.dto.PageWithDocumentsDTO;
 import com.dms.entity.Document;
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.mapper.dto.PageWithDocumentsDTOMapper;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ class PageWithDocumentsDTOMapperTest {
                           .name("james")
                           .email("james@gmail.com")
                           .password("secret123!")
+                          .role(Role.USER)
                           .build();
 
         Document firstDocument = Document.builder()
@@ -32,9 +34,12 @@ class PageWithDocumentsDTOMapperTest {
                                     .name("dog.jpeg")
                                     .type("image/jpeg")
                                     .path("/test")
+                                    .size(1413L)
+                                    .isArchived(false)
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
                                     .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                     .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
+                                    .deleteAt(null)
                                     .build();
 
         Document secondDocument = Document.builder()
@@ -44,9 +49,12 @@ class PageWithDocumentsDTOMapperTest {
                                      .name("cat.jpeg")
                                      .type("image/jpeg")
                                      .path("/test")
+                                     .size(1413L)
+                                     .isArchived(false)
                                      .hash("0a6df48a27ef7db48b213df3dba84fad1bb4fd9b47568da1f570c067d9a4867f")
                                      .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
                                      .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
+                                     .deleteAt(null)
                                      .build();
 
         List<Document> documentList = List.of(firstDocument, secondDocument);

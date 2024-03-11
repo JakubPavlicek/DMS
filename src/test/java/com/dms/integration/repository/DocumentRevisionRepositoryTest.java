@@ -2,6 +2,7 @@ package com.dms.integration.repository;
 
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
@@ -41,6 +42,7 @@ class DocumentRevisionRepositoryTest {
                           .name("james")
                           .email("james@gmail.com")
                           .password("secret123!")
+                          .role(Role.USER)
                           .build();
 
         author = userRepository.save(author);
@@ -97,6 +99,7 @@ class DocumentRevisionRepositoryTest {
                           .name("john")
                           .email("john@email.com")
                           .password("secret123!")
+                          .role(Role.USER)
                           .build();
 
         author = userRepository.save(author);
@@ -127,6 +130,7 @@ class DocumentRevisionRepositoryTest {
                           .name("john")
                           .email("john@email.com")
                           .password("secret123!")
+                          .role(Role.USER)
                           .build();
 
         author = userRepository.save(author);
@@ -185,8 +189,7 @@ class DocumentRevisionRepositoryTest {
                                                            .type("image/jpeg")
                                                            .size(20207L)
                                                            .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
-                                                           .createdAt(LocalDateTime.parse("2023-11-14T08:30:00")
-                                                                                   .minusHours(1))
+                                                           .createdAt(LocalDateTime.parse("2023-11-14T08:30:00").minusHours(1))
                                                            .build();
 
         revisionRepository.save(anotherRevision);

@@ -1,6 +1,6 @@
 package com.dms.controller;
 
-import com.dms.Oauth2Api;
+import com.dms.AuthApi;
 import com.dms.dto.TokenResponseDTO;
 import com.dms.dto.UserLoginDTO;
 import com.dms.service.AuthService;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthController implements Oauth2Api {
+public class AuthController implements AuthApi {
 
     private final AuthService authService;
 

@@ -3,6 +3,7 @@ package com.dms.unit.mapper.dto;
 import com.dms.dto.DocumentRevisionDTO;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.mapper.dto.DocumentRevisionDTOMapper;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ class DocumentRevisionDTOMapperTest {
                           .name("james")
                           .email("james@gmail.com")
                           .password("secret123!")
+                          .role(Role.USER)
                           .build();
 
         Document document = Document.builder()
@@ -29,11 +31,12 @@ class DocumentRevisionDTOMapperTest {
                                     .name("dog.jpeg")
                                     .type("image/jpeg")
                                     .path("/test")
-                                    .size(20207L)
+                                    .size(1413L)
+                                    .isArchived(false)
                                     .hash("fb1c43900e39c38a20d84bdc3dd87d798b43c293a4ff243f2cc27b267f1efa58")
-                                    .createdAt(LocalDateTime.parse("2023-10-14T08:30:00"))
-                                    .updatedAt(LocalDateTime.parse("2023-10-14T08:30:00"))
-                                    .deleteAt(LocalDateTime.parse("2023-12-14T08:30:00"))
+                                    .createdAt(LocalDateTime.parse("2023-11-14T08:30:00"))
+                                    .updatedAt(LocalDateTime.parse("2023-11-14T08:30:00"))
+                                    .deleteAt(null)
                                     .build();
 
         DocumentRevision revision = DocumentRevision.builder()

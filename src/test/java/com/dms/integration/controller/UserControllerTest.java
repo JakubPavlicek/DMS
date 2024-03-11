@@ -1,6 +1,7 @@
 package com.dms.integration.controller;
 
-import com.dms.config.SecurityUserProperties;
+import com.dms.config.AdminUserProperties;
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.repository.UserRepository;
 import com.dms.util.JwtManager;
@@ -11,11 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,12 +37,15 @@ class UserControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private SecurityUserProperties securityUserProperties;
+    private AdminUserProperties adminUserProperties;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     private User user;
+
+    private final SimpleGrantedAuthority userAuthority = new SimpleGrantedAuthority("ROLE_" + Role.USER.name());
+    private final SimpleGrantedAuthority adminAuthority = new SimpleGrantedAuthority("ROLE_" + Role.ADMIN.name());
 
     @BeforeEach
     void setUp() {
@@ -50,6 +54,7 @@ class UserControllerTest {
                    .name("james")
                    .email("james@gmail.com")
                    .password(passwordEncoder.encode("secret123!"))
+                   .role(Role.USER)
                    .build();
     }
 
@@ -231,7 +236,7 @@ class UserControllerTest {
         userRepository.save(user);
 
         mvc.perform(get("/users/me")
-               .with(jwt().jwt(JwtManager.createJwt(user.getEmail()))))
+               .with(jwt().authorities(userAuthority).jwt(JwtManager.createJwt(user.getEmail()))))
            .andExpectAll(
                status().isOk(),
                content().contentType(MediaType.APPLICATION_JSON),
@@ -244,7 +249,7 @@ class UserControllerTest {
     @Test
     void shouldNotReturnCurrentUserWhenUserIsNotFound() throws Exception {
         mvc.perform(get("/users/me")
-               .with(jwt().jwt(JwtManager.createJwt(user.getEmail()))))
+               .with(jwt().authorities(userAuthority).jwt(JwtManager.createJwt(user.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -257,7 +262,7 @@ class UserControllerTest {
         userRepository.save(user);
 
         mvc.perform(put("/users/password")
-               .with(httpBasic(securityUserProperties.getName(), securityUserProperties.getPassword()))
+               .with(jwt().authorities(adminAuthority).jwt(JwtManager.createJwt(adminUserProperties.getEmail())))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -271,7 +276,7 @@ class UserControllerTest {
     @Test
     void shouldNotChangePasswordWhenEmailIsNull() throws Exception {
         mvc.perform(put("/users/password")
-               .with(httpBasic(securityUserProperties.getName(), securityUserProperties.getPassword()))
+               .with(jwt().authorities(adminAuthority).jwt(JwtManager.createJwt(adminUserProperties.getEmail())))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -288,7 +293,6 @@ class UserControllerTest {
     @Test
     void shouldNotChangePasswordWhenUserIsNotAuthenticated() throws Exception {
         mvc.perform(put("/users/password")
-               .with(httpBasic("name", "password"))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -303,14 +307,14 @@ class UserControllerTest {
     @Test
     void shouldNotChangePasswordWhenUserIsNotAuthorized() throws Exception {
         mvc.perform(get("/users/password")
-               .with(jwt().jwt(JwtManager.createJwt(user.getEmail()))))
+               .with(jwt().authorities(userAuthority).jwt(JwtManager.createJwt(user.getEmail()))))
            .andExpect(status().isForbidden());
     }
 
     @Test
     void shouldChangeLogLevel() throws Exception {
         mvc.perform(post("/actuator/loggers/com.dms")
-               .with(httpBasic(securityUserProperties.getName(), securityUserProperties.getPassword()))
+               .with(jwt().authorities(adminAuthority).jwt(JwtManager.createJwt(adminUserProperties.getEmail())))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -323,7 +327,6 @@ class UserControllerTest {
     @Test
     void shouldNotChangeLogLevelWhenUserIsNotAuthenticated() throws Exception {
         mvc.perform(post("/actuator/loggers/com.dms")
-               .with(httpBasic("john", "john123!"))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -336,7 +339,7 @@ class UserControllerTest {
     @Test
     void shouldNotChangeLogLevelWhenUserIsNotAuthorized() throws Exception {
         mvc.perform(post("/actuator/loggers/com.dms")
-               .with(jwt().jwt(JwtManager.createJwt(user.getEmail())))
+               .with(jwt().authorities(userAuthority).jwt(JwtManager.createJwt(user.getEmail())))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {

@@ -3,6 +3,7 @@ package com.dms.integration.controller;
 import com.dms.config.BlobStorageProperties;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
@@ -24,6 +25,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
@@ -79,6 +81,8 @@ class DocumentControllerTest {
     private DocumentRevision secondRevision;
     private DocumentRevision thirdRevision;
 
+    private final SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + Role.USER.name());
+
     @BeforeEach
     void setUp() throws IOException {
         DirectoryCleaner.cleanDirectory(blobStorageProperties.getPath());
@@ -96,6 +100,7 @@ class DocumentControllerTest {
                      .email("james@gmail.com")
                      .name("james")
                      .password("secret123!")
+                     .role(Role.USER)
                      .build();
 
         document = Document.builder()
@@ -174,7 +179,7 @@ class DocumentControllerTest {
     @Test
     void shouldArchiveDocument() throws Exception {
         mvc.perform(put("/documents/{documentId}/archive", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpect(status().isNoContent());
 
         Optional<Document> archivedDocument = documentRepository.findById(document.getId());
@@ -193,7 +198,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotArchiveDocumentWhenDocumentIsNotFound() throws Exception {
         mvc.perform(put("/documents/{documentId}/archive", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -204,7 +209,7 @@ class DocumentControllerTest {
     @Test
     void shouldDeleteDocumentWithRevisions() throws Exception {
         mvc.perform(delete("/documents/{documentId}", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpect(status().isNoContent());
 
         Optional<Document> documentById = documentRepository.findById(document.getId());
@@ -227,7 +232,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotDeleteDocumentWhenDocumentIsNotFound() throws Exception {
         mvc.perform(delete("/documents/{documentId}", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                jsonPath("$.detail").value(containsString("not found"))
@@ -237,7 +242,7 @@ class DocumentControllerTest {
     @Test
     void shouldDownloadDocument() throws Exception {
         mvc.perform(get("/documents/{documentId}/download", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isOk(),
                content().contentType(MediaType.TEXT_PLAIN),
@@ -252,7 +257,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotDownloadDocumentWhenDocumentIsNotFound() throws Exception {
         mvc.perform(get("/documents/{documentId}/download", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                jsonPath("$.detail").value(containsString("not found"))
@@ -270,7 +275,7 @@ class DocumentControllerTest {
         blobStorageService.deleteBlob(firstHash);
 
         mvc.perform(get("/documents/{documentId}/download", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isInternalServerError(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -281,7 +286,7 @@ class DocumentControllerTest {
     @Test
     void shouldReturnDocument() throws Exception {
         mvc.perform(get("/documents/{documentId}", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isOk(),
                content().contentType(MediaType.APPLICATION_JSON),
@@ -300,7 +305,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotReturnDocumentWhenDocumentIsNotFound() throws Exception {
         mvc.perform(get("/documents/{documentId}", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                jsonPath("$.detail").value(containsString("not found"))
@@ -316,7 +321,7 @@ class DocumentControllerTest {
     @Test
     void shouldReturnDocumentRevisions() throws Exception {
         mvc.perform(get("/documents/{documentId}/revisions", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("page", "0")
                .param("limit", "3")
                .param("sort", "name:desc,type:asc")
@@ -349,7 +354,7 @@ class DocumentControllerTest {
     )
     void shouldReturnSortedDocumentRevisions(String field, String order) throws Exception {
         mvc.perform(get("/documents/{documentId}/revisions", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("sort", field + ":" + order))
            .andExpect(status().isOk());
     }
@@ -363,7 +368,7 @@ class DocumentControllerTest {
     )
     void shouldReturnFilteredDocumentRevisions(String field, String value) throws Exception {
         mvc.perform(get("/documents/{documentId}/revisions", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("filter", field + ":\"" + value + "\""))
            .andExpect(status().isOk());
     }
@@ -371,7 +376,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotReturnDocumentRevisionsWhenDocumentIsNotFound() throws Exception {
         mvc.perform(get("/documents/{documentId}/revisions", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -389,7 +394,7 @@ class DocumentControllerTest {
     @ValueSource(strings = {"name=desc", "name:name", "name::desc", "name:asc|type:desc"})
     void shouldNotReturnDocumentRevisionsWhenSortHasInvalidFormat(String sort) throws Exception {
         mvc.perform(get("/documents/{documentId}/revisions", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("sort", sort))
            .andExpectAll(
                status().isBadRequest(),
@@ -403,7 +408,7 @@ class DocumentControllerTest {
     @ValueSource(strings = {"name:doc", "name:\"doc", "name=doc", "name:\"doc\"|type:\"text\""})
     void shouldNotReturnDocumentRevisionsWhenFilterHasInvalidFormat(String filter) throws Exception {
         mvc.perform(get("/documents/{documentId}/revisions", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("filter", filter))
            .andExpectAll(
                status().isBadRequest(),
@@ -416,7 +421,7 @@ class DocumentControllerTest {
     @Test
     void shouldReturnDocuments() throws Exception {
         mvc.perform(get("/documents")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("page", "0")
                .param("limit", "2")
                .param("sort", "name:desc,type:asc")
@@ -449,7 +454,7 @@ class DocumentControllerTest {
     )
     void shouldReturnSortedDocuments(String field, String order) throws Exception {
         mvc.perform(get("/documents")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("sort", field + ":" + order))
            .andExpect(status().isOk());
     }
@@ -465,7 +470,7 @@ class DocumentControllerTest {
     )
     void shouldReturnFilteredDocuments(String field, String value) throws Exception {
         mvc.perform(get("/documents")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("filter", field + ":\"" + value + "\""))
            .andExpect(status().isOk());
     }
@@ -480,7 +485,7 @@ class DocumentControllerTest {
     @ValueSource(strings = {"name=desc", "name:name", "name::desc", "name:asc|type:desc"})
     void shouldNotReturnDocumentsWhenSortHasInvalidFormat(String sort) throws Exception {
         mvc.perform(get("/documents")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("sort", sort))
            .andExpectAll(
                status().isBadRequest(),
@@ -494,7 +499,7 @@ class DocumentControllerTest {
     @ValueSource(strings = {"name:doc", "name:\"doc", "name=doc", "name:\"doc\"|type:\"text\""})
     void shouldNotReturnDocumentsWhenFilterHasInvalidFormat(String filter) throws Exception {
         mvc.perform(get("/documents")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("filter", filter))
            .andExpectAll(
                status().isBadRequest(),
@@ -507,7 +512,7 @@ class DocumentControllerTest {
     @Test
     void shouldMoveDocument() throws Exception {
         mvc.perform(put("/documents/{documentId}/move", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -524,7 +529,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotMoveDocumentWhenPathIsNull() throws Exception {
         mvc.perform(put("/documents/{documentId}/move", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.APPLICATION_JSON)
                .content("{}"))
            .andExpectAll(
@@ -536,7 +541,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotMoveDocumentWhenPathIsInvalid() throws Exception {
         mvc.perform(put("/documents/{documentId}/move", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -558,7 +563,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotMoveDocumentWhenPathAlreadyExists() throws Exception {
         mvc.perform(put("/documents/{documentId}/move", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -575,7 +580,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotMoveDocumentWhenNoDataAreProvided() throws Exception {
         mvc.perform(put("/documents/{documentId}/move", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isUnsupportedMediaType(),
                jsonPath("$.context_info.messages[0]").value("Request must contain data")
@@ -585,7 +590,7 @@ class DocumentControllerTest {
     @Test
     void shouldRestoreDocument() throws Exception {
         mvc.perform(put("/documents/{documentId}/restore", document.getDocumentId())
-            .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+            .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
             .andExpectAll(
                 status().isOk(),
                 content().contentType(MediaType.APPLICATION_JSON),
@@ -608,7 +613,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotRestoreDocumentWhenDocumentIsNotFound() throws Exception {
         mvc.perform(put("/documents/{documentId}/restore", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -619,7 +624,7 @@ class DocumentControllerTest {
     @Test
     void shouldSwitchDocumentToRevision() throws Exception {
         mvc.perform(put("/documents/{documentId}/revisions/{revisionId}", document.getDocumentId(), secondRevision.getRevisionId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isOk(),
                content().contentType(MediaType.APPLICATION_JSON),
@@ -648,7 +653,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotSwitchDocumentToRevisionWhenDocumentIsNotFound() throws Exception {
         mvc.perform(put("/documents/{documentId}/revisions/{revisionId}", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed", secondRevision.getRevisionId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -659,7 +664,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotSwitchDocumentToRevisionWhenRevisionIsNotFound() throws Exception {
         mvc.perform(put("/documents/{documentId}/revisions/{revisionId}", document.getDocumentId(), "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -678,7 +683,7 @@ class DocumentControllerTest {
         mvc.perform(multipart(HttpMethod.POST, "/documents/upload")
                .file(file)
                .file(destination)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isCreated(),
@@ -703,7 +708,7 @@ class DocumentControllerTest {
 
         mvc.perform(multipart(HttpMethod.POST, "/documents/upload")
                .file(destination)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isBadRequest(),
@@ -719,7 +724,7 @@ class DocumentControllerTest {
 
         mvc.perform(multipart(HttpMethod.POST, "/documents/upload")
                .file(file)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isBadRequest(),
@@ -743,7 +748,7 @@ class DocumentControllerTest {
         mvc.perform(multipart(HttpMethod.POST, "/documents/upload")
                .file(file)
                .file(destination)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isConflict(),
@@ -761,7 +766,7 @@ class DocumentControllerTest {
         mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
                .file(file)
                .file(destination)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isCreated(),
@@ -782,7 +787,7 @@ class DocumentControllerTest {
 
         mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
                .file(file)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isCreated(),
@@ -800,7 +805,7 @@ class DocumentControllerTest {
     @Test
     void shouldNotUploadNewDocumentVersionWhenFileIsMissing() throws Exception {
         mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isBadRequest(),
@@ -818,7 +823,7 @@ class DocumentControllerTest {
         mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
                .file(file)
                .file(destination)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isBadRequest(),
@@ -847,7 +852,7 @@ class DocumentControllerTest {
         mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
                .file(file)
                .file(destination)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isNotFound(),
@@ -864,7 +869,7 @@ class DocumentControllerTest {
         mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
                .file(file)
                .file(destination)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isConflict(),
@@ -882,7 +887,7 @@ class DocumentControllerTest {
         mvc.perform(multipart(HttpMethod.PUT, "/documents/{documentId}", document.getDocumentId())
                .file(file)
                .file(destination)
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .contentType(MediaType.MULTIPART_FORM_DATA))
            .andExpectAll(
                status().isBadRequest(),

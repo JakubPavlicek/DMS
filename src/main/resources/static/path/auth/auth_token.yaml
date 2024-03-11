@@ -3,7 +3,7 @@ post:
   description: Requests an access token.
   operationId: token
   tags:
-    - oauth2
+    - auth
   requestBody:
     required: true
     description: The login details of the user.

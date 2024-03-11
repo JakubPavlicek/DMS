@@ -1,5 +1,6 @@
 package com.dms.unit.service;
 
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.exception.EmailAlreadyExistsException;
 import com.dms.exception.UserNotFoundException;
@@ -14,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -54,29 +54,8 @@ class UserServiceTest {
                    .name("james")
                    .email("james@gmail.com")
                    .password("secret123!")
+                   .role(Role.USER)
                    .build();
-    }
-
-    @Test
-    void shouldReturnUserByEmail() {
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-
-        UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
-
-        assertThat(userDetails).isNotNull();
-        assertThat(userDetails.getUsername()).isEqualTo(user.getEmail());
-        assertThat(userDetails.getPassword()).isEqualTo(user.getPassword());
-
-        verify(userRepository, times(1)).findByEmail(user.getEmail());
-    }
-
-    @Test
-    void shouldThrowUserNotFoundExceptionWhenUsernameIsInvalid() {
-        String email = user.getEmail();
-
-        assertThatThrownBy(() -> userService.loadUserByUsername(email)).isInstanceOf(UserNotFoundException.class);
-
-        verify(userRepository, times(1)).findByEmail(user.getEmail());
     }
 
     @Test

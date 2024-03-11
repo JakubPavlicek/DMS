@@ -1,5 +1,6 @@
 package com.dms.integration.controller;
 
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.service.UserService;
 import jakarta.transaction.Transactional;
@@ -35,6 +36,7 @@ class AuthControllerTest {
                    .name("james")
                    .email("james@gmail.com")
                    .password("secret123!")
+                   .role(Role.USER)
                    .build();
     }
 
@@ -42,7 +44,7 @@ class AuthControllerTest {
     void shouldReturnToken() throws Exception {
         userService.createUser(user);
 
-        mvc.perform(post("/oauth2/token")
+        mvc.perform(post("/auth/token")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -61,7 +63,7 @@ class AuthControllerTest {
     void shouldNotReturnTokenWhenCredentialsDoesNotMatch() throws Exception {
         userService.createUser(user);
 
-        mvc.perform(post("/oauth2/token")
+        mvc.perform(post("/auth/token")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -78,7 +80,7 @@ class AuthControllerTest {
 
     @Test
     void shouldNotReturnTokenWhenEmailIsNotProvided() throws Exception {
-        mvc.perform(post("/oauth2/token")
+        mvc.perform(post("/auth/token")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -94,7 +96,7 @@ class AuthControllerTest {
 
     @Test
     void shouldNotReturnTokenWhenPasswordIsNotProvided() throws Exception {
-        mvc.perform(post("/oauth2/token")
+        mvc.perform(post("/auth/token")
                .contentType(MediaType.APPLICATION_JSON)
                .content("""
                         {
@@ -110,7 +112,7 @@ class AuthControllerTest {
 
     @Test
     void shouldNotReturnTokenWhenRequestLoginDoesNotContainAnyData() throws Exception {
-        mvc.perform(post("/oauth2/token"))
+        mvc.perform(post("/auth/token"))
            .andExpectAll(
                status().isUnsupportedMediaType(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),

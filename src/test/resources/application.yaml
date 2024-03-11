@@ -25,6 +25,11 @@ jasypt:
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
 
+admin:
+  name: admin # set name for the admin
+  email: admin@mail.com # set email for the admin
+  password: ENC(ZtnVeP1A4OGV0/2F2OdL8fl+K0xMCDSj) # set password for the admin (must match specified password regex from static/schema/User.yaml) - encrypted using jasypt
+
 spring:
   datasource:
     url: jdbc:h2:mem:dms:DB_CLOSE_DELAY=-1
@@ -45,11 +50,6 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/changelog-master.yaml
-  security:
-    user:
-      name: admin
-      password: ENC(MWEieGtlOEAsU2n5MM7gqOi9jHmi9H3Z)
-      roles: ADMIN
 
 springdoc:
   api-docs:

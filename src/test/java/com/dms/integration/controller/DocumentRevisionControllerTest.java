@@ -3,6 +3,7 @@ package com.dms.integration.controller;
 import com.dms.config.BlobStorageProperties;
 import com.dms.entity.Document;
 import com.dms.entity.DocumentRevision;
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.DocumentRevisionRepository;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
@@ -74,6 +76,8 @@ class DocumentRevisionControllerTest {
     private User author;
     private Document document;
 
+    private final SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + Role.USER.name());
+
     @BeforeEach
     void setUp() throws IOException {
         DirectoryCleaner.cleanDirectory(blobStorageProperties.getPath());
@@ -91,6 +95,7 @@ class DocumentRevisionControllerTest {
                      .email("james@gmail.com")
                      .name("james")
                      .password("secret123!")
+                     .role(Role.USER)
                      .build();
 
         document = Document.builder()
@@ -144,7 +149,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(secondRevision);
 
         mvc.perform(delete("/revisions/{revisionId}", firstRevision.getRevisionId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNoContent()
            );
@@ -181,7 +186,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(revision);
 
         mvc.perform(delete("/revisions/{revisionId}", revision.getRevisionId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isBadRequest(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -209,7 +214,7 @@ class DocumentRevisionControllerTest {
         userRepository.save(author);
 
         mvc.perform(delete("/revisions/{revisionId}", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -234,7 +239,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(revision);
 
         mvc.perform(get("/revisions/{revisionId}/download", revision.getRevisionId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isOk(),
                header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("attachment")),
@@ -254,7 +259,7 @@ class DocumentRevisionControllerTest {
     @Test
     void shouldNotDownloadRevisionWhenRevisionIsNotFound() throws Exception {
         mvc.perform(get("/revisions/{revisionId}/download", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -279,7 +284,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(revision);
 
         mvc.perform(get("/revisions/{revisionId}/download", revision.getRevisionId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isInternalServerError(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -304,7 +309,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(revision);
 
         mvc.perform(get("/revisions/{revisionId}", revision.getRevisionId())
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isOk(),
                content().contentType(MediaType.APPLICATION_JSON),
@@ -326,7 +331,7 @@ class DocumentRevisionControllerTest {
     @Test
     void shouldNotReturnRevisionWhenRevisionIsNotFound() throws Exception {
         mvc.perform(get("/revisions/{revisionId}", "65be38e5-a749-4dc7-b6d4-8ca2c150aaed")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail()))))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail()))))
            .andExpectAll(
                status().isNotFound(),
                content().contentType(MediaType.APPLICATION_PROBLEM_JSON),
@@ -381,7 +386,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(thirdRevision);
 
         mvc.perform(get("/revisions")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("page", "0")
                .param("limit", "3")
                .param("sort", "name:desc,type:asc")
@@ -433,7 +438,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(firstRevision);
 
         mvc.perform(get("/revisions")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("sort", field + ":" + order))
            .andExpect(status().isOk());
     }
@@ -466,7 +471,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(firstRevision);
 
         mvc.perform(get("/revisions")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("filter", field + ":\"" + value + "\""))
            .andExpect(status().isOk());
     }
@@ -500,7 +505,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(firstRevision);
 
         mvc.perform(get("/revisions")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("sort", sort))
            .andExpectAll(
                status().isBadRequest(),
@@ -533,7 +538,7 @@ class DocumentRevisionControllerTest {
         revisionRepository.save(firstRevision);
 
         mvc.perform(get("/revisions")
-               .with(jwt().jwt(JwtManager.createJwt(author.getEmail())))
+               .with(jwt().authorities(authority).jwt(JwtManager.createJwt(author.getEmail())))
                .param("filter", filter))
            .andExpectAll(
                status().isBadRequest(),

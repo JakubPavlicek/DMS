@@ -1,5 +1,6 @@
 package com.dms.integration.repository;
 
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ class UserRepositoryTest {
                    .name("james")
                    .email("james@gmail.com")
                    .password("secret123!")
+                   .role(Role.USER)
                    .build();
 
         userRepository.save(user);

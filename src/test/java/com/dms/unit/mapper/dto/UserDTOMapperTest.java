@@ -2,6 +2,7 @@ package com.dms.unit.mapper.dto;
 
 import com.dms.dto.UserDTO;
 import com.dms.dto.UserRegisterDTO;
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.mapper.dto.UserDTOMapper;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ class UserDTOMapperTest {
                         .userId("195d2cf3-e3fd-4e15-80dd-15e43e63b25b")
                         .name("james")
                         .email("james@gmail.com")
+                        .role(Role.USER)
                         .build();
 
         UserDTO userDTO = UserDTOMapper.mapToUserDTO(user);
@@ -23,6 +25,7 @@ class UserDTOMapperTest {
         assertThat(userDTO.getUserId()).isEqualTo(user.getUserId());
         assertThat(userDTO.getName()).isEqualTo(user.getName());
         assertThat(userDTO.getEmail()).isEqualTo(user.getEmail());
+        assertThat(userDTO.getRole()).isEqualTo(user.getRole().name());
     }
 
     @Test

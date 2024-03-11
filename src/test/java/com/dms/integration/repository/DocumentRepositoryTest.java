@@ -1,6 +1,7 @@
 package com.dms.integration.repository;
 
 import com.dms.entity.Document;
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.repository.DocumentRepository;
 import com.dms.repository.UserRepository;
@@ -34,6 +35,7 @@ class DocumentRepositoryTest {
                      .name("james")
                      .email("james@gmail.com")
                      .password("secret123!")
+                     .role(Role.USER)
                      .build();
 
         author = userRepository.save(author);
@@ -76,6 +78,7 @@ class DocumentRepositoryTest {
                                  .name("john")
                                  .email("john@gmail.com")
                                  .password("password123!")
+                                 .role(Role.USER)
                                  .build();
 
         anotherAuthor = userRepository.save(anotherAuthor);
@@ -115,6 +118,7 @@ class DocumentRepositoryTest {
                                  .name("john")
                                  .email("john@gmail.com")
                                  .password("password123!")
+                                 .role(Role.USER)
                                  .build();
 
         anotherAuthor = userRepository.save(anotherAuthor);
@@ -221,6 +225,7 @@ class DocumentRepositoryTest {
                                  .name("john")
                                  .email("john@gmail.com")
                                  .password("password123!")
+                                 .role(Role.USER)
                                  .build();
 
         anotherAuthor = userRepository.save(anotherAuthor);

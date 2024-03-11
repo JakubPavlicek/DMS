@@ -40,8 +40,8 @@ components:
 
 paths:
 
-  /oauth2/token:
-    $ref: './path/oauth2/oauth2_token.yaml'
+  /auth/token:
+    $ref: './path/auth/auth_token.yaml'
 
   /documents:
     $ref: './path/documents/documents.yaml'

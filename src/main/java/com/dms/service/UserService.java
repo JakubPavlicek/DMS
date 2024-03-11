@@ -1,5 +1,6 @@
 package com.dms.service;
 
+import com.dms.entity.Role;
 import com.dms.entity.User;
 import com.dms.exception.EmailAlreadyExistsException;
 import com.dms.exception.UserNotFoundException;
@@ -7,26 +8,17 @@ import com.dms.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
-                             .orElseThrow(() -> new UserNotFoundException("User with email: " + username + " not found"));
-    }
 
     public User getAuthenticatedUser() {
         String authUserEmail = SecurityContextHolder.getContext()
@@ -52,6 +44,7 @@ public class UserService implements UserDetailsService {
         validateUniqueEmail(user.getEmail());
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.USER);
 
         User savedUser = userRepository.save(user);
 
@@ -78,7 +71,7 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
 
-        log.info("Successfully changed users {} password", user.getUserId());
+        log.info("Successfully changed user's {} password", user.getUserId());
     }
 
 }

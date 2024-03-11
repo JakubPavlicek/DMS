@@ -19,8 +19,9 @@ public class AdminUserInitializer {
             Optional<User> adminByEmail = userRepository.findByEmail(adminProperties.getEmail());
 
             // admin already exists so we dont want to create another admin
-            if (adminByEmail.isPresent())
+            if (adminByEmail.isPresent()) {
                 return;
+            }
 
             User admin = User.builder()
                              .name(adminProperties.getName())

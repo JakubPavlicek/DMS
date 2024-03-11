@@ -22,7 +22,7 @@ rsa:
 
 server:
   error:
-    path: /errors # suffix in URL for errors which occur during requests
+    path: errors # suffix in URL for errors which occur during requests
 
 jasypt:
   encryptor:

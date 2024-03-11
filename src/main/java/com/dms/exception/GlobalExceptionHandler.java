@@ -59,7 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNSUPPORTED_MEDIA_TYPE, detail);
         problemDetail.setTitle("Unsupported Media Type");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/media-type-not-supported"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/media-type-not-supported"));
 
         Map<String, List<String>> message = new HashMap<>();
         message.put(MESSAGES, List.of("Request must contain data"));
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Provided data are not valid");
         problemDetail.setTitle("Invalid Data Provided");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/invalid-data-provided"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/invalid-data-provided"));
 
         Map<String, List<String>> message = new HashMap<>();
         message.put(MESSAGES, getMethodArgumentErrorMessages(ex));
@@ -102,7 +102,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problemDetail.setTitle("Missing Request Part");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/missing-request-part"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/missing-request-part"));
 
         return ResponseEntity.of(problemDetail).build();
     }
@@ -113,7 +113,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problemDetail.setTitle("Resource Not Found");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/resource-not-found"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/resource-not-found"));
 
         return ResponseEntity.of(problemDetail).build();
     }
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Authentication Failed");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/bad-credentials"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/bad-credentials"));
 
         return problemDetail;
     }
@@ -135,7 +135,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         problemDetail.setTitle(exception.getFileOperation().getTitle());
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/file-operation"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/file-operation"));
 
         return problemDetail;
     }
@@ -146,7 +146,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
         problemDetail.setTitle("File With Path Already Exists");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/document-with-path-already-exists"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/document-with-path-already-exists"));
 
         return problemDetail;
     }
@@ -157,7 +157,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
         problemDetail.setTitle("User Not Found");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/user-not-found"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/user-not-found"));
 
         return problemDetail;
     }
@@ -168,7 +168,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
         problemDetail.setTitle("Email Already Exists");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/email-already-exists"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/email-already-exists"));
 
         return problemDetail;
     }
@@ -179,7 +179,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
         problemDetail.setTitle("Document Not Found");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/document-not-found"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/document-not-found"));
 
         return problemDetail;
     }
@@ -190,7 +190,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
         problemDetail.setTitle("Revision Not Found");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/revision-not-found"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/revision-not-found"));
 
         return problemDetail;
     }
@@ -201,7 +201,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Revision Deletion Error");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/revision-deletion-error"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/revision-deletion-error"));
 
         return problemDetail;
     }
@@ -212,7 +212,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Provided data are not valid");
         problemDetail.setTitle("Invalid Data Provided");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/invalid-data-provided"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/invalid-data-provided"));
 
         Set<ConstraintViolation<?>> violations = exception.getConstraintViolations();
 
@@ -246,7 +246,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Property Doesn't Exist");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/property-doesnt-exist"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/property-doesnt-exist"));
 
         return problemDetail;
     }
@@ -257,7 +257,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
         problemDetail.setTitle("Pattern Doesn't Match");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/pattern-doesnt-match"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/pattern-doesnt-match"));
 
         return problemDetail;
     }
@@ -268,7 +268,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, exception.getMessage());
         problemDetail.setTitle("Payload Too Large");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/payload-too-large"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/payload-too-large"));
 
         return problemDetail;
     }
@@ -279,7 +279,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error");
         problemDetail.setTitle("Unexpected Error Occurred");
-        problemDetail.setType(URI.create(serverProperties.getErrorUrl() + "/unexpected"));
+        problemDetail.setType(URI.create(serverProperties.getErrorUrl(request) + "/unexpected"));
 
         return problemDetail;
     }

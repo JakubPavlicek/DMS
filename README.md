@@ -52,7 +52,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │       │   ├── parameter                         // OpenAPI parameters
     │       │   ├── path                              // OpenAPI paths
     │       │   │   ├── documents                     // /documents paths
-    │       │   │   ├── oauth2                        // /oauth2 paths
+    │       │   │   ├── auth                          // /auth paths
     │       │   │   ├── revisions                     // /revisions paths
     │       │   │   └── users                         // /users paths
     │       │   ├── requestBody                       // OpenAPI requestBodies
@@ -67,7 +67,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 
 ## API
 
-#### /oauth2/token
+#### /auth/token
 - `POST` : Request access token
 
 #### /documents
@@ -123,7 +123,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 1. Create the user.
    - This is achieved by providing the name, email, and password to the /users endpoint.
 2. Obtain the access token so that you can use the API.
-   - This is achieved by providing the email and password to the /oauth2/token endpoint.
+   - This is achieved by providing the email and password to the /auth/token endpoint.
 3. After obtaining the access token, you will need to provide it in the header of each subsequent request.
 
 ![First steps](API_first_steps.svg)

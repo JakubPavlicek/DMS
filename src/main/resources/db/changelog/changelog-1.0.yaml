@@ -99,7 +99,7 @@ databaseChangeLog:
                   name: path
                   type: varchar(255)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: byte_size
                   type: bigint

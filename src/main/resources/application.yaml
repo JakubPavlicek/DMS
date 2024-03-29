@@ -37,7 +37,7 @@ admin:
 
 spring:
   profiles:
-    active: postgresql # set database that you want to use
+    active: h2 # set database that you want to use
   servlet:
     multipart:
       enabled: true

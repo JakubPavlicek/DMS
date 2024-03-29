@@ -75,7 +75,10 @@ public class DocumentRevision {
     @Column(nullable = false)
     private String type;
 
-    @Column(nullable = false)
+    @Column(
+        name = "byte_size",
+        nullable = false
+    )
     private Long size;
 
     @Column(

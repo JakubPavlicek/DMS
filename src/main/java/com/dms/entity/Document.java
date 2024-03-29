@@ -79,7 +79,10 @@ public class Document {
     @Column(nullable = false)
     private String path;
 
-    @Column(nullable = false)
+    @Column(
+        name = "byte_size",
+        nullable = false
+    )
     private Long size;
 
     @Column(

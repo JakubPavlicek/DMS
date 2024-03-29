@@ -64,8 +64,8 @@ public class User implements UserDetails {
     private String email;
 
     @Column(
-        nullable = false,
-        name = "password_hash"
+        name = "password_hash",
+        nullable = false
     )
     @ToString.Exclude
     private String password;

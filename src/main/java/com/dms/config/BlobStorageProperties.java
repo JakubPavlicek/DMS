@@ -25,14 +25,14 @@ public class BlobStorageProperties implements Validator {
 
     @Min(
         value = 1,
-        message = "Minimal directory prefix length is 1"
+        message = "Minimal subdirectory prefix length is 1"
     )
     @Max(
         value = 10,
-        message = "Maximum directory prefix length is 10"
+        message = "Maximum subdirectory prefix length is 10"
     )
-    @Value("${storage.directory-prefix-length:2}")
-    private int directoryPrefixLength;
+    @Value("${storage.subdirectory-prefix-length:2}")
+    private int subdirectoryPrefixLength;
 
     @Override
     public boolean supports(Class<?> clazz) {

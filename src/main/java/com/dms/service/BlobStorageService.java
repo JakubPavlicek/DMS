@@ -94,7 +94,7 @@ public class BlobStorageService {
     }
 
     private String getDirectoryName(String hash) {
-        return hash.substring(0, blobStorageProperties.getDirectoryPrefixLength());
+        return hash.substring(0, blobStorageProperties.getSubdirectoryPrefixLength());
     }
 
     private Path getDirectoryPath(String hash) {
@@ -109,7 +109,7 @@ public class BlobStorageService {
     private Path getFilePath(String hash) {
         try {
             String directoryName = getDirectoryName(hash);
-            String fileName = hash.substring(blobStorageProperties.getDirectoryPrefixLength());
+            String fileName = hash.substring(blobStorageProperties.getSubdirectoryPrefixLength());
             return Paths.get(blobStorageProperties.getPath(), directoryName, fileName);
         } catch (Exception exception) {
             throw new FileOperationException(FileOperation.DEFAULT);

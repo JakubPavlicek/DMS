@@ -1,7 +1,7 @@
 # local directory path for blob storage and length for the name of each subdirectory within the blob storage
 storage:
   path: /Users/kuba/Downloads/blob_storage
-  directory-prefix-length: 2
+  subdirectory-prefix-length: 2
 
 # hash algorithm used in blob storage
 hash:

@@ -151,7 +151,7 @@ Requirements for the software and other tools to build
 2. **Configuration**:
     - In **src/main/resources/application.yaml**, update these values:
         - **storage.path**: Local directory for file storage.
-        - **storage.directory-prefix-length**: Directory prefix length.
+        - **storage.subdirectory-prefix-length**: Subdirectory prefix length.
         - **hash.algorithm**: Hashing algorithm (optional).
         - **rsa.private-key**: Local directory for priave key.
         - **rsa.public-key**: Local directory for public key.

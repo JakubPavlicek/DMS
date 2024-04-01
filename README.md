@@ -46,7 +46,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │   │       ├── validation                        // Validation annotations
     │   │       └── DocumentManagerApplication.java   // Main application class
     │   └── resources
-    │       ├── db.changelog                          // LiquiBase changelogs
+    │       ├── db.changelog                          // Liquibase changelogs
     │       ├── static                                // OpenAPI files
     │       │   ├── example                           // OpenAPI examples
     │       │   ├── parameter                         // OpenAPI parameters

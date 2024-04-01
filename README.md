@@ -33,7 +33,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │   ├── java
     │   │   └── com.dms
     │   │       ├── config                            // Config and properties validation
-    │   │       ├── controller                        // REST-API controller
+    │   │       ├── controller                        // REST API controller
     │   │       ├── entity                            // Database tables
     │   │       ├── exception                         // Exceptions and exception handling
     │   │       ├── mapper                            // Mapping between objects
@@ -46,6 +46,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │   │       ├── validation                        // Validation annotations
     │   │       └── DocumentManagerApplication.java   // Main application class
     │   └── resources
+    │       ├── certs                                 // Generated RSA keys
     │       ├── db.changelog                          // Liquibase changelogs
     │       ├── static                                // OpenAPI files
     │       │   ├── example                           // OpenAPI examples

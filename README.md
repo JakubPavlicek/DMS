@@ -153,8 +153,8 @@ Requirements for the software and other tools to build
         - **storage.path**: Local directory for file storage.
         - **storage.subdirectory-prefix-length**: Subdirectory prefix length.
         - **hash.algorithm**: Hashing algorithm (optional).
-        - **rsa.private-key**: Local directory for priave key.
-        - **rsa.public-key**: Local directory for public key.
+        - **rsa.private-key**: Filepath for private key (must end with .pem).
+        - **rsa.public-key**: Filepath for public key (must end with .pem).
         - **server.error.path**: Suffix in URL for errors (optional).
         - **admin.name**: Name of the ADMIN user.
         - **admin.email**: Email of the ADMIN user.

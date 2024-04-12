@@ -7,22 +7,24 @@ storage:
 hash:
   algorithm: SHA-256
 
+# define for how many days the document will be retained in the archive
 archive:
-  retention-period-days: 60 # define for how many days the document will be retained in the archive
+  retention-period-days: 60
 
-# time till the JWT token expires
+# time (in hours) till the JWT token expires
 token:
   expiration:
-    time: 1 # in hours
+    time: 1
 
 # paths to keys
 rsa:
   private-key: src/main/resources/certs/private.pem
   public-key: src/main/resources/certs/public.pem
 
+# suffix in URL for errors which occur during requests
 server:
   error:
-    path: errors # suffix in URL for errors which occur during requests
+    path: errors
 
 jasypt:
   encryptor:

@@ -5,7 +5,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 
 ## Table of Contents
 
-- [Build With](#built-with)
+- [Built With](#built-with)
 - [Modules](#modules)
 - [API](#api)
 - [First Steps](#first-steps)

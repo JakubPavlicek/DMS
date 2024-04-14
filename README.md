@@ -10,7 +10,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
 - [API](#api)
 - [First Steps](#first-steps)
 - [Getting Started](#getting-started)
-  - [Prerequisited](#prerequisites)
+  - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Development](#development)
 
@@ -127,7 +127,7 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
    - This is achieved by providing the email and password to the /auth/token endpoint.
 3. After obtaining the access token, you will need to provide it in the header of each subsequent request.
 
-![First steps](API_first_steps.svg)
+<img alt="First steps" src="API_first_steps.svg" width="350"/>
 
 After starting the application, you can access the API specification at http://localhost:8080/swagger-ui/index.html.
 

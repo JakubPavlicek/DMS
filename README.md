@@ -152,10 +152,12 @@ Requirements for the software and other tools to build
     - In **src/main/resources/application.yaml**, update these values:
         - **storage.path**: Local directory for file storage.
         - **storage.subdirectory-prefix-length**: Subdirectory prefix length.
-        - **hash.algorithm**: Hashing algorithm (optional).
+        - **hash.algorithm**: Hashing algorithm.
+        - **archive.retention-period-days**: Document retention period.
+        - **token.expiration.time**: JWT token expiration time.
         - **rsa.private-key**: Filepath for private key (must end with .pem).
         - **rsa.public-key**: Filepath for public key (must end with .pem).
-        - **server.error.path**: Suffix in URL for errors (optional).
+        - **server.error.path**: Suffix in URL for errors.
         - **admin.name**: Name of the ADMIN user.
         - **admin.email**: Email of the ADMIN user.
         - **admin.password**: Password of the ADMIN user.

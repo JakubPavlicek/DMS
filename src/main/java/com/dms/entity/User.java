@@ -24,6 +24,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Represents a user entity in the system.
+ * This entity is mapped to the 'app_user' table in the database.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Entity
 @Table(name = "app_user")
 @Getter

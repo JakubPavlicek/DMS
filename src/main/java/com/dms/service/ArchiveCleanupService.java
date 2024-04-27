@@ -20,6 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service class for cleaning up archived documents.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Service
 @Log4j2
 @RequiredArgsConstructor
@@ -28,7 +34,10 @@ public class ArchiveCleanupService {
     private final DocumentRepository documentRepository;
     private final DocumentCommonService documentCommonService;
 
-    // run at midnight every day
+    /**
+     * Scheduled method to clean up the archive.
+     * This method runs at midnight every day and deletes archived documents that have passed their deletion time.
+     */
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void cleanupArchive() {
@@ -52,6 +61,12 @@ public class ArchiveCleanupService {
         }
     }
 
+    /**
+     * Checks if a document should be deleted from the archive.
+     * If the deletion time has passed, deletes the document and its revisions.
+     *
+     * @param document the document to check for deletion
+     */
     private void checkDocumentForDeletion(Document document) {
         if (document.getDeleteAt().isBefore(LocalDateTime.now())) {
             List<DocumentRevision> documentRevisions = document.getRevisions();

@@ -22,6 +22,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Represents a document revision entity in the system.
+ * This entity is mapped to the 'document_revision' table in the database.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Entity
 @Getter
 @Setter

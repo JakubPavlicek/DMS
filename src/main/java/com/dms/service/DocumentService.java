@@ -30,18 +30,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Service class responsible for managing documents.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Service
 @Log4j2
 @RequiredArgsConstructor
 public class DocumentService {
 
+    /** Repository for document-related database operations. */
     private final DocumentRepository documentRepository;
 
+    /** Service providing common functionality for documents. */
     private final DocumentCommonService documentCommonService;
+    /** Service for user-related operations. */
     private final UserService userService;
 
+    /** Properties related to document archiving. */
     private final ArchiveProperties archiveProperties;
 
+    /**
+     * Retrieves the document associated with the provided document ID.
+     *
+     * @param documentId the ID of the document to retrieve
+     * @return the retrieved document
+     * @throws DocumentNotFoundException if the document with the specified ID is not found
+     */
     private Document getAuthenticatedUserDocument(String documentId) {
         log.debug("Getting document: documentId={}", documentId);
         User user = userService.getAuthenticatedUser();
@@ -49,6 +66,12 @@ public class DocumentService {
                                  .orElseThrow(() -> new DocumentNotFoundException("Document with ID: " + documentId + " not found"));
     }
 
+    /**
+     * Retrieves the document associated with the provided document ID.
+     *
+     * @param documentId the ID of the document to retrieve
+     * @return the retrieved document
+     */
     public Document getDocument(String documentId) {
         log.debug("Request - Getting document: documentId={}", documentId);
 
@@ -58,6 +81,13 @@ public class DocumentService {
         return document;
     }
 
+    /**
+     * Creates a new document based on the provided file and path.
+     *
+     * @param file the file to create the document from
+     * @param path the path where the document will be stored
+     * @return the newly created document
+     */
     private Document createDocument(MultipartFile file, String path) {
         String hash = documentCommonService.storeBlob(file);
         User author = userService.getAuthenticatedUser();
@@ -80,12 +110,25 @@ public class DocumentService {
                        .build();
     }
 
+    /**
+     * Retrieves the filename from the provided multipart file.
+     *
+     * @param file the multipart file
+     * @return the filename extracted from the multipart file
+     */
     private static String getFilename(MultipartFile file) {
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
         String cleanPath = StringUtils.cleanPath(originalFileName);
         return StringUtils.getFilename(cleanPath);
     }
 
+    /**
+     * Ensures the uniqueness of the document path.
+     *
+     * @param path the path of the document
+     * @param fileName the name of the file
+     * @throws FileWithPathAlreadyExistsException if a document with the same path and name already exists
+     */
     private void ensureUniquePath(String path, String fileName) {
         log.debug("Ensuring unique document path: path={}, fileName={}", path, fileName);
 
@@ -97,6 +140,13 @@ public class DocumentService {
         }
     }
 
+    /**
+     * Uploads a new document.
+     *
+     * @param file the multipart file to upload
+     * @param path the path where the document will be stored
+     * @return the uploaded document
+     */
     @Transactional
     public Document uploadDocument(MultipartFile file, String path) {
         log.debug("Request - Uploading document: file={}, path={}", file.getOriginalFilename(), path);
@@ -106,7 +156,6 @@ public class DocumentService {
         ensureUniquePath(path, fileName);
 
         Document document = createDocument(file, path);
-
         Document savedDocument = documentRepository.save(document);
 
         log.info("Document {} with ID {} uploaded successfully", document.getName(), document.getDocumentId());
@@ -116,6 +165,14 @@ public class DocumentService {
         return savedDocument;
     }
 
+    /**
+     * Uploads a new version of an existing document.
+     *
+     * @param documentId the ID of the document to which the new version will be uploaded
+     * @param file the multipart file representing the new version
+     * @param path the path where the new version will be stored
+     * @return the document with the newly uploaded version
+     */
     @Transactional
     public Document uploadNewDocumentVersion(String documentId, MultipartFile file, String path) {
         log.debug("Request - Uploading new document version: documentId={}, file={}, path={}", documentId, file.getOriginalFilename(), path);
@@ -132,7 +189,6 @@ public class DocumentService {
         }
 
         Document newDocument = createNewDocumentVersion(oldDocument, file, path);
-
         Document savedDocument = documentRepository.save(newDocument);
 
         log.info("Successfully uploaded new document version for document {}", documentId);
@@ -142,6 +198,14 @@ public class DocumentService {
         return savedDocument;
     }
 
+    /**
+     * Creates a new document version based on the provided old document, file, and path.
+     *
+     * @param oldDocument the old version of the document
+     * @param file the multipart file representing the new version
+     * @param path the path where the new version will be stored
+     * @return the new document version
+     */
     private Document createNewDocumentVersion(Document oldDocument, MultipartFile file, String path) {
         Document newDocument = createDocument(file, path);
         newDocument.setId(oldDocument.getId());
@@ -152,6 +216,13 @@ public class DocumentService {
         return newDocument;
     }
 
+    /**
+     * Switches the document to the specified revision.
+     *
+     * @param documentId the ID of the document to switch
+     * @param revisionId the ID of the revision to switch to
+     * @return the document switched to the specified revision
+     */
     @Transactional
     public Document switchToRevision(String documentId, String revisionId) {
         log.debug("Request - Switching document to revision: documentId={}, revision={}", documentId, revisionId);
@@ -166,6 +237,11 @@ public class DocumentService {
         return documentFromRevision;
     }
 
+    /**
+     * Deletes the document along with its revisions.
+     *
+     * @param documentId the ID of the document to delete
+     */
     @Transactional
     public void deleteDocumentWithRevisions(String documentId) {
         log.debug("Request - Deleting document with revisions: documentId={}", documentId);
@@ -192,6 +268,12 @@ public class DocumentService {
         log.info("Document {} with revisions deleted successfully", documentId);
     }
 
+    /**
+     * Retrieves the file from the blob storage service based on the hash of the revision, and returns it as a {@link ResponseEntity}.
+     *
+     * @param documentId the ID of the document to download
+     * @return {@link ResponseEntity} containing the downloaded document as a {@link Resource}
+     */
     public ResponseEntity<Resource> downloadDocument(String documentId) {
         log.debug("Request - Downloading document: documentId={}", documentId);
 
@@ -208,6 +290,15 @@ public class DocumentService {
                              .body(file);
     }
 
+    /**
+     * Retrieves a page of documents based on the provided parameters.
+     *
+     * @param pageNumber the page number to retrieve
+     * @param pageSize the number of documents per page
+     * @param sort the sorting criteria
+     * @param filter the filtering criteria
+     * @return a page containing the requested documents
+     */
     public Page<Document> getDocuments(int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing documents: pageNumber={}, pageSize={}, sort={}, filter={}", pageNumber, pageSize, sort, filter);
 
@@ -226,6 +317,16 @@ public class DocumentService {
         return documents;
     }
 
+    /**
+     * Retrieves a page of revisions for the specified document.
+     *
+     * @param documentId the ID of the document
+     * @param pageNumber the page number to retrieve
+     * @param pageSize the number of revisions per page
+     * @param sort the sorting criteria
+     * @param filter the filtering criteria
+     * @return a page containing the revisions of the specified document
+     */
     public Page<DocumentRevision> getDocumentRevisions(String documentId, int pageNumber, int pageSize, String sort, String filter) {
         log.debug("Request - Listing document revisions: documentId={} pageNumber={}, pageSize={}, sort={}, filter={}", documentId, pageNumber, pageSize, sort, filter);
 
@@ -244,6 +345,13 @@ public class DocumentService {
         return documentRevisions;
     }
 
+    /**
+     * Moves the document to the specified path.
+     *
+     * @param documentId the ID of the document to move
+     * @param path the new path for the document
+     * @return the moved document
+     */
     @Transactional
     public Document moveDocument(String documentId, String path) {
         log.debug("Request - Moving document: documentId={}, path={}", documentId, path);
@@ -262,6 +370,11 @@ public class DocumentService {
         return savedDocument;
     }
 
+    /**
+     * Archives the document with the specified ID.
+     *
+     * @param documentId the ID of the document to archive
+     */
     @Transactional
     public void archiveDocument(String documentId) {
         log.debug("Request - Archiving document: documentId={}", documentId);
@@ -276,6 +389,12 @@ public class DocumentService {
         log.info("Document {} archived successfully", documentId);
     }
 
+    /**
+     * Restores the document from the archive with the specified ID.
+     *
+     * @param documentId the ID of the document to restore
+     * @return the restored document
+     */
     @Transactional
     public Document restoreDocument(String documentId) {
         log.debug("Request - Restoring document: documentId={}", documentId);

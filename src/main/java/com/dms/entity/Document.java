@@ -25,6 +25,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Represents a document entity in the system.
+ * This entity is mapped to the 'document' table in the database.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Entity
 @Getter
 @Setter

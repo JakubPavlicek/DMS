@@ -34,18 +34,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Global exception handler to handle exceptions across the application.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @RestControllerAdvice
 @Log4j2
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    /** The properties related to the server configuration. */
     private final ServerProperties serverProperties;
 
+    /** Context info key for {@link ProblemDetail}. */
     private static final String CONTEXT_INFO = "context_info";
+    /** Messages key for {@link ProblemDetail}. */
     private static final String MESSAGES = "messages";
 
+    /** Log message format for exceptions. */
     private static final String LOG_MESSAGE = "Request {} raised: ";
 
+    /**
+     * Retrieves the request URI from the given {@link WebRequest}.
+     *
+     * @param request the {@link WebRequest} from which to retrieve the URI
+     * @return the URI of the request
+     */
     private String getRequestURI(WebRequest request) {
         ServletWebRequest servletWebRequest = (ServletWebRequest) request;
         return servletWebRequest.getRequest().getRequestURI();
@@ -85,6 +101,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.of(problemDetail).build();
     }
 
+    /**
+     * Extracts error messages from the {@link MethodArgumentNotValidException}.
+     *
+     * @param ex the {@link MethodArgumentNotValidException}
+     * @return a list of error messages
+     */
     private List<String> getMethodArgumentErrorMessages(MethodArgumentNotValidException ex) {
         List<String> errorMessages = new ArrayList<>();
 
@@ -118,6 +140,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.of(problemDetail).build();
     }
 
+    /**
+     * Handles the {@link BadCredentialsException}.
+     *
+     * @param exception the {@link BadCredentialsException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail handleBadCredentialsException(BadCredentialsException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -129,6 +158,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link FileOperationException}.
+     *
+     * @param exception the {@link FileOperationException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(FileOperationException.class)
     public ProblemDetail handleFileOperationEception(FileOperationException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -140,6 +176,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link FileWithPathAlreadyExistsException}.
+     *
+     * @param exception the {@link FileWithPathAlreadyExistsException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(FileWithPathAlreadyExistsException.class)
     public ProblemDetail handleFileWithPathAlreadyExistsException(FileWithPathAlreadyExistsException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -151,6 +194,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link UserNotFoundException}.
+     *
+     * @param exception the {@link UserNotFoundException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(UserNotFoundException.class)
     public ProblemDetail handleUserNotFoundException(UserNotFoundException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -162,6 +212,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link EmailAlreadyExistsException}.
+     *
+     * @param exception the {@link EmailAlreadyExistsException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ProblemDetail handleEmailAlreadyExistsException(EmailAlreadyExistsException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -173,6 +230,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link DocumentNotFoundException}.
+     *
+     * @param exception the {@link DocumentNotFoundException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(DocumentNotFoundException.class)
     public ProblemDetail handleDocumentNotFoundException(DocumentNotFoundException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -184,6 +248,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link RevisionNotFoundException}.
+     *
+     * @param exception the {@link RevisionNotFoundException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(RevisionNotFoundException.class)
     public ProblemDetail handleRevisionNotFoundException(RevisionNotFoundException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -195,6 +266,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link RevisionDeletionException}.
+     *
+     * @param exception the {@link RevisionDeletionException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(RevisionDeletionException.class)
     public ProblemDetail handleRevisionDeletionException(RevisionDeletionException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -206,6 +284,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link ConstraintViolationException}.
+     *
+     * @param exception the {@link ConstraintViolationException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail handleConstraintViolationException(ConstraintViolationException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -224,6 +309,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Extracts error messages from the given set of constraint violations.
+     *
+     * @param violations the set of {@link ConstraintViolation}
+     * @return a list of error messages
+     */
     private List<String> getConstraintViolationErrorMessages(Set<ConstraintViolation<?>> violations) {
         List<String> errorMessages = new ArrayList<>();
 
@@ -240,6 +331,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return errorMessages;
     }
 
+    /**
+     * Handles the {@link PropertyReferenceException}.
+     *
+     * @param exception the {@link PropertyReferenceException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(PropertyReferenceException.class)
     public ProblemDetail handlePropertyReferenceException(PropertyReferenceException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -251,6 +349,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link InvalidRegexInputException}.
+     *
+     * @param exception the {@link InvalidRegexInputException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(InvalidRegexInputException.class)
     public ProblemDetail handleInvalidRegexInputException(InvalidRegexInputException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -262,6 +367,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles the {@link MultipartException}.
+     *
+     * @param exception the {@link MultipartException}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(MultipartException.class)
     public ProblemDetail handleMultipartException(MultipartException exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);
@@ -273,6 +385,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Handles generic exceptions.
+     *
+     * @param exception the {@link Exception}
+     * @param request the {@link HttpServletRequest}
+     * @return a {@link ProblemDetail} representing the error
+     */
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception exception, HttpServletRequest request) {
         log.error(LOG_MESSAGE, request.getRequestURI(), exception);

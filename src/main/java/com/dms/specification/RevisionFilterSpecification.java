@@ -10,11 +10,25 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The {@code RevisionFilterSpecification} class provides specifications for filtering {@link DocumentRevision} entities.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 public class RevisionFilterSpecification {
 
+    /** Private constructor to prevent instantiation of this utility class. */
     private RevisionFilterSpecification() {
     }
 
+    /**
+     * Generates a specification to filter document revisions by user.
+     *
+     * @param filters the filter criteria
+     * @param user the user for filtering
+     * @return the specification for filtering document revisions by user
+     */
     public static Specification<DocumentRevision> filter(Map<String, String> filters, User user) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = FilterPredicateGenerator.getLikePredicates(filters, root, criteriaBuilder);
@@ -26,7 +40,15 @@ public class RevisionFilterSpecification {
         };
     }
 
-    public static Specification<DocumentRevision> filterByDocument(Document document, Map<String, String> filters, User user) {
+    /**
+     * Generates a specification to filter document revisions by document and user.
+     *
+     * @param document the document for filtering
+     * @param filters the filter criteria
+     * @param user the user for filtering
+     * @return the specification for filtering document revisions by document and user
+     */
+    public static Specification<DocumentRevision> filterByDocumentAndUser(Document document, Map<String, String> filters, User user) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = FilterPredicateGenerator.getLikePredicates(filters, root, criteriaBuilder);
 

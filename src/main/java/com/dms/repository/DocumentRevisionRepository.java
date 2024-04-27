@@ -13,6 +13,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The {@code DocumentRevisionRepository} interface provides access to document revision-related data stored in the database.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Repository
 public interface DocumentRevisionRepository extends JpaRepository<DocumentRevision, Long>, JpaSpecificationExecutor<DocumentRevision> {
 

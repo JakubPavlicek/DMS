@@ -9,6 +9,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * The {@code ValidFile} annotation is used to validate files in request parameters.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Documented
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)

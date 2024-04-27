@@ -6,6 +6,9 @@ import com.dms.entity.User;
 
 /**
  * The {@code UserDTOMapper} class is responsible for mapping between {@link User} entities and their corresponding DTOs ({@link UserDTO} and {@link UserRegisterDTO}).
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
  */
 public class UserDTOMapper {
 

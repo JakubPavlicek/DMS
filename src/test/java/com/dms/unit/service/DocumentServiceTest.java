@@ -380,7 +380,7 @@ class DocumentServiceTest {
         Specification<DocumentRevision> specification = RevisionFilterSpecification.filter(filters, author);
 
         MockedStatic<RevisionFilterSpecification> mockSpecification = mockStatic(RevisionFilterSpecification.class);
-        mockSpecification.when(() -> RevisionFilterSpecification.filterByDocument(document, filters, author)).thenReturn(specification);
+        mockSpecification.when(() -> RevisionFilterSpecification.filterByDocumentAndUser(document, filters, author)).thenReturn(specification);
 
         List<DocumentRevision> revisionList = List.of(new DocumentRevision());
         Page<DocumentRevision> revisionPage = new PageImpl<>(revisionList, pageable, revisionList.size());

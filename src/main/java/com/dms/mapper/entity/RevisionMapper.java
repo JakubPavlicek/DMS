@@ -5,6 +5,9 @@ import com.dms.entity.DocumentRevision_;
 
 /**
  * The {@code RevisionMapper} class provides mapping between field names in the {@link DocumentRevision} and their corresponding fields in the {@link DocumentRevision_} entity.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
  */
 public class RevisionMapper {
 

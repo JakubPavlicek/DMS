@@ -235,7 +235,7 @@ public class DocumentService {
         Map<String, String> filters = documentCommonService.getRevisionFilters(filter);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
-        Specification<DocumentRevision> specification = RevisionFilterSpecification.filterByDocument(document, filters, document.getAuthor());
+        Specification<DocumentRevision> specification = RevisionFilterSpecification.filterByDocumentAndUser(document, filters, document.getAuthor());
 
         Page<DocumentRevision> documentRevisions = documentCommonService.findRevisions(specification, pageable);
 

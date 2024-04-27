@@ -10,6 +10,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The {@code DocumentRepository} interface provides access to document-related data stored in the database.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSpecificationExecutor<Document> {
 

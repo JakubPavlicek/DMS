@@ -10,11 +10,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The {@code FilterPredicateGenerator} class generates JPA criteria predicates for filtering entities.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 public class FilterPredicateGenerator {
 
+    /** Private constructor to prevent instantiation of this utility class. */
     private FilterPredicateGenerator() {
     }
 
+    /**
+     * Generates a list of predicates for filtering entities based on filter criteria.
+     *
+     * @param filters the filter criteria
+     * @param root the root entity
+     * @param criteriaBuilder the criteria builder
+     * @return a list of predicates for filtering entities
+     */
     public static <E> List<Predicate> getLikePredicates(Map<String, String> filters, Root<E> root, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
@@ -22,7 +37,7 @@ public class FilterPredicateGenerator {
             String field = filter.getKey();
             String value = filter.getValue();
 
-            // special case when we need to parse boolean from string
+            // special case -> parse boolean from string
             if (field.equals(Document_.IS_ARCHIVED)) {
                 Predicate predicate = criteriaBuilder.equal(root.get(field), Boolean.parseBoolean(value));
                 predicates.add(predicate);

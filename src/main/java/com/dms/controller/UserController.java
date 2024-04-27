@@ -12,10 +12,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller handling {@code /users} endpoints.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @RestController
 @RequiredArgsConstructor
 public class UserController implements UsersApi {
 
+    /** Service responsible for user management operations. */
     private final UserService userService;
 
     @Override

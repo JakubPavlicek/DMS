@@ -47,9 +47,12 @@ import static com.dms.entity.Role.USER;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    /** Manages cryptographic keys for token generation and validation. */
     private final KeyManager keyManager;
+    /** Provides access to user data stored in the database. */
     private final UserRepository userRepository;
 
+    /** Represents the RSA key used for JWT token encryption and decryption. */
     private RSAKey rsaKey;
 
     /**

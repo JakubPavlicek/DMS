@@ -8,10 +8,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller handling {@code /auth} endpoints.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @RestController
 @RequiredArgsConstructor
 public class AuthController implements AuthApi {
 
+    /** Service responsible for authentication operations. */
     private final AuthService authService;
 
     @Override

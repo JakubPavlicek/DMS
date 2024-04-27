@@ -13,10 +13,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller handling document {@code /revisions} endpoints.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @RestController
 @RequiredArgsConstructor
 public class DocumentRevisionController implements RevisionsApi {
 
+    /** Service responsible for document revision operations. */
     private final DocumentRevisionService revisionService;
 
     @Override

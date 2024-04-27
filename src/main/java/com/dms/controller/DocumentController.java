@@ -19,10 +19,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Controller handling {@code /documents} endpoints.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @RestController
 @RequiredArgsConstructor
 public class DocumentController implements DocumentsApi {
 
+    /** Service responsible for document management operations. */
     private final DocumentService documentService;
 
     @Override

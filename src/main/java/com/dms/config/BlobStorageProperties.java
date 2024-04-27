@@ -14,15 +14,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Configuration properties for blob storage, defined in application.yaml.
+ * Properties are prefixed with "storage".
+ * <p>
+ * Validates the storage properties and ensures the existence of the specified storage path.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @ConfigurationProperties(prefix = "storage")
 @Validated
 @Log4j2
 @Getter
 public class BlobStorageProperties implements Validator {
 
+    /** The path to the blob storage directory. */
     @Value("${storage.path}")
     private String path;
 
+    /**
+     * The length of subdirectory prefixes within the storage directory.
+     * Must be between 1 and 10 inclusive.
+     * Default value is 2.
+     */
     @Min(
         value = 1,
         message = "Minimal subdirectory prefix length is 1"
@@ -34,15 +49,28 @@ public class BlobStorageProperties implements Validator {
     @Value("${storage.subdirectory-prefix-length:2}")
     private int subdirectoryPrefixLength;
 
+    /**
+     * Checks if the specified class is supported for validation.
+     *
+     * @param clazz the class to be checked
+     * @return true if the class is assignable from {@code BlobStorageProperties}, otherwise false
+     */
     @Override
     public boolean supports(Class<?> clazz) {
         return BlobStorageProperties.class.isAssignableFrom(clazz);
     }
 
+    /**
+     * Validates the blob storage properties.
+     *
+     * @param target the object to be validated
+     * @param errors stores and exposes information about data-binding and validation errors
+     */
     @Override
     public void validate(Object target, Errors errors) {
         Path storagePath = Paths.get(path);
 
+        // create directory if it doesn't exist
         if (Files.notExists(storagePath)) {
             try {
                 Files.createDirectories(storagePath);
@@ -54,6 +82,7 @@ public class BlobStorageProperties implements Validator {
             }
         }
 
+        // check if the provided path is a directory
         if (!Files.isDirectory(storagePath)) {
             String message = "Provided path: '" + path + "' is not a directory";
             log.error(message);

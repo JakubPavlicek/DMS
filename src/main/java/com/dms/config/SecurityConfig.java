@@ -36,6 +36,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import static com.dms.entity.Role.ADMIN;
 import static com.dms.entity.Role.USER;
 
+/**
+ * Configuration class for security settings using Spring Security.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -46,6 +52,13 @@ public class SecurityConfig {
 
     private RSAKey rsaKey;
 
+    /**
+     * Configures security filters and authorization rules for HTTP requests.
+     *
+     * @param http the {@link HttpSecurity} object to be configured
+     * @return the {@link SecurityFilterChain} object
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -66,6 +79,11 @@ public class SecurityConfig {
             .build();
     }
 
+    /**
+     * Configures converters for extracting authorities from JWT.
+     *
+     * @return the {@link JwtAuthenticationConverter} object
+     */
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
@@ -76,6 +94,12 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
+    /**
+     * Configures JWT encoder for generating JWT tokens.
+     *
+     * @return the {@link JwtEncoder} object
+     * @throws KeyException if an error occurs while retrieving the RSA key
+     */
     @Bean
     JwtEncoder jwtEncoder() throws KeyException {
         rsaKey = keyManager.getRsaKey();
@@ -84,18 +108,34 @@ public class SecurityConfig {
         return new NimbusJwtEncoder(jwkSource);
     }
 
+    /**
+     * Configures JWT decoder for validating JWT tokens.
+     *
+     * @return the {@link JwtDecoder} object
+     * @throws JOSEException if an error occurs during JWT decoding
+     */
     @Bean
     JwtDecoder jwtDecoder() throws JOSEException {
         return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey())
                                .build();
     }
 
+    /**
+     * Provides the {@link UserDetailsService} implementation.
+     *
+     * @return an instance of {@link UserDetailsService}
+     */
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
                                          .orElseThrow(() -> new UserNotFoundException("User with email: " + username + " not found"));
     }
 
+    /**
+     * Configures authentication provider for DAO authentication.
+     *
+     * @return the {@link AuthenticationProvider} object
+     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -104,11 +144,21 @@ public class SecurityConfig {
         return authenticationProvider;
     }
 
+    /**
+     * Configures authentication manager for managing authentication providers.
+     *
+     * @return the {@link AuthenticationManager} object
+     */
     @Bean
     public AuthenticationManager authenticationManager() {
         return new ProviderManager(authenticationProvider());
     }
 
+    /**
+     * Configures password encoder for encoding passwords.
+     *
+     * @return the {@link PasswordEncoder} object
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

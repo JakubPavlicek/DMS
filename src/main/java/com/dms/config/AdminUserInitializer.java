@@ -10,9 +10,24 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * This class is responsible for initializing the admin user.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 @Component
 public class AdminUserInitializer {
 
+    /**
+     * Initializes the admin user if it does not already exist in the system.
+     * If an admin user with the specified email already exists, this method does nothing.
+     *
+     * @param userRepository the repository for managing user data
+     * @param adminProperties the properties containing admin user details such as email, name, and password
+     * @param passwordEncoder the encoder for encoding passwords before storing them
+     * @return a {@link CommandLineRunner} bean to execute the initialization process
+     */
     @Bean
     public CommandLineRunner commandLineRunner(UserRepository userRepository, AdminUserProperties adminProperties, PasswordEncoder passwordEncoder) {
         return args -> {

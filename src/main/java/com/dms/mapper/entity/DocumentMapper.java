@@ -1,12 +1,21 @@
 package com.dms.mapper.entity;
 
+import com.dms.entity.Document;
 import com.dms.entity.Document_;
 
+/**
+ * The {@code DocumentMapper} class provides mapping between field names in the {@link Document} and their corresponding fields in the {@link Document_} entity.
+ *
+ * @author Jakub Pavlíček
+ * @version 1.0
+ */
 public class DocumentMapper {
 
+    /** Private constructor to prevent instantiation of this utility class. */
     private DocumentMapper() {
     }
 
+    /** Enum defining the fields in the {@link Document} entity. */
     public enum Field {
         DOCUMENT_ID,
         NAME,
@@ -21,6 +30,12 @@ public class DocumentMapper {
         DELETE_AT
     }
 
+    /**
+     * Retrieves the mapped field in the {@link Document_} entity corresponding to the given field name.
+     *
+     * @param field the field name for which to retrieve the mapped field
+     * @return the mapped field in the {@link Document_} entity
+     */
     public static String getMappedDocumentField(String field) {
         Field documentField = Field.valueOf(field.toUpperCase());
 

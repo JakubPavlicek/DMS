@@ -14,11 +14,23 @@ import java.util.Objects;
  */
 public class FileValidator implements ConstraintValidator<ValidFile, MultipartFile> {
 
+    /**
+     * Initializes the validator.
+     *
+     * @param constraintAnnotation the annotation instance for this constraint
+     */
     @Override
     public void initialize(ValidFile constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
+    /**
+     * Validates the uploaded file.
+     *
+     * @param file the uploaded file to be validated
+     * @param context context in which the constraint is evaluated
+     * @return true if the file is not null and its original filename is not blank, false otherwise
+     */
     @Override
     public boolean isValid(MultipartFile file, ConstraintValidatorContext context) {
         return !Objects.requireNonNull(file.getOriginalFilename()).isBlank();

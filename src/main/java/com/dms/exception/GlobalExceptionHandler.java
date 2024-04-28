@@ -67,6 +67,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return servletWebRequest.getRequest().getRequestURI();
     }
 
+    /**
+     * Handles the {@link HttpMediaTypeNotSupportedException}.
+     *
+     * @param ex the exception thrown when the media type is not supported
+     * @param headers the headers to be included in the response
+     * @param status the HTTP status code to be returned
+     * @param request the web request
+     * @return a {@link ResponseEntity} containing details about the problem
+     */
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(LOG_MESSAGE, getRequestURI(request), ex);
@@ -85,6 +94,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.of(problemDetail).build();
     }
 
+    /**
+     * Handles the {@link MethodArgumentNotValidException}.
+     *
+     * @param ex the exception thrown when method arguments are not valid
+     * @param headers the headers to be included in the response
+     * @param status the HTTP status code to be returned
+     * @param request the web request
+     * @return a {@link ResponseEntity} containing details about the problem
+     */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(LOG_MESSAGE, getRequestURI(request), ex);
@@ -118,6 +136,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return errorMessages;
     }
 
+    /**
+     * Handles the {@link MissingServletRequestPartException}.
+     *
+     * @param ex the exception thrown when a servlet request part is missing
+     * @param headers the headers to be included in the response
+     * @param status the HTTP status code to be returned
+     * @param request the web request
+     * @return a {@link ResponseEntity} containing details about the problem
+     */
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(LOG_MESSAGE, getRequestURI(request), ex);
@@ -129,6 +156,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.of(problemDetail).build();
     }
 
+    /**
+     * Handles the {@link NoHandlerFoundException}.
+     *
+     * @param ex the exception thrown when no handler is found
+     * @param headers the headers to be included in the response
+     * @param status the HTTP status code to be returned
+     * @param request the web request
+     * @return a {@link ResponseEntity} containing details about the problem
+     */
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error(LOG_MESSAGE, getRequestURI(request), ex);

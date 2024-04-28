@@ -19,6 +19,10 @@ import java.util.Optional;
 @Component
 public class AdminUserInitializer {
 
+    /** Private constructor to prevent instantiation of this utility class. */
+    private AdminUserInitializer() {
+    }
+
     /**
      * Initializes the admin user if it does not already exist in the system.
      * If an admin user with the specified email already exists, this method does nothing.

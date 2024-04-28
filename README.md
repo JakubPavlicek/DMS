@@ -190,4 +190,4 @@ Requirements for the software and other tools to build
 
 ## Development
 
-This application is a Bachelor's thesis (in 2023), authored by Jakub Pavlíček from the University of West Bohemia in Pilsen - Faculty of Applied Sciences.
+This application is a Bachelor's thesis (2023/24), authored by Jakub Pavlíček from the University of West Bohemia in Pilsen - Faculty of Applied Sciences.

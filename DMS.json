@@ -1,0 +1,783 @@
+{
+	"info": {
+		"_postman_id": "2c32a74c-fc5b-43e0-b9ad-fc2ba149c21a",
+		"name": "DMS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26807991"
+	},
+	"item": [
+		{
+			"name": "documents",
+			"item": [
+				{
+					"name": "Upload document",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"contentType": "",
+									"type": "file",
+									"src": "/Users/kuba/Downloads/database_schema.pdf"
+								},
+								{
+									"key": "destination",
+									"value": "{\n    \"path\": \"/test\"\n}",
+									"contentType": "application/json",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{apiUrl}}/documents/upload",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get document",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/documents/{{documentId}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"{{documentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload new document version",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/kuba/Downloads/metadata_valid_from_to.png"
+								},
+								{
+									"key": "destination",
+									"value": "{\n\t\"path\": \"/home\"\n}",
+									"contentType": "application/json",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{apiUrl}}/documents/{{documentId}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"{{documentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List document revisions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/documents/{{documentId}}/revisions?page=0&limit=2&sort=name:desc,size:desc&filter=type:\"pdf\"",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"{{documentId}}",
+								"revisions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "sort",
+									"value": "name:desc,size:desc"
+								},
+								{
+									"key": "filter",
+									"value": "type:\"pdf\""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete document with revisions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/documents/{{documentId}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"{{documentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download document",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/documents/{{documentId}}/download",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"{{documentId}}",
+								"download"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List documents",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/documents?page=0&limit=3&sort=name:desc&filter=name:\"schema\",type:\"pdf\",is_archived:\"false\"",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								},
+								{
+									"key": "sort",
+									"value": "name:desc"
+								},
+								{
+									"key": "filter",
+									"value": "name:\"schema\",type:\"pdf\",is_archived:\"false\""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Switch to revision",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/documents/{{documentId}}/revisions/{{revisionId}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"{{documentId}}",
+								"revisions",
+								"{{revisionId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Move document",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"path\": \"/home\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/documents/{{documentId}}/move",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"{{documentId}}",
+								"move"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Archive document",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/documents/{{documentId}}/archive",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"{{documentId}}",
+								"archive"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore document",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/documents/{{documentId}}/restore",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"documents",
+								"{{documentId}}",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "revisions",
+			"item": [
+				{
+					"name": "Delete revision",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/revisions/{{revisionId}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"revisions",
+								"{{revisionId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download revision",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/revisions/{{revisionId}}/download",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"revisions",
+								"{{revisionId}}",
+								"download"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get revision",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/revisions/{{revisionId}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"revisions",
+								"{{revisionId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List revisions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/revisions?page=0&limit=4&sort=name:desc&filter=type:\"app\",name:\"schema\"",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"revisions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "4"
+								},
+								{
+									"key": "sort",
+									"value": "name:desc"
+								},
+								{
+									"key": "filter",
+									"value": "type:\"app\",name:\"schema\""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"james\",\n\t\"email\": \"james@gmail.com\",\n\t\"password\": \"secret123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/users",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get current user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{james_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/users/me",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change user password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"james@gmail.com\",\n    \"password\": \"password123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/users/password",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"users",
+								"password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "Request access token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"james@gmail.com\",\n\t\"password\": \"secret123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/auth/token",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "log",
+			"item": [
+				{
+					"name": "Change log level",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"configuredLevel\": \"INFO\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/actuator/loggers/com.dms",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"actuator",
+								"loggers",
+								"com.dms"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "apiUrl",
+			"value": "localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "documentId",
+			"value": "250b15c0-745b-4bb4-8827-b3325ba779a0",
+			"type": "string"
+		},
+		{
+			"key": "revisionId",
+			"value": "1494f4d5-325b-4a32-b11c-ac004f7b187a",
+			"type": "string"
+		},
+		{
+			"key": "james_token",
+			"value": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJqYW1lc0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImV4cCI6MTcxMzEwODUxMiwiaWF0IjoxNzEzMTA0OTEyfQ.i_mShKjDxJgjQWo_eH9AwFvU_HRIDcV0XqykS25mD-cASQAaj9HSWNsp2SzJzaKOnHaj7k38MrcGuPnQ7_OgvwquH_D-GF6NfrN4Aet-E3YrnDxNkZ-UWM2Dj6-_mbHNq6DcTC1CAYFWmEHizJOyKE5NU8Xji6Vnh1STKzQOwpuYH4Mkcfy6ksccz1cba1mf7DG3YNaG-v9jmRAQznIWlDT3FzeAjxdQVbR0jo_nn1UoXNYaSa14IZl29DI8plrrq5IonK7DtiUNaFKz5v-9BgnWjgLoIRFoiKjOcTt3bs11u-yBp9qYyJEhZTRsTndwTOWtykWzahVREAkVsNzPEg",
+			"type": "string"
+		},
+		{
+			"key": "admin_token",
+			"value": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTcxMDE2MjQ0OCwiaWF0IjoxNzEwMTU4ODQ4fQ.A1oaEB8E_PUDk5Ksh0PPIAGuMHQRgsiEfFXQ1QQYD3Ez9--z3DKDA5PjGsitccZwP-kqKZi6KIgPUKbD5p_VxIxLVuJ4Jz0vc7dNzAY2KeqRYILWsGiRb_fSIsVMk2tax4hw-8D-V45lqSkBNRXhpP1HoakQFSmQVTMR9dALKF2RLHePBPhlotoeVIhPC34nJ9o05SjIJ9FRRSYflQZmppp_pwgJVzP17rcTtSoWZiPQKRzIcur_MTWq389G7pyH0-QhqlZ4HiAYNsi-tkKX2nR5vkEs_Y7NXbNYxQjhSJAcyKnxQ7C2TUD8aV4NZeaGYrvUUjeAQ0trMmZvUKNSVg",
+			"type": "string"
+		}
+	]
+}

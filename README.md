@@ -175,11 +175,15 @@ Requirements for the software and other tools to build
             - **spring.datasource.username**: Database username.
             - **spring.datasource.password**: Database password.
 
-3. **Start the Application**:
+3. **Generate JavaDoc documentation and JaCoCo report** (optional):
+    - **Windows**: `./mvnw.cmd install`
+    - **Linux** and **macOS**: `./mvnw install` 
+
+4. **Start the Application**:
     - On **Windows**: `./mvnw.cmd spring-boot:run`
     - On **Linux** and **macOS**: `./mvnw spring-boot:run`
 
-4. **Alternative** (if configurations are set):
+5. **Alternative** (if configurations are set):
     - To set a specific profile, use the following command:
         - **Windows**: `./mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgresql`
         - **Linux** and **macOS**: `./mvnw spring-boot:run -Dspring-boot.run.profiles=postgresql`

@@ -64,6 +64,10 @@ Designed with simplicity and accessibility in mind, this Software as a Service (
     │       ├── application.yaml                      // Application config
     │       └── log4j2.yaml                           // Logger config
     └── test
+        └── java
+            └── com.dms
+                ├── integration                       // integration tests
+                └── unit                              // unit tests
 ```
 
 ## API
